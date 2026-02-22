@@ -1,6 +1,7 @@
 /**
  * @file token-budget.ts
- * @description Token budget management: tracks monthly AI token usage per user via Redis
+ * @description Управление бюджетом токенов AI: учёт месячного расхода через Redis.
+ * Лимит: 50 000 токенов в месяц на пользователя.
  * @dependencies ioredis
  * @created 2026-02-22
  */
@@ -46,3 +47,14 @@ export async function getUsedTokens(userId: string): Promise<number> {
   const used = await redis.get(key);
   return used ? parseInt(used, 10) : 0;
 }
+
+/** Псевдоним для использования в роутах */
+export async function checkTokenBudget(
+  userId: string
+): Promise<{ remaining: number; exceeded: boolean }> {
+  const remaining = await getRemainingTokens(userId);
+  return { remaining, exceeded: remaining <= 0 };
+}
+
+/** Псевдоним для увеличения счётчика в роутах */
+export const incrementTokenUsage = consumeTokens;

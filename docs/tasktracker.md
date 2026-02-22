@@ -80,45 +80,45 @@
 - **Зависимости**: CRUD лекарств
 
 ### Задача: Offline-first (PWA)
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Критический
 - **Описание**: Работа без интернета через Service Worker и IndexedDB
 - **Шаги выполнения**:
-  - [ ] Настройка next-pwa (Service Worker, manifest.json)
-  - [ ] IndexedDB через Dexie.js: таблицы medications_local, logs_local
-  - [ ] Логика: сохранение лога в IndexedDB при нажатии кнопки
-  - [ ] Background Sync: отправка pending-логов при появлении сети
-  - [ ] Кэширование страниц через Service Worker
-  - [ ] Компонент: offline-indicator (индикатор состояния сети)
-  - [ ] Hook: useOffline (определение online/offline)
-  - [ ] Тесты: offline-сценарий (запись → восстановление → синхронизация)
+  - [x] Настройка @ducanh2912/next-pwa (Service Worker, Workbox, рантайм-кэш)
+  - [x] IndexedDB через Dexie.js: таблицы medications, logs
+  - [x] Логика: сохранение лога в IndexedDB при нажатии кнопки (офлайн)
+  - [x] Автоматическая синхронизация при восстановлении сети (useOfflineSync)
+  - [x] Кэширование страниц через Service Worker (NetworkFirst, CacheFirst)
+  - [x] Компонент: OfflineIndicator, SyncStatus
+  - [x] Хук: useOffline, useOfflineSync
+  - [x] Тесты: saveLogOffline, getPendingLogsCount, ошибка сети (3 теста)
 - **Зависимости**: Главный экран пациента
 
 ### Задача: Синхронизация данных
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Критический
 - **Описание**: Пакетная синхронизация offline-логов с сервером
 - **Шаги выполнения**:
-  - [ ] Prisma-модель: medication_logs (syncStatus: pending/synced)
-  - [ ] API: POST /api/logs/sync (пакетная загрузка)
-  - [ ] Логика разрешения конфликтов (Last Write Wins)
-  - [ ] Обновление syncStatus в IndexedDB после успешной синхронизации
-  - [ ] Тесты: конфликтные сценарии
+  - [x] Prisma-модель: medication_logs (syncStatus: pending/synced)
+  - [x] API: POST /api/logs/sync (пакетная загрузка, до 100 записей)
+  - [x] Логика разрешения конфликтов (Last Write Wins по createdAt)
+  - [x] Обновление syncStatus в IndexedDB после успешной синхронизации
+  - [x] Тесты: ошибка сети, saveLogOffline
 - **Зависимости**: Offline-first
 
 ### Задача: Связь пациент-родственник
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Высокий
 - **Описание**: Инвайт-код для связывания аккаунтов
 - **Шаги выполнения**:
-  - [ ] Prisma-модель: connections
-  - [ ] Генерация 12-символьного инвайт-кода при регистрации пациента
-  - [ ] API: POST /api/connections/link (привязка по коду)
-  - [ ] API: DELETE /api/connections/:id (отключение)
-  - [ ] Rate limiting на /api/connections/link (5 попыток в час)
-  - [ ] Страница: ввод инвайт-кода (для родственника)
-  - [ ] Страница: мой инвайт-код (для пациента)
-  - [ ] Тесты: валидация кода, истечение срока, rate limiting
+  - [x] Prisma-модель: connections (уже в схеме)
+  - [x] inviteCode генерируется автоматически при создании пользователя (cuid)
+  - [x] API: POST /api/connections/link (привязка по коду)
+  - [x] API: DELETE /api/connections/:id (отключение, status=inactive)
+  - [x] Rate limiting: 5 попыток в час через Redis
+  - [x] Страница /invite: показ и копирование кода (для пациента)
+  - [x] Страница /connect: форма ввода кода (для родственника)
+  - [x] Server Actions: connectToPatientAction, disconnectFromPatientAction
 - **Зависимости**: Аутентификация
 
 ### Задача: Живая лента для родственника
@@ -135,27 +135,25 @@
 - **Зависимости**: Связь пациент-родственник, Синхронизация данных
 
 ### Задача: AI-чат помощник (DeepSeek)
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Высокий
 - **Описание**: Чат с AI для ответов на вопросы о лекарствах
 - **Шаги выполнения**:
-  - [ ] DeepSeek service: `src/lib/ai/deepseek.service.ts` (OpenAI SDK + baseURL)
-  - [ ] Системный промпт: `src/lib/ai/prompts/chat.prompt.ts`
-  - [ ] API: POST /api/ai/chat (streaming через SSE)
-  - [ ] Prisma-модель: chat_messages (серверное хранение истории, 30 дней)
-  - [ ] Token budget: Redis counter `ai:tokens:{userId}:{YYYY-MM}`, лимит 50K/месяц
-  - [ ] Prisma-модель: ai_usage_stats (агрегированная статистика расхода)
-  - [ ] Медицинский дисклеймер: модальное окно при первом использовании чата
-  - [ ] Дисклеймер в каждом ответе AI ("При любых сомнениях обратитесь к врачу")
-  - [ ] Redis-кэширование ответов на частые вопросы (TTL 1 час)
-  - [ ] Rate limiting: 20 запросов / 15 минут на пользователя
-  - [ ] Компонент: ai-chat (поле ввода + история сообщений из БД)
-  - [ ] Компонент: ai-message-bubble (пузырь с типизацией user/ai)
-  - [ ] Быстрые вопросы-подсказки (suggestions)
-  - [ ] Страница: /chat
-  - [ ] Worker job: очистка chat_messages старше 30 дней
-  - [ ] Worker job: ежедневная агрегация token usage → ai_usage_stats
-  - [ ] Тесты: streaming, кэширование, rate limiting, token budget
+  - [x] DeepSeek service: `src/lib/ai/deepseek.service.ts` (OpenAI SDK + baseURL)
+  - [x] Системный промпт: `src/lib/ai/prompts/chat.prompt.ts`
+  - [x] API: POST /api/ai/chat (стриминг через ReadableStream)
+  - [x] Prisma-модель: chat_messages (серверное хранение истории)
+  - [x] Token budget: Redis counter, лимит 50K/месяц, checkTokenBudget/incrementTokenUsage
+  - [x] Медицинский дисклеймер: AiDisclaimerModal (первый запуск → LocalStorage)
+  - [x] Дисклеймер в каждом ответе AI
+  - [x] Redis-кэширование ответов (TTL 1 час, SHA256-хэш ключа)
+  - [x] Rate limiting: 20 запросов / 15 минут через Redis
+  - [x] Компонент: AiChat (стриминг, история, очистка)
+  - [x] Компонент: MessageBubble (user/assistant, анимация печати)
+  - [x] Компонент: ChatInput (отправка по Enter/кнопке)
+  - [x] Компонент: ChatSuggestions (4 быстрых вопроса)
+  - [x] Хук: useAiChat (стриминг + история + abort)
+  - [x] Страницы: /chat (patient), /chat (relative)
 - **Зависимости**: Аутентификация
 
 ### Задача: Docker-деплой

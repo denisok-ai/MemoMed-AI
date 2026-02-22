@@ -22,7 +22,7 @@ export default async function FeedPage() {
   const connections = await prisma.connection.findMany({
     where: {
       relativeId: session.user.id,
-      isActive: true,
+      status: 'active',
     },
     include: {
       patient: {
