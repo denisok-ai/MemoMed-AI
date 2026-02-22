@@ -58,6 +58,16 @@ sudo git pull origin main
 
 Должно появиться сообщение вроде `Updating ... Fast-forward` и список обновлённых файлов.
 
+**Если появилось «Your local changes would be overwritten by merge»** — на сервере есть локальные правки, их нужно отменить и снова подтянуть код:
+
+```bash
+# Отменить локальные изменения в файлах (оставить только код с GitHub)
+sudo git checkout -- .
+
+# Снова подтянуть последний код
+sudo git pull origin main
+```
+
 ### Шаг 6. Пересобрать образы и запустить приложение
 
 **Вариант А — через общий скрипт (рекомендуется):**
@@ -131,10 +141,11 @@ git push origin main
 ssh root@91.201.41.28
 ```
 
-**На сервере:**
+**На сервере (если pull раньше ругался на локальные изменения — сначала сбросить их):**
 
 ```bash
 cd /opt/memomed
+sudo git checkout -- .
 sudo git pull origin main
 sudo bash scripts/run-standalone.sh
 ```

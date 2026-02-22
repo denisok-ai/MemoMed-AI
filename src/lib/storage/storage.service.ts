@@ -86,9 +86,7 @@ async function deleteFromLocal(url: string): Promise<void> {
 // --- S3-совместимое хранилище ---
 
 async function saveToS3(file: ArrayBuffer, filename: string, mimeType: string): Promise<string> {
-  // S3 SDK подгружается только при STORAGE_TYPE=s3 (опциональная зависимость)
-
-  // @ts-expect-error: @aws-sdk/client-s3 устанавливается при необходимости
+  // S3 SDK подгружается только при STORAGE_TYPE=s3
   const { S3Client, PutObjectCommand } = (await import(
     /* @vite-ignore */ '@aws-sdk/client-s3'
   )) as typeof import('@aws-sdk/client-s3');
@@ -119,7 +117,6 @@ async function saveToS3(file: ArrayBuffer, filename: string, mimeType: string): 
 }
 
 async function deleteFromS3(url: string): Promise<void> {
-  // @ts-expect-error: @aws-sdk/client-s3 устанавливается при необходимости
   const { S3Client, DeleteObjectCommand } = (await import(
     /* @vite-ignore */ '@aws-sdk/client-s3'
   )) as typeof import('@aws-sdk/client-s3');
