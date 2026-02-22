@@ -45,7 +45,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session?.user) redirect('/login');
   if (session.user.role !== 'admin') redirect('/dashboard');
 
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true';
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

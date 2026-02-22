@@ -125,7 +125,7 @@ export default function LoginPage() {
           </div>
 
           {/* Dev-режим подсказка */}
-          {process.env.NODE_ENV === 'development' && (
+          {(process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true') && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center space-y-1">
               <p className="text-yellow-700 text-xs font-mono font-bold tracking-wide">
                 🔧 РЕЖИМ РАЗРАБОТКИ

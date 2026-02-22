@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true';
 
   const [userCount, medicationCount, logCount, chatCount, feedbackCount] = await Promise.all([
     prisma.user.count(),
