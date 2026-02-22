@@ -126,7 +126,13 @@ export default async function AdminLlmPage() {
               {/* Действия */}
               <div className="flex gap-2 flex-shrink-0">
                 {!p.isActive && (
-                  <form action={activateLlmProviderAction.bind(null, p.id)}>
+                  <form
+                    action={
+                      activateLlmProviderAction.bind(null, p.id) as (
+                        formData: FormData
+                      ) => Promise<void>
+                    }
+                  >
                     <button
                       type="submit"
                       className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm
@@ -144,7 +150,13 @@ export default async function AdminLlmPage() {
                   Изменить
                 </a>
                 {!p.isActive && (
-                  <form action={deleteLlmProviderAction.bind(null, p.id)}>
+                  <form
+                    action={
+                      deleteLlmProviderAction.bind(null, p.id) as (
+                        formData: FormData
+                      ) => Promise<void>
+                    }
+                  >
                     <button
                       type="submit"
                       className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm
@@ -208,7 +220,10 @@ export default async function AdminLlmPage() {
           </div>
         </div>
 
-        <form action={createLlmProviderAction} className="space-y-4">
+        <form
+          action={createLlmProviderAction as (formData: FormData) => Promise<void>}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-[#757575] mb-1">Название *</label>
