@@ -29,6 +29,7 @@
     "@ducanh2912/next-pwa": "^10.2.9",
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
+    "@types/web-push": "^3.6.4",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.70.0",
     "clsx": "^2.1.1",
@@ -40,6 +41,7 @@
     "prisma": "^7.4.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "web-push": "^3.6.7",
     "workbox-window": "^7.4.0",
     "zod": "^4.3.6"
   },

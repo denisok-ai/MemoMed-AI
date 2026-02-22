@@ -1,14 +1,16 @@
 /**
  * @file page.tsx
- * @description Главная страница родственника — лента событий подключённых пациентов
- * @dependencies prisma, next-auth
+ * @description Главная страница родственника — живая лента событий через SSE
+ * @dependencies LiveFeed, prisma, next-auth
  * @created 2026-02-22
  */
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { LiveFeed } from '@/components/relative/live-feed';
 
 export const metadata: Metadata = {
   title: 'Лента событий — MemoMed AI',
@@ -18,99 +20,41 @@ export default async function FeedPage() {
   const session = await auth();
   if (!session?.user) redirect('/login');
 
-  // Получаем пациентов, которых отслеживает родственник
-  const connections = await prisma.connection.findMany({
-    where: {
-      relativeId: session.user.id,
-      status: 'active',
-    },
-    include: {
-      patient: {
-        include: {
-          profile: { select: { fullName: true } },
-          medications: {
-            where: { isActive: true },
-            orderBy: { scheduledTime: 'asc' },
-            include: {
-              logs: {
-                orderBy: { actualAt: 'desc' },
-                take: 5,
-              },
-            },
-          },
-        },
-      },
-    },
+  const connectionsCount = await prisma.connection.count({
+    where: { relativeId: session.user.id, status: 'active' },
   });
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-[#212121]">Лента событий</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-[#212121]">Лента событий</h1>
+        <Link
+          href="/connect"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#7e57c2] text-white
+            rounded-xl font-medium text-sm hover:bg-[#6a3fb5] transition-colors min-h-[48px]"
+          aria-label="Подключиться к пациенту"
+        >
+          + Пациент
+        </Link>
+      </div>
 
-      {connections.length === 0 ? (
+      {connectionsCount === 0 ? (
         <div className="text-center py-16 space-y-4">
-          <p className="text-5xl" aria-hidden="true">👤</p>
+          <p className="text-5xl" aria-hidden="true">👥</p>
           <p className="text-xl text-[#757575]">Нет подключённых пациентов</p>
           <p className="text-base text-[#9e9e9e]">
-            Попросите пациента поделиться кодом приглашения
+            Введите инвайт-код от пациента, чтобы следить за приёмом лекарств
           </p>
+          <Link
+            href="/connect"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#7e57c2] text-white
+              rounded-2xl text-lg font-semibold hover:bg-[#6a3fb5] transition-colors"
+          >
+            Подключиться
+          </Link>
         </div>
       ) : (
-        <ul className="space-y-6" role="list">
-          {connections.map((conn) => {
-            const patientName = conn.patient.profile?.fullName ?? 'Пациент';
-            const medications = conn.patient.medications;
-
-            return (
-              <li key={conn.id}>
-                <article className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                  <header className="px-6 py-4 bg-[#ede7f6] flex items-center gap-3">
-                    <span className="text-2xl" aria-hidden="true">👤</span>
-                    <div>
-                      <p className="text-lg font-semibold text-[#7e57c2]">{patientName}</p>
-                      <p className="text-sm text-[#9e9e9e]">
-                        {medications.length} лекарств
-                      </p>
-                    </div>
-                  </header>
-
-                  {medications.length === 0 ? (
-                    <p className="px-6 py-4 text-base text-[#757575]">
-                      Лекарства не добавлены
-                    </p>
-                  ) : (
-                    <ul className="divide-y divide-gray-50">
-                      {medications.map((med) => {
-                        const lastLog = med.logs[0];
-                        const takenToday = lastLog && new Date(lastLog.actualAt ?? 0).toDateString() === new Date().toDateString();
-
-                        return (
-                          <li key={med.id} className="px-6 py-4 flex items-center gap-4">
-                            <span className="text-xl" aria-hidden="true">💊</span>
-                            <div className="flex-1">
-                              <p className="text-base font-medium text-[#212121]">{med.name}</p>
-                              <p className="text-sm text-[#757575]">{med.dosage} · {med.scheduledTime}</p>
-                            </div>
-                            <span
-                              className={`text-sm font-medium px-3 py-1 rounded-full ${
-                                takenToday
-                                  ? 'bg-[#e8f5e9] text-[#4caf50]'
-                                  : 'bg-[#fff3e0] text-[#ff9800]'
-                              }`}
-                              aria-label={takenToday ? 'Принято сегодня' : 'Не принято'}
-                            >
-                              {takenToday ? '✅ Принято' : '⏳ Ожидает'}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </article>
-              </li>
-            );
-          })}
-        </ul>
+        <LiveFeed />
       )}
     </div>
   );
