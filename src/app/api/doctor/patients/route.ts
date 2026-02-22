@@ -7,6 +7,7 @@
  * @created 2026-02-22
  */
 
+import type { MedicationLogStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
@@ -46,7 +47,7 @@ export async function GET() {
     where: {
       medication: { patientId: { in: patientIds } },
       scheduledAt: { gte: since },
-      status: { in: ['taken', 'missed'] },
+      status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
     },
     select: { status: true, medication: { select: { patientId: true } } },
   });

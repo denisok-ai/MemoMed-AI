@@ -6,6 +6,7 @@
  * @created 2026-02-22
  */
 
+import type { MedicationLogStatus } from '@prisma/client';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { prisma } from '@/lib/db/prisma';
@@ -67,7 +68,10 @@ export default async function AdminReportsPage({
     prisma.user.count({ where: { createdAt: { gte: since7 } } }),
     prisma.medication.count({ where: { isActive: true } }),
     prisma.medicationLog.count({
-      where: { scheduledAt: { gte: since30 }, status: { in: ['taken', 'missed'] } },
+      where: {
+        scheduledAt: { gte: since30 },
+        status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
+      },
     }),
     prisma.medicationLog.count({ where: { scheduledAt: { gte: since30 }, status: 'taken' } }),
     prisma.medicationLog.count({ where: { scheduledAt: { gte: since30 }, status: 'missed' } }),
@@ -81,7 +85,10 @@ export default async function AdminReportsPage({
   // ── Топ-10 пациентов по дисциплине ───────────────────────────────────────────
   const patientLogsRaw = await prisma.medicationLog.groupBy({
     by: ['medicationId'],
-    where: { scheduledAt: { gte: since30 }, status: { in: ['taken', 'missed'] } },
+    where: {
+      scheduledAt: { gte: since30 },
+      status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
+    },
     _count: { id: true },
   });
 
