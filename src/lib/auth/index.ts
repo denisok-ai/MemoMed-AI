@@ -24,6 +24,7 @@ const isDevLoginEnabled =
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  trustHost: true, // для доступа по IP (91.201.41.28) и за прокси
   providers: [
     Credentials({
       async authorize(credentials) {
