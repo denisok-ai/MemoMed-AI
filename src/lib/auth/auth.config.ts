@@ -20,15 +20,8 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isDev =
-        process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true';
-      const publicPages = [
-        '/',
-        '/login',
-        '/register',
-        '/privacy',
-        ...(isDev ? ['/dev-login'] : []),
-      ];
+      // /dev-login всегда в publicPages — проверка ENABLE_DEV_LOGIN на странице (env в middleware только при сборке)
+      const publicPages = ['/', '/login', '/register', '/privacy', '/dev-login'];
       const isOnPublicPage = publicPages.includes(nextUrl.pathname);
       const isPublicApi = ['/api/auth', '/api/health'].some((p) => nextUrl.pathname.startsWith(p));
 

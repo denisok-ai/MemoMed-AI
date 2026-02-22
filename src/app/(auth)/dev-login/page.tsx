@@ -10,6 +10,10 @@ import { redirect } from 'next/navigation';
 import { devLoginAction } from '@/lib/auth/dev-actions';
 import type { Metadata } from 'next';
 
+// Проверка в Server Component — env доступны в runtime (в middleware — только при сборке)
+const isDevLoginEnabled =
+  process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true';
+
 export const metadata: Metadata = {
   title: '🔧 Dev Login — MemoMed AI',
 };
@@ -118,7 +122,7 @@ const DEV_ACCOUNTS: DevAccount[] = [
 ];
 
 export default function DevLoginPage() {
-  if (process.env.NODE_ENV !== 'development') {
+  if (!isDevLoginEnabled) {
     redirect('/login');
   }
 
@@ -136,8 +140,8 @@ export default function DevLoginPage() {
           </div>
           <h1 className="text-4xl font-black text-white tracking-tight">🔧 Быстрый вход</h1>
           <p className="text-slate-400 text-lg max-w-md mx-auto">
-            Выберите роль для мгновенного входа в систему. Эта страница доступна только в{' '}
-            <code className="text-yellow-300 font-mono">development</code>.
+            Выберите роль для мгновенного входа в систему. Доступна в режиме разработки или при{' '}
+            <code className="text-yellow-300 font-mono">ENABLE_DEV_LOGIN=true</code>.
           </p>
           <p className="text-slate-500 text-sm font-mono">
             Пароль всех аккаунтов:{' '}
