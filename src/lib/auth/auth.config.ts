@@ -20,7 +20,8 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isDev = process.env.NODE_ENV === 'development';
+      const isDev =
+        process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true';
       const publicPages = [
         '/',
         '/login',

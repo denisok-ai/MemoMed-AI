@@ -9,13 +9,25 @@
 import webpush from 'web-push';
 import { prisma } from '@/lib/db/prisma';
 
-/** Инициализируем VAPID один раз */
+/** Инициализируем VAPID один раз. При невалидных ключах push отключён. */
 const vapidPublicKey = process.env.VAPID_PUBLIC_KEY ?? '';
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY ?? '';
 const vapidEmail = process.env.VAPID_EMAIL ?? 'mailto:admin@memomed.app';
 
+let pushConfigured = false;
 if (vapidPublicKey && vapidPrivateKey) {
-  webpush.setVapidDetails(`mailto:${vapidEmail.replace('mailto:', '')}`, vapidPublicKey, vapidPrivateKey);
+  try {
+    webpush.setVapidDetails(
+      vapidEmail.startsWith('mailto:') ? vapidEmail : `mailto:${vapidEmail}`,
+      vapidPublicKey,
+      vapidPrivateKey
+    );
+    pushConfigured = true;
+  } catch (e) {
+    console.warn(
+      '[push] VAPID ключи невалидны — push-уведомления отключены. Сгенерируйте: npx web-push generate-vapid-keys'
+    );
+  }
 }
 
 export interface PushPayload {
@@ -33,8 +45,7 @@ export interface PushPayload {
  * Невалидные подписки (410 Gone) автоматически удаляются.
  */
 export async function sendPushToUser(userId: string, payload: PushPayload): Promise<void> {
-  if (!vapidPublicKey || !vapidPrivateKey) {
-    console.warn('VAPID ключи не настроены — push-уведомления отключены');
+  if (!pushConfigured) {
     return;
   }
 
@@ -87,14 +98,11 @@ export function buildMedicationReminderPayload(
   scheduledTime: string,
   delayMinutes = 0
 ): PushPayload {
-  const timeStr = delayMinutes === 0
-    ? `в ${scheduledTime}`
-    : `${delayMinutes} минут назад`;
+  const timeStr = delayMinutes === 0 ? `в ${scheduledTime}` : `${delayMinutes} минут назад`;
 
   return {
-    title: delayMinutes === 0
-      ? `Время принять ${medicationName}`
-      : `Не забыли про ${medicationName}?`,
+    title:
+      delayMinutes === 0 ? `Время принять ${medicationName}` : `Не забыли про ${medicationName}?`,
     body: `${dosage} — запланировано ${timeStr}`,
     tag: `reminder-${medicationName}`,
     data: { url: '/dashboard' },

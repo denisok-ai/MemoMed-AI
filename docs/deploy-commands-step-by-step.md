@@ -129,6 +129,58 @@ sudo bash scripts/run-standalone.sh
 
 ---
 
+## Режим отладки и тестовые данные
+
+### Включить dev-login на сервере
+
+Страница `/dev-login` позволяет войти тестовыми аккаунтами без пароля. По умолчанию доступна только при `NODE_ENV=development`. На сервере включите её через переменную окружения:
+
+```bash
+cd /opt/memomed
+sudo nano .env
+```
+
+Добавьте или измените строку:
+
+```
+ENABLE_DEV_LOGIN=true
+```
+
+Перезапустите приложение:
+
+```bash
+sudo docker compose -f docker-compose.standalone.yml up -d
+```
+
+После этого откройте **http://IP-сервера:3000/dev-login** — появятся карточки для входа (admin, врач, родственник, пациент).
+
+### Добавить тестовые данные (seed)
+
+Скрипт создаёт 50 пациентов, 5 врачей, 5 родственников, 1 администратора, лекарства, логи приёмов и записи дневника. **Пароль всех аккаунтов: `Test1234!`**
+
+**На сервере (Docker):**
+
+```bash
+cd /opt/memomed
+sudo docker compose -f docker-compose.standalone.yml exec worker npx tsx prisma/seed.ts
+```
+
+**Локально (разработка):**
+
+```bash
+cd /home/denisok/projects/MemoMed-AI
+npm run db:seed
+```
+
+После выполнения seed доступны аккаунты:
+
+- `admin@memomed.dev` → админ-панель
+- `doctor1@memomed.dev` … `doctor5@memomed.dev` → врачи
+- `relative1@memomed.dev` … `relative5@memomed.dev` → родственники
+- `patient1@memomed.dev` … `patient50@memomed.dev` → пациенты
+
+---
+
 ## Краткая шпаргалка (копировать по блокам)
 
 **Локально:**
