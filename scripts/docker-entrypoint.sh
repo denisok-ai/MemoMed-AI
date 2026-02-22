@@ -4,6 +4,8 @@
 set -e
 cd /app
 if command -v npx >/dev/null 2>&1 && [ -d prisma/migrations ]; then
-  npx prisma migrate deploy --config prisma.config.cjs 2>/dev/null || true
+  echo "[entrypoint] Applying database migrations..."
+  npx prisma migrate deploy --config prisma.config.cjs || { echo "[entrypoint] Migration failed"; exit 1; }
+  echo "[entrypoint] Migrations applied"
 fi
 exec node server.js
