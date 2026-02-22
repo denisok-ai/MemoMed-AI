@@ -31,8 +31,9 @@ nano .env  # заполняем все переменные
 ```
 
 **Обязательные переменные:**
+
 - `NEXTAUTH_SECRET` — случайная строка 32+ символа: `openssl rand -base64 32`
-- `POSTGRES_PASSWORD` — пароль для PostgreSQL
+- `MEMOMED_PG_PASSWORD` — пароль для PostgreSQL
 - `NEXTAUTH_URL` — публичный URL сайта (`https://your-domain.com`)
 - `DEEPSEEK_API_KEY` — ключ API DeepSeek
 
@@ -71,6 +72,7 @@ bash scripts/deploy.sh
 ```
 
 Скрипт автоматически:
+
 1. Делает бэкап БД
 2. Пулит новый код
 3. Пересобирает образы
@@ -95,12 +97,14 @@ docker compose ps
 Бэкапы создаются автоматически при каждом деплое в `/var/backups/memomed/`.
 
 Ручное создание бэкапа:
+
 ```bash
 docker compose exec postgres pg_dump -U memomed memomed_db | \
   gzip > backup_$(date +%Y%m%d).sql.gz
 ```
 
 Восстановление:
+
 ```bash
 gunzip -c backup_YYYYMMDD.sql.gz | \
   docker compose exec -T postgres psql -U memomed memomed_db
@@ -108,10 +112,10 @@ gunzip -c backup_YYYYMMDD.sql.gz | \
 
 ## Структура сервисов
 
-| Сервис | Порт | Описание |
-|--------|------|----------|
-| nginx | 80, 443 | Reverse proxy, SSL |
-| app | 3000 (внутренний) | Next.js приложение |
-| worker | — | BullMQ воркер |
-| postgres | 5432 (внутренний) | БД |
-| redis | 6379 (внутренний) | Кэш, очереди |
+| Сервис   | Порт              | Описание           |
+| -------- | ----------------- | ------------------ |
+| nginx    | 80, 443           | Reverse proxy, SSL |
+| app      | 3000 (внутренний) | Next.js приложение |
+| worker   | —                 | BullMQ воркер      |
+| postgres | 5432 (внутренний) | БД                 |
+| redis    | 6379 (внутренний) | Кэш, очереди       |

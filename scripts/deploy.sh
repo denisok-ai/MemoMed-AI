@@ -22,7 +22,7 @@ fi
 
 # Проверяем обязательные переменные окружения
 source "$PROJECT_DIR/.env"
-REQUIRED_VARS=("NEXTAUTH_SECRET" "POSTGRES_PASSWORD" "NEXTAUTH_URL")
+REQUIRED_VARS=("NEXTAUTH_SECRET" "MEMOMED_PG_PASSWORD" "NEXTAUTH_URL")
 for var in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!var:-}" ]; then
     echo "ОШИБКА: Переменная $var не задана в .env"

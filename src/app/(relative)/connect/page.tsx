@@ -33,7 +33,7 @@ export default async function ConnectPage({
 
   const where = statusFilter
     ? { relativeId: session.user.id, status: statusFilter as 'active' | 'pending' | 'inactive' }
-    : { relativeId: session.user.id, status: { in: ['active', 'pending'] as const } };
+    : { relativeId: session.user.id, status: { in: ['active', 'pending'] } };
 
   const [connections, total, activeCount] = await Promise.all([
     prisma.connection.findMany({
