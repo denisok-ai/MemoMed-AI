@@ -33,15 +33,24 @@ export async function devLoginAction(email: string, role: string): Promise<void>
     redirect('/login');
   }
 
+  const targetUrl = ROLE_HOME[role] ?? '/dashboard';
+
   try {
-    await signIn('credentials', {
+    const result = await signIn('credentials', {
       email,
       password: DEV_PASSWORD,
       redirect: false,
+      callbackUrl: targetUrl,
     });
-  } catch {
+    // NextAuth может вернуть ok: false при успехе в некоторых конфигурациях — проверяем ошибку
+    if (result?.error) {
+      console.warn('[dev-login] signIn error:', result.error);
+      redirect('/login');
+    }
+  } catch (e) {
+    console.warn('[dev-login] signIn exception:', e);
     redirect('/login');
   }
 
-  redirect(ROLE_HOME[role] ?? '/dashboard');
+  redirect(targetUrl);
 }

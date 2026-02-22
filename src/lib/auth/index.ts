@@ -18,6 +18,10 @@ const loginSchema = z.object({
   password: z.string().min(8),
 });
 
+const DEV_PASSWORD = 'Test1234!';
+const isDevLoginEnabled =
+  process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true';
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
@@ -29,6 +33,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const { email, password } = parsed.data;
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return null;
+
+        // В режиме отладки: @memomed.dev + Test1234! — вход без проверки хеша
+        if (isDevLoginEnabled && email.endsWith('@memomed.dev') && password === DEV_PASSWORD) {
+          return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            name: null,
+          };
+        }
 
         const passwordMatch = await bcrypt.compare(password, user.passwordHash);
         if (!passwordMatch) return null;
