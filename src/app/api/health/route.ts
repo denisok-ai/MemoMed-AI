@@ -11,6 +11,8 @@ import { redis } from '@/lib/db/redis';
 
 interface HealthStatus {
   status: 'ok' | 'degraded' | 'error';
+  version: string;
+  buildDate: string;
   timestamp: string;
   services: {
     database: 'ok' | 'error';
@@ -19,7 +21,6 @@ interface HealthStatus {
 }
 
 export async function GET(): Promise<NextResponse<HealthStatus>> {
-  const services = { database: 'error' as const, redis: 'error' as const };
   let dbOk = false;
   let redisOk = false;
 
@@ -40,6 +41,8 @@ export async function GET(): Promise<NextResponse<HealthStatus>> {
   const allOk = dbOk && redisOk;
   const status: HealthStatus = {
     status: allOk ? 'ok' : dbOk || redisOk ? 'degraded' : 'error',
+    version: process.env.NEXT_PUBLIC_BUILD_VERSION ?? '0.0.0',
+    buildDate: process.env.NEXT_PUBLIC_BUILD_DATE ?? '',
     timestamp: new Date().toISOString(),
     services: {
       database: dbOk ? 'ok' : 'error',

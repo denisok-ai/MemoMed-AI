@@ -20,9 +20,9 @@ export default async function PatientLayout({ children }: { children: React.Reac
     redirect('/login');
   }
 
-  if (session.user.role === 'relative') {
-    redirect('/feed');
-  }
+  if (session.user.role === 'relative') redirect('/feed');
+  if (session.user.role === 'doctor') redirect('/doctor/dashboard');
+  if (session.user.role === 'admin') redirect('/admin');
 
   const [userName, profile] = await Promise.all([
     Promise.resolve(session.user.name ?? undefined),

@@ -1,7 +1,7 @@
 /**
  * @file page.tsx
- * @description Страница списка лекарств пациента с возможностью удаления
- * @dependencies prisma, next-auth, MedicationCard
+ * @description Страница списка лекарств — MedTech 2025/2026:
+ * glassmorphism карточки, staggered анимации, профессиональные иконки
  * @created 2026-02-22
  */
 
@@ -12,6 +12,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { MedicationCard } from '@/components/patient/medication-card';
 import { DeleteMedicationButton } from '@/components/patient/delete-medication-button';
+import { PillIcon, PlusIcon, EditIcon, ChevronRightIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Мои лекарства — MemoMed AI',
@@ -19,64 +20,96 @@ export const metadata: Metadata = {
 
 export default async function MedicationsPage() {
   const session = await auth();
-
   if (!session?.user) redirect('/login');
 
   const medications = await prisma.medication.findMany({
-    where: {
-      patientId: session.user.id,
-      isActive: true,
-    },
+    where: { patientId: session.user.id, isActive: true },
     orderBy: { scheduledTime: 'asc' },
   });
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#212121]">Мои лекарства</h1>
+    <div className="med-page med-animate">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black text-[#0D1B2A]">Мои лекарства</h1>
+          {medications.length > 0 && (
+            <p className="text-slate-500 text-sm mt-0.5">
+              {medications.length}{' '}
+              {medications.length === 1
+                ? 'препарат'
+                : medications.length < 5
+                  ? 'препарата'
+                  : 'препаратов'}
+            </p>
+          )}
+        </div>
         <Link
           href="/medications/add"
-          className="flex items-center gap-2 px-5 py-3 bg-[#7e57c2] text-white rounded-xl
-            font-semibold text-base hover:bg-[#6a3fb5] transition-colors min-h-[48px]"
+          className="flex items-center gap-2 px-5 py-2.5
+            bg-gradient-to-r from-[#1565C0] to-[#1976D2]
+            text-white rounded-xl font-bold text-sm
+            hover:shadow-lg hover:shadow-blue-200/50
+            active:scale-[0.97] transition-all min-h-[48px]"
           aria-label="Добавить лекарство"
         >
-          <span className="text-xl" aria-hidden="true">+</span>
+          <PlusIcon className="w-4 h-4" />
           Добавить
         </Link>
       </div>
 
       {medications.length === 0 ? (
-        <div className="text-center py-16 space-y-4">
-          <p className="text-5xl" aria-hidden="true">💊</p>
-          <p className="text-xl text-[#757575]">Лекарства не добавлены</p>
-          <Link
-            href="/medications/add"
-            className="inline-flex items-center px-8 py-4 bg-[#4caf50] text-white rounded-2xl
-              text-lg font-semibold hover:bg-[#43a047] transition-colors"
+        <div
+          className="med-card flex flex-col items-center justify-center
+          py-16 space-y-5 text-center"
+        >
+          <div
+            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600
+            flex items-center justify-center shadow-lg shadow-blue-200/50 med-float"
           >
+            <PillIcon className="w-10 h-10 text-white" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xl font-bold text-[#0D1B2A]">Лекарства не добавлены</p>
+            <p className="text-slate-500 max-w-xs text-sm">
+              Добавьте лекарство, чтобы получать напоминания о приёме
+            </p>
+          </div>
+          <Link href="/medications/add" className="med-btn-primary rounded-2xl gap-3">
+            <PlusIcon className="w-4 h-4" />
             Добавить первое лекарство
+            <ChevronRightIcon className="w-4 h-4 opacity-60" />
           </Link>
         </div>
       ) : (
-        <ul className="space-y-4" role="list" aria-label="Список лекарств">
+        <ul className="space-y-3 med-stagger" role="list" aria-label="Список лекарств">
           {medications.map((med) => (
             <li key={med.id}>
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
+              <div
+                className="med-card-accent group flex items-center gap-3
+                hover:translate-x-1 transition-all"
+              >
+                <div className="flex-1 min-w-0">
                   <MedicationCard
                     name={med.name}
                     dosage={med.dosage}
                     scheduledTime={med.scheduledTime}
+                    photoUrl={med.photoUrl}
                   />
                 </div>
-                <div className="flex flex-col gap-2 pt-1">
+
+                <div
+                  className="flex gap-1.5 items-center opacity-60
+                  group-hover:opacity-100 transition-opacity"
+                >
                   <Link
                     href={`/medications/${med.id}/edit`}
-                    className="p-3 rounded-xl bg-gray-100 text-[#757575] hover:bg-gray-200
-                      transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
+                    className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400
+                      hover:bg-blue-50 hover:text-[#1565C0]
+                      flex items-center justify-center transition-all"
                     aria-label={`Редактировать ${med.name}`}
                   >
-                    ✏️
+                    <EditIcon className="w-4 h-4" />
                   </Link>
                   <DeleteMedicationButton id={med.id} name={med.name} />
                 </div>

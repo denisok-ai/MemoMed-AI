@@ -1,94 +1,246 @@
 /**
  * @file page.tsx
- * @description Страница истории приёма лекарств — отображает последние 30 записей
- * @dependencies prisma, next-auth
+ * @description История приёма лекарств с пагинацией, фильтрами по статусу и группировкой по дням.
  * @created 2026-02-22
  */
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { ClipboardIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'История приёма — MemoMed AI',
 };
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  taken: { label: '✅ Принято', color: 'bg-[#e8f5e9] text-[#4caf50]' },
-  missed: { label: '❌ Пропущено', color: 'bg-[#ffebee] text-[#f44336]' },
-  pending: { label: '⏳ Ожидает', color: 'bg-[#fff3e0] text-[#ff9800]' },
+const PAGE_SIZE = 20;
+
+const STATUS_OPTS = [
+  { id: 'all', label: 'Все' },
+  { id: 'taken', label: '✅ Принято' },
+  { id: 'missed', label: '❌ Пропущено' },
+  { id: 'pending', label: '⏳ Ожидает' },
+] as const;
+type StatusOpt = (typeof STATUS_OPTS)[number]['id'];
+
+const STATUS_UI: Record<string, { icon: string; label: string; bg: string; text: string }> = {
+  taken: { icon: '✓', label: 'Принято', bg: 'bg-green-100', text: 'text-green-700' },
+  missed: { icon: '✗', label: 'Пропущено', bg: 'bg-red-100', text: 'text-red-600' },
+  pending: { icon: '⏳', label: 'Ожидает', bg: 'bg-amber-100', text: 'text-amber-700' },
 };
 
-export default async function HistoryPage() {
+export default async function HistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; status?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect('/login');
 
-  const logs = await prisma.medicationLog.findMany({
-    where: {
-      medication: {
-        patientId: session.user.id,
-      },
-    },
-    orderBy: { scheduledAt: 'desc' },
-    take: 30,
-    include: {
-      medication: {
-        select: { name: true, dosage: true },
-      },
-    },
-  });
+  const { page: pageStr, status: rawStatus } = await searchParams;
+  const page = Math.max(1, parseInt(pageStr ?? '1'));
+  const statusFilter: StatusOpt = STATUS_OPTS.find((s) => s.id === rawStatus)?.id ?? 'all';
+
+  const where = {
+    medication: { patientId: session.user.id },
+    ...(statusFilter !== 'all' ? { status: statusFilter } : {}),
+  };
+
+  const [total, logs] = await Promise.all([
+    prisma.medicationLog.count({ where }),
+    prisma.medicationLog.findMany({
+      where,
+      orderBy: { scheduledAt: 'desc' },
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+      include: { medication: { select: { name: true, dosage: true, scheduledTime: true } } },
+    }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const from = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, total);
+
+  // Группируем логи по дате (для читаемости)
+  type LogEntry = (typeof logs)[number];
+  const grouped: { dateLabel: string; items: LogEntry[] }[] = [];
+  for (const log of logs) {
+    const dateKey = log.scheduledAt.toLocaleDateString('ru-RU', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
+    const last = grouped[grouped.length - 1];
+    if (last && last.dateLabel === dateKey) {
+      last.items.push(log);
+    } else {
+      grouped.push({ dateLabel: dateKey, items: [log] });
+    }
+  }
+
+  function filterHref(s: StatusOpt, p?: number) {
+    const sp = new URLSearchParams();
+    if (s !== 'all') sp.set('status', s);
+    if (p && p > 1) sp.set('page', String(p));
+    const q = sp.toString();
+    return `/history${q ? `?${q}` : ''}`;
+  }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-[#212121]">История приёма</h1>
+    <div className="med-page med-animate">
+      {/* Заголовок */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black text-[#0D1B2A]">История приёма</h1>
+          {total > 0 && <p className="text-slate-500 text-sm mt-0.5">{total} записей</p>}
+        </div>
+      </div>
 
-      {logs.length === 0 ? (
-        <div className="text-center py-16 space-y-4">
-          <p className="text-5xl" aria-hidden="true">📋</p>
-          <p className="text-xl text-[#757575]">История пуста</p>
-          <p className="text-base text-[#9e9e9e]">Записи появятся после приёма лекарств</p>
+      {/* Фильтры */}
+      <div className="flex gap-2 overflow-x-auto pb-1 mb-6">
+        {STATUS_OPTS.map((opt) => (
+          <Link
+            key={opt.id}
+            href={filterHref(opt.id)}
+            className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap
+              transition-all min-h-[auto]
+              ${
+                statusFilter === opt.id
+                  ? 'bg-[#1565C0] text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }`}
+          >
+            {opt.label}
+          </Link>
+        ))}
+      </div>
+
+      {/* Контент */}
+      {total === 0 ? (
+        <div className="med-card flex flex-col items-center py-16 space-y-4 text-center">
+          <div className="w-20 h-20 rounded-2xl bg-slate-50 flex items-center justify-center med-float">
+            <ClipboardIcon className="w-10 h-10 text-slate-300" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-[#0D1B2A]">
+              {statusFilter === 'all' ? 'История пуста' : 'Записей не найдено'}
+            </p>
+            <p className="text-slate-400 text-sm mt-1">
+              {statusFilter === 'all'
+                ? 'Записи появятся после первого приёма лекарств'
+                : `Нет записей со статусом "${STATUS_OPTS.find((s) => s.id === statusFilter)?.label}"`}
+            </p>
+          </div>
+          {statusFilter !== 'all' && (
+            <Link
+              href="/history"
+              className="px-4 py-2 bg-[#1565C0] text-white rounded-xl text-sm font-semibold
+                hover:bg-[#0D47A1] transition-colors min-h-[auto]"
+            >
+              Показать все
+            </Link>
+          )}
         </div>
       ) : (
-        <ul className="space-y-3" role="list" aria-label="История приёма лекарств">
-          {logs.map((log) => {
-            const statusInfo = statusLabels[log.status] ?? statusLabels.pending;
-            const date = new Date(log.scheduledAt);
-            const dateStr = date.toLocaleDateString('ru-RU', {
-              day: 'numeric',
-              month: 'long',
-            });
-            const timeStr = date.toLocaleTimeString('ru-RU', {
-              hour: '2-digit',
-              minute: '2-digit',
-            });
+        <div className="space-y-6">
+          {grouped.map(({ dateLabel, items }) => (
+            <div key={dateLabel}>
+              {/* Разделитель по дате */}
+              <div className="flex items-center gap-3 mb-3">
+                <p className="text-sm font-bold text-slate-400 uppercase tracking-wider capitalize">
+                  {dateLabel}
+                </p>
+                <div className="flex-1 h-px bg-slate-100" />
+                <span className="text-sm text-slate-300">{items.length}</span>
+              </div>
 
-            return (
-              <li key={log.id}>
-                <article
-                  className="flex items-center gap-4 p-4 bg-white rounded-2xl
-                    border border-gray-100 shadow-sm"
+              <ul className="space-y-2">
+                {items.map((log) => {
+                  const ui = STATUS_UI[log.status] ?? STATUS_UI.pending;
+                  const timeStr = log.scheduledAt.toLocaleTimeString('ru', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+                  const actualStr = log.actualAt
+                    ? log.actualAt.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })
+                    : null;
+
+                  return (
+                    <li
+                      key={log.id}
+                      className="flex items-center gap-3 px-4 py-3 bg-white
+                        rounded-2xl border border-slate-100 hover:border-slate-200 transition-all"
+                    >
+                      {/* Статус */}
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center
+                        text-sm font-bold flex-shrink-0 ${ui.bg} ${ui.text}`}
+                      >
+                        {ui.icon}
+                      </div>
+
+                      {/* Препарат */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[#0D1B2A] truncate text-sm">
+                          {log.medication.name}
+                        </p>
+                        <p className="text-sm text-slate-400">{log.medication.dosage}</p>
+                      </div>
+
+                      {/* Время */}
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-mono text-slate-500">план {timeStr}</p>
+                        {actualStr && log.status === 'taken' && (
+                          <p className="text-sm font-mono text-green-500">факт {actualStr}</p>
+                        )}
+                        {log.status !== 'taken' && (
+                          <p className={`text-sm font-semibold ${ui.text}`}>{ui.label}</p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+
+          {/* Пагинация */}
+          <div className="flex items-center justify-between pt-2">
+            <p className="text-sm text-slate-400">
+              {from}–{to} из {total}
+            </p>
+            <div className="flex gap-2">
+              {page > 1 && (
+                <Link
+                  href={filterHref(statusFilter, page - 1)}
+                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
+                    hover:border-[#1565C0] transition-colors min-h-[auto]"
                 >
-                  <span className="text-xl flex-shrink-0" aria-hidden="true">💊</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-base font-semibold text-[#212121] truncate">
-                      {log.medication.name}
-                    </p>
-                    <p className="text-sm text-[#757575]">
-                      {log.medication.dosage} · {dateStr} в {timeStr}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-sm font-medium px-3 py-1 rounded-full flex-shrink-0 ${statusInfo.color}`}
-                    aria-label={statusInfo.label}
-                  >
-                    {statusInfo.label}
-                  </span>
-                </article>
-              </li>
-            );
-          })}
-        </ul>
+                  ← Новее
+                </Link>
+              )}
+
+              {/* Номер страницы */}
+              {totalPages > 1 && (
+                <span className="px-4 py-2 text-sm text-slate-500">
+                  {page} / {totalPages}
+                </span>
+              )}
+
+              {page < totalPages && (
+                <Link
+                  href={filterHref(statusFilter, page + 1)}
+                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
+                    hover:border-[#1565C0] transition-colors min-h-[auto]"
+                >
+                  Старше →
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

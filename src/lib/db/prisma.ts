@@ -1,6 +1,7 @@
 /**
  * @file prisma.ts
- * @description Singleton Prisma client instance for Next.js (Prisma 7+)
+ * @description Singleton Prisma client (Prisma 7+ c PrismaPg адаптером).
+ * Проверяет наличие DATABASE_URL при создании.
  * @dependencies @prisma/client, @prisma/adapter-pg, pg
  * @created 2026-02-22
  */
@@ -14,10 +15,13 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient(): PrismaClient {
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    max: 10,
-  });
+  const connectionString = process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error('DATABASE_URL не задана. Скопируйте .env.example в .env и заполните значение.');
+  }
+
+  const pool = new Pool({ connectionString, max: 10 });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }

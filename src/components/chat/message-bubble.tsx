@@ -21,7 +21,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       {/* Аватар ИИ */}
       {!isUser && (
         <div
-          className="w-9 h-9 rounded-full bg-[#7e57c2] flex items-center justify-center
+          className="w-9 h-9 rounded-full bg-[#1565C0] flex items-center justify-center
             flex-shrink-0 text-lg mt-1"
           aria-hidden="true"
         >
@@ -32,7 +32,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <div
         className={`max-w-[80%] px-4 py-3 rounded-2xl space-y-1 ${
           isUser
-            ? 'bg-[#7e57c2] text-white rounded-br-sm'
+            ? 'bg-[#1565C0] text-white rounded-br-sm'
             : 'bg-[#f5f5f5] text-[#212121] rounded-bl-sm'
         }`}
       >
@@ -41,7 +41,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           // Дисклеймер рендерим особо
           if (paragraph.startsWith('---')) {
             return (
-              <p key={i} className="text-xs text-[#9e9e9e] italic border-t border-gray-200 pt-2 mt-2">
+              <p
+                key={i}
+                className="text-sm text-[#9e9e9e] italic border-t border-gray-200 pt-2 mt-2"
+              >
                 {paragraph.replace(/^---\n/, '').replace(/_/g, '')}
               </p>
             );

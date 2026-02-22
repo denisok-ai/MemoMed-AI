@@ -1,6 +1,6 @@
 /**
  * @file delete-medication-button.tsx
- * @description Кнопка архивирования лекарства с подтверждением и Server Action
+ * @description Кнопка удаления лекарства в стиле MedTech
  * @created 2026-02-22
  */
 
@@ -8,6 +8,7 @@
 
 import { useTransition } from 'react';
 import { deleteMedicationAction } from '@/lib/medications/actions';
+import { TrashIcon } from '@/components/shared/nav-icons';
 
 interface DeleteMedicationButtonProps {
   id: string;
@@ -19,7 +20,6 @@ export function DeleteMedicationButton({ id, name }: DeleteMedicationButtonProps
 
   function handleDelete() {
     if (!confirm(`Удалить лекарство «${name}»?`)) return;
-
     startTransition(async () => {
       await deleteMedicationAction(id);
     });
@@ -30,14 +30,18 @@ export function DeleteMedicationButton({ id, name }: DeleteMedicationButtonProps
       onClick={handleDelete}
       disabled={isPending}
       aria-label={`Удалить ${name}`}
-      className="p-3 rounded-xl bg-[#ffebee] text-[#f44336] hover:bg-[#ffcdd2]
-        transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center
+      className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400
+        hover:bg-red-50 hover:text-red-500
+        flex items-center justify-center transition-colors
         disabled:opacity-50"
     >
       {isPending ? (
-        <span className="w-4 h-4 border-2 border-[#f44336] border-t-transparent rounded-full animate-spin" />
+        <span
+          className="w-4 h-4 border-2 border-red-400 border-t-transparent
+          rounded-full animate-spin"
+        />
       ) : (
-        '🗑️'
+        <TrashIcon className="w-4 h-4" />
       )}
     </button>
   );

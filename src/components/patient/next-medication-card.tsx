@@ -1,16 +1,17 @@
 /**
  * @file next-medication-card.tsx
- * @description Карточка ближайшего лекарства с таймером до приёма
+ * @description Карточка ближайшего лекарства — desktop-optimized glassmorphism.
+ * Крупная иконка, больше padding, чёткая информация.
  * @created 2026-02-22
  */
 
 import type { NextMedication } from '@/lib/medications/queries';
+import { PillIcon } from '@/components/shared/nav-icons';
 
 interface NextMedicationCardProps {
   medication: NextMedication;
 }
 
-/** Форматирует оставшееся время в читаемый вид */
 function formatTimeUntil(minutes: number): string {
   if (minutes < 0) {
     const abs = Math.abs(minutes);
@@ -29,41 +30,46 @@ export function NextMedicationCard({ medication }: NextMedicationCardProps) {
 
   return (
     <div
-      className={`rounded-3xl p-6 space-y-3 ${
+      className={`rounded-2xl p-6 space-y-4 transition-all duration-300 ${
         isUrgent
-          ? 'bg-[#fff3e0] border-2 border-[#ff9800]'
-          : 'bg-white/20 border border-white/30 backdrop-blur-sm'
+          ? 'bg-orange-50/95 border-2 border-orange-300 shadow-lg shadow-orange-100'
+          : 'bg-white/[0.12] border border-white/20 backdrop-blur-md shadow-lg shadow-black/10'
       }`}
       role="region"
       aria-label={`Ближайшее лекарство: ${medication.name}`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-2xl" aria-hidden="true">💊</span>
+        <div
+          className={`w-12 h-12 rounded-xl flex items-center justify-center
+          ${isUrgent ? 'bg-orange-100' : 'bg-white/15'}`}
+        >
+          <PillIcon className={`w-6 h-6 ${isUrgent ? 'text-orange-600' : 'text-white'}`} />
+        </div>
+
         <span
-          className={`text-base font-semibold px-3 py-1 rounded-full ${
-            isUrgent ? 'bg-[#ff9800] text-white' : 'bg-white/30 text-white'
+          className={`text-sm font-bold px-4 py-2 rounded-full tracking-tight
+          ${
+            isUrgent
+              ? 'bg-orange-500 text-white animate-pulse'
+              : 'bg-white/20 text-white/90 backdrop-blur'
           }`}
-          aria-label={`До приёма: ${timeText}`}
         >
           {timeText}
         </span>
       </div>
 
       <div>
-        <p
-          className={`text-xl font-bold ${isUrgent ? 'text-[#e65100]' : 'text-white'}`}
-        >
+        <p className={`text-2xl font-bold ${isUrgent ? 'text-orange-800' : 'text-white'}`}>
           {medication.name}
         </p>
         <p
-          className={`text-base ${isUrgent ? 'text-[#bf360c]' : 'text-white/80'}`}
+          className={`text-base font-medium mt-1
+          ${isUrgent ? 'text-orange-600' : 'text-white/70'}`}
         >
           {medication.dosage} · {medication.scheduledTime}
         </p>
         {medication.instruction && (
-          <p
-            className={`text-sm mt-1 ${isUrgent ? 'text-[#795548]' : 'text-white/60'}`}
-          >
+          <p className={`text-sm mt-2 ${isUrgent ? 'text-orange-500' : 'text-white/50'}`}>
             {medication.instruction}
           </p>
         )}

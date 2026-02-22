@@ -10,19 +10,19 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      role: 'patient' | 'relative' | 'admin';
+      role: 'patient' | 'relative' | 'doctor' | 'admin';
     } & DefaultSession['user'];
   }
 
   interface User {
     id: string;
-    role: 'patient' | 'relative' | 'admin';
+    role: 'patient' | 'relative' | 'doctor' | 'admin';
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
-    role: 'patient' | 'relative' | 'admin';
+    role: 'patient' | 'relative' | 'doctor' | 'admin';
   }
 }

@@ -1,6 +1,6 @@
 /**
  * @file login-form.tsx
- * @description Клиентская форма входа с Server Action и отображением ошибок
+ * @description Форма входа в стиле MedTech
  * @dependencies loginAction, FormError, SubmitButton
  * @created 2026-02-22
  */
@@ -21,8 +21,11 @@ export function LoginForm() {
     <form action={action} className="space-y-5">
       <FormError message={state.error} />
 
-      <div className="space-y-2">
-        <label htmlFor="email" className="block text-lg font-medium text-[#212121]">
+      <div className="space-y-1.5">
+        <label
+          htmlFor="email"
+          className="block text-sm font-semibold text-slate-600 uppercase tracking-wide"
+        >
           Электронная почта
         </label>
         <input
@@ -31,14 +34,16 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           required
-          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
-            focus:border-[#7e57c2] focus:outline-none transition-colors"
+          className="med-input"
           placeholder="your@email.ru"
         />
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="password" className="block text-lg font-medium text-[#212121]">
+      <div className="space-y-1.5">
+        <label
+          htmlFor="password"
+          className="block text-sm font-semibold text-slate-600 uppercase tracking-wide"
+        >
           Пароль
         </label>
         <input
@@ -47,13 +52,12 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
-            focus:border-[#7e57c2] focus:outline-none transition-colors"
+          className="med-input"
           placeholder="••••••••"
         />
       </div>
 
-      <SubmitButton label="Войти" loadingLabel="Проверка данных..." className="bg-[#7e57c2] hover:bg-[#6a3fb5]" />
+      <SubmitButton label="Войти" loadingLabel="Проверка данных..." />
     </form>
   );
 }

@@ -22,6 +22,9 @@ prisma/migrations/
 # Testing
 coverage/
 .vitest/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # IDE
 .vscode/

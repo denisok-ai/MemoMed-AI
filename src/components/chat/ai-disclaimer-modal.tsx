@@ -17,7 +17,7 @@ export function AiDisclaimerModal() {
   useEffect(() => {
     const shown = localStorage.getItem(DISCLAIMER_KEY);
     if (!shown) {
-      setIsOpen(true);
+      queueMicrotask(() => setIsOpen(true));
     }
   }, []);
 
@@ -37,11 +37,10 @@ export function AiDisclaimerModal() {
     >
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 space-y-6">
         <div className="space-y-3">
-          <div className="text-4xl text-center" aria-hidden="true">⚕️</div>
-          <h2
-            id="disclaimer-title"
-            className="text-xl font-bold text-[#212121] text-center"
-          >
+          <div className="text-4xl text-center" aria-hidden="true">
+            ⚕️
+          </div>
+          <h2 id="disclaimer-title" className="text-xl font-bold text-[#212121] text-center">
             Важная информация
           </h2>
         </div>
@@ -52,8 +51,8 @@ export function AiDisclaimerModal() {
             <strong> не заменяет консультацию врача.</strong>
           </p>
           <p>
-            Информация носит <strong>справочный характер</strong> и не является
-            медицинской рекомендацией.
+            Информация носит <strong>справочный характер</strong> и не является медицинской
+            рекомендацией.
           </p>
           <p>
             При любых сомнениях относительно вашего здоровья или лечения —{' '}
@@ -63,8 +62,8 @@ export function AiDisclaimerModal() {
 
         <button
           onClick={handleAccept}
-          className="w-full py-4 bg-[#7e57c2] text-white text-lg font-semibold rounded-xl
-            hover:bg-[#6a3fb5] transition-colors min-h-[56px]"
+          className="w-full py-4 bg-[#1565C0] text-white text-lg font-semibold rounded-xl
+            hover:bg-[#0D47A1] transition-colors min-h-[56px]"
           autoFocus
         >
           Я понимаю, продолжить

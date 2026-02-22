@@ -7,6 +7,8 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import './globals.css';
 
 const inter = Inter({
@@ -34,20 +36,25 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#7e57c2',
+  themeColor: '#1565C0',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="ru">
-      <body className={`${inter.variable} ${montserrat.variable} antialiased`}>{children}</body>
+    <html lang={locale}>
+      <body className={`${inter.variable} ${montserrat.variable} antialiased`}>
+        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }

@@ -35,19 +35,39 @@ export interface LocalMedicationLog {
   createdAt: string;
 }
 
+/** Запись дневника самочувствия в локальном хранилище */
+export interface LocalJournalEntry {
+  /** Дата в формате YYYY-MM-DD — первичный ключ */
+  logDate: string;
+  moodScore: number | null;
+  painLevel: number | null;
+  sleepQuality: number | null;
+  energyLevel: number | null;
+  freeText: string | null;
+  /** pending — ожидает отправки, synced — отправлено */
+  syncStatus: 'pending' | 'synced';
+  updatedAt: number;
+}
+
 /** База данных Dexie */
 class MemoMedDB extends Dexie {
   medications!: EntityTable<LocalMedication, 'id'>;
   logs!: EntityTable<LocalMedicationLog, 'localId'>;
+  journal!: EntityTable<LocalJournalEntry, 'logDate'>;
 
   constructor() {
     super('memomed-db');
 
     this.version(1).stores({
-      // Индексы для medications
       medications: 'id, scheduledTime, isActive',
-      // Индексы для logs: localId первичный ключ, syncStatus для поиска несинхронизированных
       logs: 'localId, medicationId, scheduledAt, syncStatus, createdAt',
+    });
+
+    // Версия 2: добавляем дневник самочувствия
+    this.version(2).stores({
+      medications: 'id, scheduledTime, isActive',
+      logs: 'localId, medicationId, scheduledAt, syncStatus, createdAt',
+      journal: 'logDate, syncStatus, updatedAt',
     });
   }
 }

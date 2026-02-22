@@ -43,7 +43,7 @@ export function SyncStatus() {
         <button
           onClick={syncNow}
           className="text-[#ff9800] font-semibold hover:text-[#e65100] transition-colors
-            min-h-[44px] px-2"
+            min-h-[48px] px-2"
           aria-label="Синхронизировать сейчас"
         >
           Отправить

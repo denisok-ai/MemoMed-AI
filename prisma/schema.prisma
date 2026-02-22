@@ -11,11 +11,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
   patient
   relative
+  doctor
   admin
 }
 
@@ -65,6 +67,7 @@ model User {
   medications      Medication[]
   healthJournal    HealthJournal[]
   medicationFeedback MedicationFeedback[]
+  meteoLogs        MeteoLog[]
   auditLogs        AuditLog[]
   chatMessages     ChatMessage[]
   aiUsageStats     AiUsageStat[]
@@ -115,6 +118,7 @@ model Connection {
   relative User @relation("RelativeConnections", fields: [relativeId], references: [id], onDelete: Cascade)
 
   @@unique([patientId, relativeId])
+  @@index([relativeId, status])
   @@map("connections")
 }
 
@@ -151,6 +155,7 @@ model MedicationLog {
   medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
 
   @@index([medicationId, scheduledAt])
+  @@index([medicationId, createdAt])
   @@index([scheduledAt])
   @@map("medication_logs")
 }
@@ -231,6 +236,43 @@ model AiUsageStat {
 
   @@unique([userId, monthKey])
   @@map("ai_usage_stats")
+}
+
+/** Метеоданные для корреляционного анализа */
+model MeteoLog {
+  id           String   @id @default(uuid())
+  patientId    String
+  logDate      DateTime @db.Date
+  temperature  Float?
+  humidity     Int?
+  pressure     Int?
+  weatherMain  String?
+  geomagIndex  Float?
+  regionCode   String?
+  createdAt    DateTime @default(now())
+
+  patient User @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, logDate])
+  @@index([patientId, logDate])
+  @@map("meteo_logs")
+}
+
+/** Настройки LLM-провайдеров (DeepSeek, OpenAI и др.) */
+model LlmProvider {
+  id          String   @id @default(uuid())
+  name        String
+  baseUrl     String
+  model       String
+  apiKeyHash  String?
+  isActive    Boolean  @default(false)
+  temperature Float    @default(0.7)
+  maxTokens   Int      @default(500)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("llm_providers")
 }
 
 model AuditLog {

@@ -1,28 +1,46 @@
-version: '3.8'
+# docker-compose.dev.yml — Локальная разработка MemoMed AI
+# Запускает PostgreSQL и Redis для dev-режима (Next.js запускается отдельно через npm run dev)
+#
+# Использование:
+#   podman-compose -f docker-compose.dev.yml up -d
+#   podman-compose -f docker-compose.dev.yml down
+#
+# Порты вынесены наружу через переменные (по умолчанию 5433/6380, чтобы не конфликтовать с другими проектами)
 
-# Development override — starts only postgres and redis, not the app (run app with npm run dev)
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: memomed_postgres
     environment:
       POSTGRES_USER: memomed
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${MEMOMED_PG_PASSWORD:-memomed_dev}
       POSTGRES_DB: memomed_db
     volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
+      - memomed_pg_data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '${MEMOMED_PG_PORT:-5433}:5432'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U memomed -d memomed_db']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    container_name: memomed_redis
     ports:
-      - '6379:6379'
+      - '${MEMOMED_REDIS_PORT:-6380}:6379'
     command: redis-server --appendonly yes
+    volumes:
+      - memomed_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
 
 volumes:
-  postgres_dev_data:
+  memomed_pg_data:
+  memomed_redis_data:

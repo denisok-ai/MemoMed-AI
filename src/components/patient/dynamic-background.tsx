@@ -1,7 +1,7 @@
 /**
  * @file dynamic-background.tsx
- * @description Динамический градиентный фон, меняющийся в зависимости от времени суток
- * Утро: сиреневый-синий, День: голубой-бирюзовый, Вечер: оранжевый-фиолетовый, Ночь: тёмно-синий
+ * @description Динамический фон — только декоративный слой.
+ * Приветствие вынесено в отдельный компонент для корректного позиционирования.
  * @created 2026-02-22
  */
 
@@ -19,10 +19,10 @@ function getTimeOfDay(hour: number): TimeOfDay {
 }
 
 const gradients: Record<TimeOfDay, string> = {
-  morning: 'from-[#7e57c2] via-[#9575cd] to-[#42a5f5]',
-  day: 'from-[#42a5f5] via-[#26c6da] to-[#4caf50]',
-  evening: 'from-[#ff7043] via-[#ab47bc] to-[#7e57c2]',
-  night: 'from-[#1a237e] via-[#283593] to-[#37474f]',
+  morning: 'from-[#1565C0] via-[#1976D2] to-[#42A5F5]',
+  day: 'from-[#0D47A1] via-[#1565C0] to-[#00838F]',
+  evening: 'from-[#0D47A1] via-[#4A148C] to-[#BF360C]',
+  night: 'from-[#0A1628] via-[#0D47A1] to-[#1A237E]',
 };
 
 const greetings: Record<TimeOfDay, string> = {
@@ -42,28 +42,49 @@ export function DynamicBackground({ userName }: DynamicBackgroundProps) {
   useEffect(() => {
     const update = () => setTimeOfDay(getTimeOfDay(new Date().getHours()));
     update();
-
-    // Обновляем фон раз в 5 минут
     const interval = setInterval(update, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div
-      className={`absolute inset-0 bg-gradient-to-br ${gradients[timeOfDay]} transition-all duration-[3000ms] ease-in-out`}
-      aria-hidden="true"
-    >
-      {/* Декоративные круги для глубины */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+  const greeting = `${greetings[timeOfDay]}${userName ? `, ${userName.split(' ')[0]}` : ''}`;
 
-      {/* Приветствие */}
-      <p
-        className="absolute top-8 left-1/2 -translate-x-1/2 text-white/60 text-lg whitespace-nowrap"
-        aria-label={userName ? `${greetings[timeOfDay]}, ${userName}` : greetings[timeOfDay]}
+  return (
+    <>
+      {/* Decorative background */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${gradients[timeOfDay]}
+          transition-all duration-[3000ms] ease-in-out`}
+        aria-hidden="true"
       >
-        {greetings[timeOfDay]}{userName ? `, ${userName.split(' ')[0]}` : ''}
+        <div
+          className="absolute -top-20 -right-20 w-80 h-80 rounded-full
+          bg-white/[0.06] blur-3xl"
+        />
+        <div
+          className="absolute bottom-10 -left-14 w-64 h-64 rounded-full
+          bg-white/[0.04] blur-2xl"
+        />
+        <div
+          className="absolute top-1/2 right-[20%] w-40 h-40 rounded-full
+          bg-white/[0.03] blur-xl"
+        />
+
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+      </div>
+
+      {/* Greeting — relative positioned, inside the content flow */}
+      <p
+        className="relative z-10 text-white/60 text-lg md:text-xl
+        font-semibold tracking-wide text-center"
+      >
+        {greeting}
       </p>
-    </div>
+    </>
   );
 }

@@ -1,57 +1,59 @@
 /**
  * @file auth.config.ts
- * @description Конфигурация NextAuth.js v5 — провайдер Credentials, JWT-коллбэки
- * @dependencies next-auth, bcryptjs, prisma, zod
+ * @description Edge-safe конфиг NextAuth.js v5 — только callbacks и pages.
+ * НЕ содержит Prisma, bcrypt и другие Node.js зависимости.
+ * Используется в middleware (Edge Runtime) и в полном конфиге.
  * @created 2026-02-22
  */
 
 import type { NextAuthConfig } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
-import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
 
-/** Схема валидации данных входа */
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+function getRoleHome(role?: string): string {
+  if (role === 'relative') return '/feed';
+  if (role === 'doctor') return '/doctor/dashboard';
+  if (role === 'admin') return '/admin';
+  return '/dashboard';
+}
 
-export const authConfig: NextAuthConfig = {
-  providers: [
-    Credentials({
-      async authorize(credentials) {
-        const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-
-        const { email, password } = parsed.data;
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return null;
-
-        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-        if (!passwordMatch) return null;
-
-        return {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          name: null,
-        };
-      },
-    }),
-  ],
+export const authConfig = {
+  providers: [],
   callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isDev = process.env.NODE_ENV === 'development';
+      const publicPages = [
+        '/',
+        '/login',
+        '/register',
+        '/privacy',
+        ...(isDev ? ['/dev-login'] : []),
+      ];
+      const isOnPublicPage = publicPages.includes(nextUrl.pathname);
+      const isPublicApi = ['/api/auth', '/api/health'].some((p) => nextUrl.pathname.startsWith(p));
+
+      if (isPublicApi) return true;
+      if (isLoggedIn && (nextUrl.pathname === '/login' || nextUrl.pathname === '/register')) {
+        const target = getRoleHome(auth?.user?.role);
+        return Response.redirect(new URL(target, nextUrl));
+      }
+      if (isLoggedIn && nextUrl.pathname === '/') {
+        const target = getRoleHome(auth?.user?.role);
+        return Response.redirect(new URL(target, nextUrl));
+      }
+      if (!isLoggedIn && !isOnPublicPage) return false;
+      return true;
+    },
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role as 'patient' | 'relative' | 'admin';
+        token.role = user.role as 'patient' | 'relative' | 'doctor' | 'admin';
       }
       return token;
     },
     session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+        session.user.id = token.id as string;
+        session.user.role = token.role as 'patient' | 'relative' | 'doctor' | 'admin';
       }
       return session;
     },
@@ -60,4 +62,4 @@ export const authConfig: NextAuthConfig = {
   pages: {
     signIn: '/login',
   },
-};
+} satisfies NextAuthConfig;

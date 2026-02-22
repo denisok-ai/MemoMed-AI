@@ -30,6 +30,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      // Заглушки для опциональных зависимостей, которых нет в тестовой среде
+      '@aws-sdk/client-s3': resolve(__dirname, './tests/mocks/aws-sdk-s3.ts'),
     },
   },
 });

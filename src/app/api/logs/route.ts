@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { cancelReminders } from '@/lib/reminders/queue';
 import type { ApiResponse } from '@/types';
 
 /** Схема создания лога приёма */
@@ -20,22 +21,10 @@ const createLogSchema = z.object({
   status: z.enum(['taken', 'missed', 'pending']).default('taken'),
 });
 
-/** Схема пакетной синхронизации офлайн-логов */
-const syncLogsSchema = z.object({
-  logs: z.array(
-    z.object({
-      localId: z.string(),
-      medicationId: z.string().uuid(),
-      scheduledAt: z.string().datetime(),
-      actualAt: z.string().datetime().optional(),
-      status: z.enum(['taken', 'missed', 'pending']),
-      createdAt: z.string().datetime(),
-    })
-  ).max(100, 'Максимум 100 записей за раз'),
-});
-
 /** POST /api/logs — записать факт приёма лекарства */
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<{ id: string }>>> {
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<ApiResponse<{ id: string }>>> {
   const session = await auth();
 
   if (!session?.user) {
@@ -77,6 +66,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       syncStatus: 'synced',
     },
   });
+
+  if (parsed.data.status === 'taken') {
+    await cancelReminders(parsed.data.medicationId, parsed.data.scheduledAt).catch((err) => {
+      console.warn('[logs] cancelReminders failed:', err);
+    });
+  }
 
   return NextResponse.json({ data: { id: log.id }, message: 'Приём записан' }, { status: 201 });
 }

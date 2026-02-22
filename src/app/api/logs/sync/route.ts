@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { cancelReminders } from '@/lib/reminders/queue';
 import type { ApiResponse } from '@/types';
 
 const syncLogsSchema = z.object({
@@ -33,9 +34,7 @@ interface SyncResult {
 }
 
 /** POST /api/logs/sync — пакетная загрузка офлайн-логов */
-export async function POST(
-  request: NextRequest
-): Promise<NextResponse<ApiResponse<SyncResult>>> {
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<SyncResult>>> {
   const session = await auth();
 
   if (!session?.user) {
@@ -82,6 +81,11 @@ export async function POST(
           createdAt: new Date(log.createdAt),
         },
       });
+      if (log.status === 'taken') {
+        await cancelReminders(log.medicationId, log.scheduledAt).catch((err) => {
+          console.warn('[logs/sync] cancelReminders failed:', err);
+        });
+      }
       synced.push(log.localId);
     } catch {
       failed.push(log.localId);

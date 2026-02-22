@@ -8,7 +8,11 @@
 'use client';
 
 import { useActionState } from 'react';
-import { createMedicationAction, updateMedicationAction, type MedicationActionResult } from '@/lib/medications/actions';
+import {
+  createMedicationAction,
+  updateMedicationAction,
+  type MedicationActionResult,
+} from '@/lib/medications/actions';
 import { FormError } from '@/components/shared/form-error';
 import { SubmitButton } from '@/components/shared/submit-button';
 
@@ -50,7 +54,7 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           required
           defaultValue={defaultValues?.name}
           className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
-            focus:border-[#7e57c2] focus:outline-none transition-colors"
+            focus:border-[#1565C0] focus:outline-none transition-colors"
           placeholder="Например: Аспирин"
         />
       </div>
@@ -66,7 +70,7 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           required
           defaultValue={defaultValues?.dosage}
           className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
-            focus:border-[#7e57c2] focus:outline-none transition-colors"
+            focus:border-[#1565C0] focus:outline-none transition-colors"
           placeholder="Например: 1 таблетка 500 мг"
         />
       </div>
@@ -82,14 +86,13 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           required
           defaultValue={defaultValues?.scheduledTime}
           className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
-            focus:border-[#7e57c2] focus:outline-none transition-colors"
+            focus:border-[#1565C0] focus:outline-none transition-colors"
         />
       </div>
 
       <div className="space-y-2">
         <label htmlFor="instruction" className="block text-lg font-medium text-[#212121]">
-          Инструкция{' '}
-          <span className="text-[#757575] font-normal text-base">(необязательно)</span>
+          Инструкция <span className="text-[#757575] font-normal text-base">(необязательно)</span>
         </label>
         <textarea
           id="instruction"
@@ -97,7 +100,7 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           rows={3}
           defaultValue={defaultValues?.instruction}
           className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
-            focus:border-[#7e57c2] focus:outline-none transition-colors resize-none"
+            focus:border-[#1565C0] focus:outline-none transition-colors resize-none"
           placeholder="Особые указания: принимать после еды, запивать водой..."
         />
       </div>

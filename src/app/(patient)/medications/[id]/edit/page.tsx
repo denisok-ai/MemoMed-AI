@@ -11,6 +11,8 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { MedicationForm } from '@/components/patient/medication-form';
+import { PhotoUpload } from '@/components/patient/photo-upload';
+import { FeedbackModal } from '@/components/patient/feedback-modal';
 
 export const metadata: Metadata = {
   title: 'Редактировать лекарство — MemoMed AI',
@@ -50,7 +52,7 @@ export default async function EditMedicationPage({ params }: PageProps) {
         <h1 className="text-2xl font-bold text-[#212121]">Редактировать лекарство</h1>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-8">
         <MedicationForm
           medicationId={medication.id}
           defaultValues={{
@@ -60,6 +62,24 @@ export default async function EditMedicationPage({ params }: PageProps) {
             scheduledTime: medication.scheduledTime,
           }}
         />
+
+        <div>
+          <h2 className="text-lg font-semibold text-[#212121] mb-4">📷 Фото упаковки</h2>
+          <PhotoUpload
+            medicationId={medication.id}
+            currentPhotoUrl={medication.photoUrl}
+            medicationName={medication.name}
+          />
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold text-[#212121] mb-4">⭐ Отзыв</h2>
+          <FeedbackModal
+            medicationId={medication.id}
+            medicationName={medication.name}
+            dosage={medication.dosage}
+          />
+        </div>
       </div>
     </div>
   );

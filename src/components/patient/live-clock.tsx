@@ -1,6 +1,6 @@
 /**
  * @file live-clock.tsx
- * @description Живые часы — клиентский компонент, обновляется каждую секунду
+ * @description Живые часы — desktop-optimized, крупный шрифт, чёткая типографика
  * @created 2026-02-22
  */
 
@@ -8,7 +8,6 @@
 
 import { useState, useEffect } from 'react';
 
-/** Форматирует дату в русской локали с днём недели */
 function formatDate(date: Date): string {
   return date.toLocaleDateString('ru-RU', {
     weekday: 'long',
@@ -17,7 +16,6 @@ function formatDate(date: Date): string {
   });
 }
 
-/** Форматирует время HH:MM:SS */
 function formatTime(date: Date): string {
   return date.toLocaleTimeString('ru-RU', {
     hour: '2-digit',
@@ -29,36 +27,36 @@ export function LiveClock() {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    // Устанавливаем начальное время только на клиенте (избегаем hydration mismatch)
-    setNow(new Date());
-
-    const interval = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-
+    const tick = () => setNow(new Date());
+    queueMicrotask(tick);
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
 
   if (!now) {
     return (
-      <div className="text-center space-y-1">
-        <div className="h-14 w-48 bg-white/20 rounded-2xl animate-pulse mx-auto" />
-        <div className="h-5 w-36 bg-white/20 rounded-xl animate-pulse mx-auto" />
+      <div className="text-center space-y-3">
+        <div className="h-20 md:h-24 w-48 bg-white/10 rounded-2xl med-pulse mx-auto" />
+        <div className="h-6 w-40 bg-white/10 rounded-xl med-pulse mx-auto" />
       </div>
     );
   }
 
   return (
-    <div className="text-center space-y-1">
+    <div className="text-center space-y-2">
       <time
         dateTime={now.toISOString()}
-        className="block text-5xl font-bold text-white font-[family-name:var(--font-montserrat)] tabular-nums"
+        className="block text-7xl md:text-8xl font-black text-white tracking-tight
+          font-[family-name:var(--font-montserrat)] tabular-nums leading-none
+          drop-shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
         aria-live="polite"
         aria-label={`Текущее время: ${formatTime(now)}`}
       >
         {formatTime(now)}
       </time>
-      <p className="text-lg text-white/80 capitalize">{formatDate(now)}</p>
+      <p className="text-lg md:text-xl text-white/50 capitalize font-medium tracking-wide">
+        {formatDate(now)}
+      </p>
     </div>
   );
 }

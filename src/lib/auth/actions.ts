@@ -13,6 +13,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { redirect } from 'next/navigation';
+import type { Role } from '@prisma/client';
 
 /** Схема валидации формы входа */
 const loginSchema = z.object({
@@ -25,7 +26,7 @@ const registerSchema = z.object({
   email: z.string().email('Некорректный адрес электронной почты'),
   password: z.string().min(8, 'Пароль должен быть не менее 8 символов'),
   fullName: z.string().min(2, 'Имя слишком короткое').max(100, 'Имя слишком длинное'),
-  role: z.enum(['patient', 'relative']),
+  role: z.enum(['patient', 'relative', 'doctor']),
   consentGiven: z
     .union([z.boolean(), z.string()])
     .transform((v) => v === true || v === 'on' || v === 'true'),
@@ -117,7 +118,7 @@ export async function registerAction(
     data: {
       email,
       passwordHash,
-      role,
+      role: role as Role,
       consentGiven,
       feedbackConsent: feedbackConsent ?? false,
       profile: {
@@ -136,5 +137,7 @@ export async function registerAction(
     return { error: 'Аккаунт создан, но вход не выполнен. Войдите вручную.' };
   }
 
-  redirect('/dashboard');
+  const roleHome =
+    role === 'relative' ? '/feed' : role === 'doctor' ? '/doctor/dashboard' : '/dashboard';
+  redirect(roleHome);
 }

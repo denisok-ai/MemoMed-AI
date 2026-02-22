@@ -44,8 +44,8 @@ export function ConnectForm() {
           autoCapitalize="characters"
           className="w-full px-4 py-3 text-xl font-mono tracking-widest text-center
             border-2 border-gray-200 rounded-xl uppercase
-            focus:border-[#7e57c2] focus:outline-none transition-colors"
-          placeholder="XXXXXXXX"
+            focus:border-[#1565C0] focus:outline-none transition-colors"
+          placeholder="Введите код"
           maxLength={32}
         />
       </div>
@@ -53,7 +53,7 @@ export function ConnectForm() {
       <SubmitButton
         label="Подключиться"
         loadingLabel="Проверка кода..."
-        className="bg-[#7e57c2] hover:bg-[#6a3fb5]"
+        className="bg-[#1565C0] hover:bg-[#0D47A1]"
       />
     </form>
   );

@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { createMedicationSchema } from '@/lib/validations/medication.schema';
+import { scheduleReminders } from '@/lib/reminders/queue';
 import type { ApiResponse } from '@/types';
 
 /** GET /api/medications — получить все активные лекарства текущего пациента */
@@ -46,7 +47,9 @@ export async function GET(): Promise<NextResponse> {
 }
 
 /** POST /api/medications — создать новое лекарство */
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<{ id: string }>>> {
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<ApiResponse<{ id: string }>>> {
   const session = await auth();
 
   if (!session?.user) {
@@ -77,5 +80,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     },
   });
 
-  return NextResponse.json({ data: { id: medication.id }, message: 'Лекарство добавлено' }, { status: 201 });
+  await scheduleReminders(
+    medication.id,
+    medication.patientId,
+    medication.name,
+    medication.dosage,
+    medication.scheduledTime
+  ).catch((err) => {
+    console.warn('[medications] scheduleReminders failed:', err);
+  });
+
+  return NextResponse.json(
+    { data: { id: medication.id }, message: 'Лекарство добавлено' },
+    { status: 201 }
+  );
 }

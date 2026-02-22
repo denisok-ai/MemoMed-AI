@@ -1,8 +1,7 @@
 /**
  * @file page.tsx
- * @description Главный экран пациента: живые часы, ближайшее лекарство и большая кнопка приёма
- * Цветовой фон меняется в зависимости от времени суток
- * @dependencies LiveClock, TakeMedicationButton, NextMedicationCard, DynamicBackground
+ * @description Главный экран пациента — desktop-optimized MedTech dashboard.
+ * Centered app-column (max 640px), generous spacing, large touch targets.
  * @created 2026-02-22
  */
 
@@ -16,10 +15,65 @@ import { LiveClock } from '@/components/patient/live-clock';
 import { TakeMedicationButton } from '@/components/patient/take-medication-button';
 import { NextMedicationCard } from '@/components/patient/next-medication-card';
 import { DynamicBackground } from '@/components/patient/dynamic-background';
+import {
+  PillIcon,
+  ClipboardIcon,
+  BotIcon,
+  BookIcon,
+  BarChartIcon,
+  StarIcon,
+  CheckIcon,
+  ChevronRightIcon,
+} from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Главная — MemoMed AI',
 };
+
+const QUICK_LINKS = [
+  {
+    href: '/medications',
+    label: 'Лекарства',
+    Icon: PillIcon,
+    gradient: 'from-blue-500 to-blue-600',
+    bg: 'bg-blue-50',
+  },
+  {
+    href: '/history',
+    label: 'История',
+    Icon: ClipboardIcon,
+    gradient: 'from-slate-500 to-slate-600',
+    bg: 'bg-slate-50',
+  },
+  {
+    href: '/stats',
+    label: 'Статистика',
+    Icon: BarChartIcon,
+    gradient: 'from-teal-500 to-teal-600',
+    bg: 'bg-teal-50',
+  },
+  {
+    href: '/journal',
+    label: 'Дневник',
+    Icon: BookIcon,
+    gradient: 'from-indigo-500 to-indigo-600',
+    bg: 'bg-indigo-50',
+  },
+  {
+    href: '/chat',
+    label: 'ИИ-помощник',
+    Icon: BotIcon,
+    gradient: 'from-cyan-500 to-cyan-600',
+    bg: 'bg-cyan-50',
+  },
+  {
+    href: '/feedback',
+    label: 'Отзывы',
+    Icon: StarIcon,
+    gradient: 'from-amber-500 to-amber-600',
+    bg: 'bg-amber-50',
+  },
+] as const;
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -29,13 +83,16 @@ export default async function DashboardPage() {
     getNextMedication(session.user.id),
     prisma.profile.findUnique({
       where: { userId: session.user.id },
-      select: { fullName: true },
+      select: { fullName: true, onboardingDone: true },
     }),
   ]);
 
+  if (profile && !profile.onboardingDone) {
+    redirect('/onboarding');
+  }
+
   const userName = profile?.fullName ?? undefined;
 
-  // Создаём scheduledAt из сегодняшней даты + время из лекарства
   const getScheduledAt = (scheduledTime: string) => {
     const today = new Date();
     const [hours, minutes] = scheduledTime.split(':').map(Number);
@@ -45,91 +102,107 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col">
-      {/* Верхняя секция с часами и фоном */}
+      {/* ── Hero — часы + приветствие + карточка ближайшего лекарства ── */}
       <section
-        className="relative overflow-hidden flex flex-col items-center justify-center
-          px-6 pt-16 pb-10 min-h-[320px] space-y-6"
+        className="relative overflow-hidden flex flex-col items-center
+          px-6 pt-14 pb-14 md:pt-20 md:pb-20"
         aria-label="Текущее время и приветствие"
       >
         <DynamicBackground userName={userName} />
-        <div className="relative z-10 space-y-6 w-full max-w-md">
+
+        <div
+          className="relative z-10 w-full max-w-lg mx-auto
+          space-y-8 md:space-y-10 med-animate"
+        >
           <LiveClock />
 
-          {/* Карточка ближайшего лекарства */}
-          {nextMedication && (
-            <NextMedicationCard medication={nextMedication} />
-          )}
+          {nextMedication && <NextMedicationCard medication={nextMedication} />}
         </div>
       </section>
 
-      {/* Нижняя секция с кнопкой */}
+      {/* ── Основная панель ── */}
       <section
-        className="flex-1 flex flex-col gap-4 p-6 bg-white"
+        className="flex-1 bg-[var(--color-background)] rounded-t-[2rem] -mt-6
+          shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
         aria-label="Действия"
       >
-        {nextMedication ? (
-          <TakeMedicationButton
-            medicationId={nextMedication.id}
-            medicationName={nextMedication.name}
-            scheduledAt={getScheduledAt(nextMedication.scheduledTime)}
-          />
-        ) : (
-          <div className="text-center py-8 space-y-4">
-            <p className="text-5xl" aria-hidden="true">🎉</p>
-            <p className="text-xl text-[#4caf50] font-semibold">
-              Все лекарства приняты на сегодня!
-            </p>
-            <Link
-              href="/medications/add"
-              className="inline-block px-8 py-4 bg-[#7e57c2] text-white rounded-2xl
-                text-lg font-semibold hover:bg-[#6a3fb5] transition-colors"
-            >
-              + Добавить лекарство
-            </Link>
+        <div className="max-w-lg mx-auto px-6 py-8 md:py-10 space-y-8">
+          {/* Кнопка приёма или success */}
+          <div className="med-animate" style={{ animationDelay: '80ms' }}>
+            {nextMedication ? (
+              <TakeMedicationButton
+                medicationId={nextMedication.id}
+                medicationName={nextMedication.name}
+                scheduledAt={getScheduledAt(nextMedication.scheduledTime)}
+              />
+            ) : (
+              <div
+                className="med-card flex items-center gap-5 p-5
+                bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-100"
+              >
+                <div
+                  className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500
+                  flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-200/50"
+                >
+                  <CheckIcon className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-green-800 font-bold text-lg">Все лекарства приняты!</p>
+                  <p className="text-green-600 text-sm">Отличная дисциплина на сегодня</p>
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Быстрые ссылки */}
-        <div className="grid grid-cols-2 gap-3 mt-2">
-          <Link
-            href="/medications"
-            className="flex items-center gap-3 p-4 bg-[#ede7f6] rounded-2xl
-              hover:bg-[#d1c4e9] transition-colors min-h-[72px]"
-            aria-label="Перейти к списку лекарств"
-          >
-            <span className="text-2xl" aria-hidden="true">💊</span>
-            <span className="text-base font-medium text-[#7e57c2]">Лекарства</span>
-          </Link>
+          {/* Быстрые ссылки */}
+          <div className="med-animate" style={{ animationDelay: '160ms' }}>
+            <p className="med-section-title mb-4">Быстрый доступ</p>
+            <div className="grid grid-cols-3 gap-3 md:gap-4 med-stagger">
+              {QUICK_LINKS.map(({ href, label, Icon, gradient, bg }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`group flex flex-col items-center gap-3 p-4 md:p-5
+                    rounded-2xl ${bg} border border-transparent
+                    hover:border-slate-200 hover:shadow-lg hover:-translate-y-0.5
+                    active:scale-[0.96] transition-all duration-200`}
+                  aria-label={label}
+                >
+                  <div
+                    className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl
+                    bg-gradient-to-br ${gradient}
+                    flex items-center justify-center
+                    shadow-md group-hover:shadow-lg group-hover:scale-105
+                    transition-all duration-200`}
+                  >
+                    <Icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
+                  </div>
+                  <span
+                    className="text-sm md:text-base font-bold text-slate-700 text-center
+                    group-hover:text-[#1565C0] transition-colors leading-tight"
+                  >
+                    {label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
 
-          <Link
-            href="/history"
-            className="flex items-center gap-3 p-4 bg-[#e8f5e9] rounded-2xl
-              hover:bg-[#c8e6c9] transition-colors min-h-[72px]"
-            aria-label="История приёма"
-          >
-            <span className="text-2xl" aria-hidden="true">📋</span>
-            <span className="text-base font-medium text-[#4caf50]">История</span>
-          </Link>
-
-          <Link
-            href="/chat"
-            className="flex items-center gap-3 p-4 bg-[#e3f2fd] rounded-2xl
-              hover:bg-[#bbdefb] transition-colors min-h-[72px]"
-            aria-label="ИИ-помощник"
-          >
-            <span className="text-2xl" aria-hidden="true">🤖</span>
-            <span className="text-base font-medium text-[#42a5f5]">ИИ-помощник</span>
-          </Link>
-
-          <Link
-            href="/journal"
-            className="flex items-center gap-3 p-4 bg-[#fce4ec] rounded-2xl
-              hover:bg-[#f8bbd9] transition-colors min-h-[72px]"
-            aria-label="Дневник здоровья"
-          >
-            <span className="text-2xl" aria-hidden="true">📓</span>
-            <span className="text-base font-medium text-[#e91e63]">Дневник</span>
-          </Link>
+          {/* CTA — добавить лекарство */}
+          {!nextMedication && (
+            <div className="med-animate" style={{ animationDelay: '240ms' }}>
+              <Link
+                href="/medications/add"
+                className="flex items-center justify-center gap-3
+                  med-btn-primary rounded-2xl py-4 text-lg w-full"
+                aria-label="Добавить лекарство"
+              >
+                <PillIcon className="w-5 h-5" />
+                Добавить лекарство
+                <ChevronRightIcon className="w-4 h-4 opacity-60" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
     </div>

@@ -42,9 +42,7 @@ export function PushNotificationsToggle() {
         <div>
           <p className="text-base font-medium text-[#212121]">Напоминания о лекарствах</p>
           <p className="text-sm text-[#9e9e9e]">
-            {isSubscribed
-              ? 'Уведомления включены'
-              : 'Получайте напоминания на это устройство'}
+            {isSubscribed ? 'Уведомления включены' : 'Получайте напоминания на это устройство'}
           </p>
         </div>
       </div>
@@ -53,7 +51,7 @@ export function PushNotificationsToggle() {
         onClick={isSubscribed ? unsubscribe : subscribe}
         disabled={isLoading}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors
-          focus:outline-none focus:ring-2 focus:ring-[#7e57c2] focus:ring-offset-2
+          focus:outline-none focus:ring-2 focus:ring-[#1565C0] focus:ring-offset-2
           ${isSubscribed ? 'bg-[#4caf50]' : 'bg-gray-300'}
           disabled:opacity-50`}
         role="switch"

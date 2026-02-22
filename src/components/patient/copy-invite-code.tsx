@@ -37,11 +37,11 @@ export function CopyInviteCode({ code }: CopyInviteCodeProps) {
     <div className="space-y-4">
       {/* Отображение кода крупным шрифтом */}
       <div
-        className="bg-white rounded-2xl px-8 py-6 border-2 border-[#7e57c2]"
+        className="bg-white rounded-2xl px-8 py-6 border-2 border-[#1565C0]"
         aria-label={`Инвайт-код: ${code}`}
       >
         <p
-          className="text-4xl font-bold text-[#7e57c2] font-mono tracking-widest text-center"
+          className="text-4xl font-bold text-[#1565C0] font-mono tracking-widest text-center"
           aria-live="polite"
         >
           {code}
@@ -53,9 +53,7 @@ export function CopyInviteCode({ code }: CopyInviteCodeProps) {
         onClick={handleCopy}
         className={`w-full py-4 text-lg font-semibold rounded-xl transition-all duration-200
           min-h-[56px] ${
-            copied
-              ? 'bg-[#4caf50] text-white'
-              : 'bg-[#7e57c2] text-white hover:bg-[#6a3fb5]'
+            copied ? 'bg-[#4caf50] text-white' : 'bg-[#1565C0] text-white hover:bg-[#6a3fb5]'
           }`}
         aria-label={copied ? 'Код скопирован' : 'Скопировать код'}
         aria-live="polite"

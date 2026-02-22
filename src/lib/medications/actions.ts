@@ -11,7 +11,11 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
-import { createMedicationSchema, updateMedicationSchema } from '@/lib/validations/medication.schema';
+import {
+  createMedicationSchema,
+  updateMedicationSchema,
+} from '@/lib/validations/medication.schema';
+import { scheduleReminders } from '@/lib/reminders/queue';
 
 export interface MedicationActionResult {
   error?: string;
@@ -42,11 +46,21 @@ export async function createMedicationAction(
     return { error: parsed.error.issues[0]?.message ?? 'Некорректные данные' };
   }
 
-  await prisma.medication.create({
+  const medication = await prisma.medication.create({
     data: {
       ...parsed.data,
       patientId: session.user.id,
     },
+  });
+
+  await scheduleReminders(
+    medication.id,
+    medication.patientId,
+    medication.name,
+    medication.dosage,
+    medication.scheduledTime
+  ).catch((err) => {
+    console.warn('[medications/actions] scheduleReminders failed:', err);
   });
 
   revalidatePath('/medications');

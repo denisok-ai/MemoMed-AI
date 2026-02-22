@@ -26,8 +26,8 @@ export function ChatSuggestions({ onSelect }: ChatSuggestionsProps) {
             key={suggestion}
             onClick={() => onSelect(suggestion)}
             role="listitem"
-            className="px-4 py-2 text-sm bg-[#ede7f6] text-[#7e57c2] rounded-full
-              hover:bg-[#d1c4e9] transition-colors text-left min-h-[40px]"
+            className="px-4 py-2 text-sm bg-[#E3F2FD] text-[#1565C0] rounded-full
+              hover:bg-[#BBDEFB] transition-colors text-left min-h-[48px]"
           >
             {suggestion}
           </button>

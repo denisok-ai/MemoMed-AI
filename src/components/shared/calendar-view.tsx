@@ -40,8 +40,18 @@ interface CalendarViewProps {
 const DAY_NAMES = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
 const MONTH_NAMES = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
 ];
 
 const colorStyles: Record<DayColor, string> = {
@@ -83,16 +93,21 @@ export function CalendarView({ patientId }: CalendarViewProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   function prevMonth() {
-    if (month === 0) { setYear(y => y - 1); setMonth(11); }
-    else setMonth(m => m - 1);
+    if (month === 0) {
+      setYear((y) => y - 1);
+      setMonth(11);
+    } else setMonth((m) => m - 1);
     setSelectedDay(null);
   }
 
   function nextMonth() {
     const today = new Date();
-    if (year > today.getFullYear() || (year === today.getFullYear() && month >= today.getMonth())) return;
-    if (month === 11) { setYear(y => y + 1); setMonth(0); }
-    else setMonth(m => m + 1);
+    if (year > today.getFullYear() || (year === today.getFullYear() && month >= today.getMonth()))
+      return;
+    if (month === 11) {
+      setYear((y) => y + 1);
+      setMonth(0);
+    } else setMonth((m) => m + 1);
     setSelectedDay(null);
   }
 
@@ -103,7 +118,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
         <button
           onClick={prevMonth}
           className="p-3 rounded-xl hover:bg-gray-100 transition-colors min-h-[48px] min-w-[48px]
-            text-xl text-[#7e57c2]"
+            text-xl text-[#1565C0]"
           aria-label="Предыдущий месяц"
         >
           ←
@@ -114,7 +129,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
         <button
           onClick={nextMonth}
           className="p-3 rounded-xl hover:bg-gray-100 transition-colors min-h-[48px] min-w-[48px]
-            text-xl text-[#7e57c2]"
+            text-xl text-[#1565C0]"
           aria-label="Следующий месяц"
         >
           →
@@ -124,7 +139,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
       {/* Заголовки дней недели */}
       <div className="grid grid-cols-7 gap-1">
         {DAY_NAMES.map((name) => (
-          <div key={name} className="text-center text-xs font-medium text-[#9e9e9e] py-1">
+          <div key={name} className="text-center text-sm font-medium text-[#9e9e9e] py-1">
             {name}
           </div>
         ))}
@@ -138,7 +153,11 @@ export function CalendarView({ patientId }: CalendarViewProps) {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-7 gap-1" role="grid" aria-label={`Календарь ${MONTH_NAMES[month]} ${year}`}>
+        <div
+          className="grid grid-cols-7 gap-1"
+          role="grid"
+          aria-label={`Календарь ${MONTH_NAMES[month]} ${year}`}
+        >
           {/* Пустые ячейки в начале */}
           {Array.from({ length: firstDayMon }).map((_, i) => (
             <div key={`empty-${i}`} />
@@ -159,14 +178,16 @@ export function CalendarView({ patientId }: CalendarViewProps) {
                 onClick={() => setSelectedDay(isSelected ? null : (dayData ?? null))}
                 className={`aspect-square rounded-xl text-sm font-medium transition-all
                   ${colorStyles[color]}
-                  ${isToday ? 'ring-2 ring-[#7e57c2] ring-offset-1' : ''}
+                  ${isToday ? 'ring-2 ring-[#1565C0] ring-offset-1' : ''}
                   ${isSelected ? 'ring-2 ring-white ring-offset-2 scale-110' : ''}
                   ${dayData && dayData.color !== 'empty' ? 'hover:opacity-80 cursor-pointer' : 'cursor-default'}
                 `}
                 disabled={!dayData || dayData.color === 'empty'}
-                aria-label={dayData
-                  ? `${day}: ${dayData.takenCount} из ${dayData.totalCount} принято`
-                  : String(day)}
+                aria-label={
+                  dayData
+                    ? `${day}: ${dayData.takenCount} из ${dayData.totalCount} принято`
+                    : String(day)
+                }
               >
                 {day}
               </button>
@@ -180,13 +201,14 @@ export function CalendarView({ patientId }: CalendarViewProps) {
         <div className="bg-[#f5f5f5] rounded-2xl p-4 space-y-2 animate-in fade-in">
           <p className="text-base font-semibold text-[#212121]">
             {new Date(selectedDay.date + 'T12:00:00').toLocaleDateString('ru-RU', {
-              day: 'numeric', month: 'long',
+              day: 'numeric',
+              month: 'long',
             })}
           </p>
           <div className="flex gap-4 text-sm">
             <span className="text-[#4caf50]">✅ Принято: {selectedDay.takenCount}</span>
             <span className="text-[#f44336]">❌ Пропущено: {selectedDay.missedCount}</span>
-            <span className="text-[#7e57c2]">📊 {selectedDay.disciplinePercent}%</span>
+            <span className="text-[#1565C0]">📊 {selectedDay.disciplinePercent}%</span>
           </div>
         </div>
       )}
@@ -198,9 +220,9 @@ export function CalendarView({ patientId }: CalendarViewProps) {
             <p className="text-2xl font-bold text-[#2e7d32]">{data.stats.disciplinePercent}%</p>
             <p className="text-sm text-[#4caf50]">Дисциплина</p>
           </div>
-          <div className="bg-[#ede7f6] rounded-2xl p-4 text-center">
-            <p className="text-2xl font-bold text-[#7e57c2]">{data.stats.currentStreak}</p>
-            <p className="text-sm text-[#9575cd]">Дней подряд 🔥</p>
+          <div className="bg-[#E3F2FD] rounded-2xl p-4 text-center">
+            <p className="text-2xl font-bold text-[#1565C0]">{data.stats.currentStreak}</p>
+            <p className="text-sm text-[#42A5F5]">Дней подряд 🔥</p>
           </div>
           <div className="bg-[#e3f2fd] rounded-2xl p-4 text-center">
             <p className="text-2xl font-bold text-[#1976d2]">{data.stats.perfectDays}</p>

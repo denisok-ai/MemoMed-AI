@@ -22,8 +22,9 @@ const SLIDES: OnboardingSlide[] = [
   {
     emoji: '💊',
     title: 'Ваши лекарства',
-    description: 'Добавьте список лекарств — время приёма и дозировку. Приложение напомнит в нужный момент.',
-    bgColor: 'from-[#7e57c2] to-[#9575cd]',
+    description:
+      'Добавьте список лекарств — время приёма и дозировку. Приложение напомнит в нужный момент.',
+    bgColor: 'from-[#1565C0] to-[#42A5F5]',
   },
   {
     emoji: '✅',
@@ -34,13 +35,15 @@ const SLIDES: OnboardingSlide[] = [
   {
     emoji: '📡',
     title: 'Работает офлайн',
-    description: 'Приложение работает даже без интернета. Данные синхронизируются автоматически при подключении.',
+    description:
+      'Приложение работает даже без интернета. Данные синхронизируются автоматически при подключении.',
     bgColor: 'from-[#42a5f5] to-[#26c6da]',
   },
   {
     emoji: '👥',
     title: 'Для близких',
-    description: 'Поделитесь кодом с родственниками — они смогут следить за приёмом лекарств в реальном времени.',
+    description:
+      'Поделитесь кодом с родственниками — они смогут следить за приёмом лекарств в реальном времени.',
     bgColor: 'from-[#ff7043] to-[#ab47bc]',
   },
 ];
@@ -73,7 +76,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       {/* Градиентный фон */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${current.bgColor} transition-all duration-500`} />
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${current.bgColor} transition-all duration-500`}
+      />
 
       {/* Кнопка «Пропустить» */}
       <div className="relative z-10 flex justify-end p-6">
@@ -89,8 +94,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       </div>
 
       {/* Основной контент */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center
-        px-8 text-center space-y-8">
+      <div
+        className="relative z-10 flex-1 flex flex-col items-center justify-center
+        px-8 text-center space-y-8"
+      >
         <div
           className="text-[120px] leading-none"
           aria-hidden="true"
@@ -100,12 +107,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         </div>
 
         <div className="space-y-4 max-w-sm">
-          <h2 className="text-3xl font-bold text-white leading-tight">
-            {current.title}
-          </h2>
-          <p className="text-xl text-white/90 leading-relaxed">
-            {current.description}
-          </p>
+          <h2 className="text-3xl font-bold text-white leading-tight">{current.title}</h2>
+          <p className="text-xl text-white/90 leading-relaxed">{current.description}</p>
         </div>
       </div>
 
@@ -131,7 +134,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           <button
             onClick={handleComplete}
             disabled={isPending}
-            className="w-full py-5 bg-white text-[#7e57c2] text-xl font-bold rounded-3xl
+            className="w-full py-5 bg-white text-[#1565C0] text-xl font-bold rounded-3xl
               hover:bg-white/90 transition-colors min-h-[64px] disabled:opacity-60"
           >
             {isPending ? 'Подготовка...' : 'Начать 🚀'}

@@ -40,7 +40,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
         rows={1}
         placeholder="Спросите об этом лекарстве..."
         className="flex-1 px-4 py-3 text-base border-2 border-gray-200 rounded-2xl
-          resize-none focus:border-[#7e57c2] focus:outline-none transition-colors
+          resize-none focus:border-[#1565C0] focus:outline-none transition-colors
           disabled:opacity-60 max-h-[120px] overflow-y-auto"
         style={{ minHeight: '52px' }}
         aria-label="Сообщение ИИ-помощнику"
@@ -49,8 +49,8 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
         onClick={handleSend}
         disabled={!text.trim() || isLoading}
         aria-label="Отправить сообщение"
-        className="w-13 h-13 min-w-[52px] min-h-[52px] bg-[#7e57c2] text-white rounded-2xl
-          hover:bg-[#6a3fb5] disabled:opacity-50 disabled:cursor-not-allowed
+        className="w-13 h-13 min-w-[52px] min-h-[52px] bg-[#1565C0] text-white rounded-2xl
+          hover:bg-[#0D47A1] disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors flex items-center justify-center text-xl"
       >
         {isLoading ? (

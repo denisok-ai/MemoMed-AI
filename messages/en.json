@@ -1,0 +1,137 @@
+{
+  "common": {
+    "appName": "MemoMed AI",
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "register": "Register",
+    "email": "Email address",
+    "password": "Password",
+    "fullName": "Your name",
+    "role": "Who are you?",
+    "rolePatient": "Patient (taking medications)",
+    "roleRelative": "Relative (monitoring a loved one)",
+    "roleDoctor": "Doctor (monitoring patients)",
+    "consentRequired": "I agree to the personal data processing policy (required)",
+    "feedbackConsent": "Allow anonymous medication effectiveness data usage (optional)",
+    "createAccount": "Create account",
+    "haveAccount": "Already have an account?",
+    "noAccount": "No account?",
+    "incorrectCredentials": "Incorrect email or password",
+    "signInError": "Sign in error. Please try again."
+  },
+  "nav": {
+    "home": "Home",
+    "medications": "Medications",
+    "journal": "Journal",
+    "feedback": "Reviews",
+    "chat": "AI",
+    "feed": "Feed",
+    "patients": "Patients",
+    "connect": "Connect",
+    "stats": "Statistics",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Good day!",
+    "nextMedication": "Next dose",
+    "takeMedication": "Take medication",
+    "taken": "Taken! ✅",
+    "noMedications": "No medications added",
+    "addFirst": "Add your first medication"
+  },
+  "medications": {
+    "title": "My Medications",
+    "add": "Add medication",
+    "edit": "Edit",
+    "delete": "Delete",
+    "name": "Name",
+    "dosage": "Dosage",
+    "scheduledTime": "Scheduled time",
+    "instructions": "Instructions",
+    "noMedications": "No medications",
+    "addHint": "Tap «+» to add your first medication"
+  },
+  "stats": {
+    "title": "Statistics",
+    "discipline": "Discipline",
+    "streak": "Streak",
+    "avgDelay": "Average delay",
+    "taken": "Taken",
+    "missed": "Missed",
+    "days": "days",
+    "period": "Period",
+    "loading": "Loading statistics..."
+  },
+  "journal": {
+    "title": "Health Journal",
+    "mood": "Mood",
+    "pain": "Pain",
+    "sleep": "Sleep",
+    "energy": "Energy",
+    "notes": "Notes",
+    "save": "Save entry",
+    "noEntries": "No entries"
+  },
+  "feedback": {
+    "title": "Medication Reviews",
+    "subtitle": "Your reviews help your doctor and research. Data is anonymized.",
+    "selectMedication": "Medication",
+    "effectiveness": "Medication effectiveness",
+    "sideEffects": "Side effects",
+    "sideEffectsHint": "E.g.: nausea, dizziness, rash...",
+    "comment": "Comment",
+    "commentHint": "Tell us more about your experience with this medication...",
+    "privacy": "Data is anonymized before analysis. Personal information is not shared with third parties.",
+    "submit": "Submit review",
+    "submitting": "Submitting...",
+    "success": "Thank you! Review saved and sent to your doctor.",
+    "optional": "(optional)",
+    "myFeedbacks": "My recent reviews",
+    "noMedications": "No active medications",
+    "noMedicationsHint": "Add a medication to leave a review"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "placeholder": "Ask a question about medications...",
+    "send": "Send",
+    "disclaimer": "Responses are informational only. Consult your doctor.",
+    "clear": "Clear chat"
+  },
+  "feed": {
+    "title": "Event Feed",
+    "noPatients": "No connected patients",
+    "connect": "Connect patient",
+    "taken": "took",
+    "missed": "missed",
+    "delay": "with delay"
+  },
+  "doctor": {
+    "title": "My Patients",
+    "noPatients": "No connected patients",
+    "noPatientsHint": "Ask your patient to share their invite code",
+    "discipline30": "in 30 days",
+    "medications": "medication(s)"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "voice": "Voice reminders",
+    "account": "Account"
+  }
+}

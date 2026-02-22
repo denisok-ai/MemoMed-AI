@@ -7,6 +7,9 @@
 
 import type { NextConfig } from 'next';
 import withPWAInit from '@ducanh2912/next-pwa';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const withPWA = withPWAInit({
   dest: 'public',
@@ -45,11 +48,33 @@ const withPWA = withPWAInit({
   },
 });
 
-const nextConfig: NextConfig = {
-  output: 'standalone',
+// При сборке для Capacitor используем статический экспорт (output: 'export')
+const isCapacitorBuild = process.env.BUILD_TARGET === 'capacitor';
 
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+const nextConfig: NextConfig = {
+  output: isCapacitorBuild ? 'export' : 'standalone',
+  // Capacitor-сборка требует trailingSlash для корректной работы роутинга
+  ...(isCapacitorBuild ? { trailingSlash: true } : {}),
+
+  env: {
+    NEXT_PUBLIC_BUILD_VERSION: process.env.npm_package_version ?? '0.0.0',
+    NEXT_PUBLIC_BUILD_DATE: new Date().toISOString(),
+    NEXT_PUBLIC_BUILD_COMMIT: process.env.COMMIT_SHA ?? 'dev',
+  },
+
+  serverExternalPackages: ['@prisma/client', 'bcryptjs'],
+
+  turbopack: {},
+
+  images: {
+    remotePatterns: [
+      // S3/MinIO хранилище (если настроено)
+      ...(process.env.S3_ENDPOINT
+        ? [{ protocol: 'https' as const, hostname: new URL(process.env.S3_ENDPOINT).hostname }]
+        : []),
+    ],
+    // Локальные загрузки через /uploads/
+    localPatterns: [{ pathname: '/uploads/**' }],
   },
 
   async headers() {
@@ -71,4 +96,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default withNextIntl(withPWA(nextConfig));

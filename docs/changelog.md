@@ -1,19 +1,23 @@
 <!--
   @file: changelog.md
-  @description: Хронологический журнал всех изменений проекта MemoMed AI
-  @dependencies: project.md, tasktracker.md
+  @description: Исторические записи изменений (до введения версий). Актуальный журнал — CHANGELOG.md в корне.
+  @dependencies: project.md, tasktracker.md, versioning.md
   @created: 2026-02-22
 -->
 
-# MemoMed AI -- Журнал изменений (Changelog)
+# MemoMed AI — Исторический журнал (до версионирования)
 
-> Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/)
+> **Актуальный журнал изменений по версиям:** [CHANGELOG.md](../CHANGELOG.md) в корне проекта.  
+> Правила версионирования: [docs/versioning.md](versioning.md).
+
+Ниже — архив записей до введения семантического версионирования (0.1.0).
 
 ---
 
-## [2026-02-22] - Архитектурное проектирование и решение Q&A
+## [2026-02-22] — Архитектурное проектирование и решение Q&A
 
 ### Добавлено
+
 - Документация проекта: `docs/project.md` (архитектура, стек, стандарты, roadmap)
 - Трекер задач: `docs/tasktracker.md` (20+ задач по 5 этапам)
 - Дневник разработки: `docs/diary.md` (2 записи: архитектурные решения + Q&A)
@@ -29,6 +33,7 @@
 - Задачи в v1.1: онбординг, Text-to-Speech
 
 ### Изменено
+
 - Стек: Flutter → Next.js 14+ (web-first подход)
 - Стек: OpenAI → DeepSeek API (оплата из РФ)
 - Стек: Express.js → Next.js API Routes (единый проект)
@@ -40,12 +45,15 @@
 - История чата: клиентская → серверная (таблица `chat_messages`)
 
 ### Исправлено
+
 - Баг в SQL-схеме: функция `reset_daily_medication_flags()` уничтожала историю приёмов (удалена, логи теперь иммутабельны)
 
 ---
 
 ## Ссылки
 
+- [CHANGELOG.md](../CHANGELOG.md) — актуальный журнал по версиям
+- [Версионирование](versioning.md)
 - [Описание проекта](project.md)
 - [Трекер задач](tasktracker.md)
 - [Дневник разработки](diary.md)

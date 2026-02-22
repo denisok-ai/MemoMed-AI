@@ -10,6 +10,7 @@
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { cancelReminders } from '@/lib/reminders/queue';
 
 export interface TakeMedicationResult {
   success: boolean;
@@ -52,6 +53,10 @@ export async function takeMedicationAction(
       status: 'taken',
       syncStatus: 'synced',
     },
+  });
+
+  await cancelReminders(medicationId, scheduledAt).catch((err) => {
+    console.warn('[log-actions] cancelReminders failed:', err);
   });
 
   revalidatePath('/dashboard');

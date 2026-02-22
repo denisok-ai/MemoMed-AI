@@ -1,7 +1,6 @@
 /**
  * @file live-feed.tsx
- * @description Живая лента событий для родственника с SSE и polling-fallback.
- * Показывает статус подключения и список событий в реальном времени.
+ * @description Живая лента событий — MedTech 2025/2026 style
  * @dependencies useLiveFeed, FeedItem
  * @created 2026-02-22
  */
@@ -10,22 +9,23 @@
 
 import { useLiveFeed } from '@/hooks/use-live-feed';
 import { FeedItem } from './feed-item';
+import { ActivityIcon } from '@/components/shared/nav-icons';
 
 export function LiveFeed() {
   const { events, isConnected, connectionMode, error, refresh } = useLiveFeed();
 
   return (
     <div className="space-y-4">
-      {/* Строка статуса подключения */}
+      {/* Connection status */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span
-            className={`w-2.5 h-2.5 rounded-full ${
-              isConnected ? 'bg-[#4caf50] animate-pulse' : 'bg-[#9e9e9e]'
+            className={`w-2 h-2 rounded-full ${
+              isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
             }`}
             aria-hidden="true"
           />
-          <span className="text-sm text-[#757575]">
+          <span className="text-sm font-semibold text-slate-500">
             {isConnected
               ? connectionMode === 'sse'
                 ? 'Live-обновления'
@@ -37,7 +37,8 @@ export function LiveFeed() {
         {connectionMode === 'polling' && (
           <button
             onClick={refresh}
-            className="text-sm text-[#7e57c2] hover:underline min-h-[44px] px-2"
+            className="text-sm font-bold text-[#1565C0] hover:underline
+              min-h-[48px] px-3 rounded-lg hover:bg-blue-50 transition-colors"
             aria-label="Обновить ленту"
           >
             Обновить
@@ -45,28 +46,39 @@ export function LiveFeed() {
         )}
       </div>
 
-      {/* Ошибка */}
       {error && (
-        <div role="alert" className="text-sm text-[#f44336] bg-[#ffebee] rounded-xl p-3">
-          ⚠️ {error}
+        <div
+          role="alert"
+          className="text-sm text-red-600 bg-red-50 rounded-xl p-3
+          border border-red-100"
+        >
+          {error}
         </div>
       )}
 
-      {/* Список событий */}
       {events.length === 0 ? (
-        <div className="text-center py-12 space-y-3">
-          <p className="text-4xl" aria-hidden="true">
-            {isConnected ? '👀' : '📡'}
-          </p>
-          <p className="text-lg text-[#757575]">
-            {isConnected ? 'Ожидаем события...' : 'Подключение...'}
-          </p>
-          <p className="text-sm text-[#9e9e9e]">
-            События появятся, когда пациент примет лекарство
-          </p>
+        <div className="text-center py-16 space-y-4">
+          <div
+            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-400 to-slate-500
+            flex items-center justify-center mx-auto shadow-lg shadow-slate-200/50 med-float"
+          >
+            <ActivityIcon className="w-8 h-8 text-white" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-base font-bold text-[#0D1B2A]">
+              {isConnected ? 'Ожидаем события...' : 'Подключение...'}
+            </p>
+            <p className="text-sm text-slate-500">
+              События появятся, когда пациент примет лекарство
+            </p>
+          </div>
         </div>
       ) : (
-        <ul className="space-y-3" role="list" aria-label="Лента событий приёма лекарств">
+        <ul
+          className="space-y-3 med-stagger"
+          role="list"
+          aria-label="Лента событий приёма лекарств"
+        >
           {events.map((event) => (
             <li key={event.logId}>
               <FeedItem event={event} />
