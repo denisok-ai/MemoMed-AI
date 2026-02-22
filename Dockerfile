@@ -12,7 +12,7 @@ RUN npm ci --only=production && npm cache clean --force
 # Этап 3: все зависимости для сборки
 FROM base AS build-deps
 COPY package*.json ./
-RUN npm ci && npm cache clean --force
+RUN npm install && npm cache clean --force
 
 # Этап 4: компиляция TypeScript и сборка Next.js
 FROM build-deps AS builder
