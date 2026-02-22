@@ -9,7 +9,9 @@ RUN npm install && npm cache clean --force
 
 FROM deps AS runner
 ENV NODE_ENV=production
+# Для prisma generate при сборке нужен URL в конфиге (реальный подставится в runtime)
+ENV DATABASE_URL=postgresql://memomed:changeme@localhost:5432/memomed_db
 COPY . .
-RUN npx prisma generate
+RUN npx prisma generate --config prisma.config.cjs
 
 CMD ["npx", "tsx", "worker/index.ts"]

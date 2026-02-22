@@ -4,6 +4,6 @@
 set -e
 cd /app
 if command -v npx >/dev/null 2>&1 && [ -d prisma/migrations ]; then
-  npx prisma migrate deploy 2>/dev/null || true
+  npx prisma migrate deploy --config prisma.config.cjs 2>/dev/null || true
 fi
 exec node server.js
