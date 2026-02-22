@@ -128,7 +128,7 @@ export default async function AdminLlmPage() {
                 {!p.isActive && (
                   <form
                     action={
-                      activateLlmProviderAction.bind(null, p.id) as (
+                      activateLlmProviderAction.bind(null, p.id) as unknown as (
                         formData: FormData
                       ) => Promise<void>
                     }
@@ -152,7 +152,7 @@ export default async function AdminLlmPage() {
                 {!p.isActive && (
                   <form
                     action={
-                      deleteLlmProviderAction.bind(null, p.id) as (
+                      deleteLlmProviderAction.bind(null, p.id) as unknown as (
                         formData: FormData
                       ) => Promise<void>
                     }
@@ -221,7 +221,7 @@ export default async function AdminLlmPage() {
         </div>
 
         <form
-          action={createLlmProviderAction as (formData: FormData) => Promise<void>}
+          action={createLlmProviderAction as unknown as (formData: FormData) => Promise<void>}
           className="space-y-4"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
