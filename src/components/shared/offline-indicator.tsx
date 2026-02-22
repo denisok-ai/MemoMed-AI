@@ -1,26 +1,41 @@
 /**
  * @file offline-indicator.tsx
- * @description Displays a banner when the user is offline
- * @dependencies useOffline hook
+ * @description Баннер об отсутствии интернета — отображается при offline-режиме
  * @created 2026-02-22
  */
 
 'use client';
 
-import { useOffline } from '@/hooks/use-offline';
+import { useState, useEffect } from 'react';
 
 export function OfflineIndicator() {
-  const isOffline = useOffline();
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const updateOnlineStatus = () => setIsOffline(!navigator.onLine);
+
+    // Проверяем начальное состояние
+    setIsOffline(!navigator.onLine);
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
+  }, []);
 
   if (!isOffline) return null;
 
   return (
     <div
-      role="status"
-      aria-live="polite"
-      className="fixed top-0 left-0 right-0 z-50 bg-[#ffc107] text-[#212121] text-center py-3 px-4 text-lg font-medium"
+      role="alert"
+      aria-live="assertive"
+      className="fixed top-0 left-0 right-0 z-50 bg-[#ff9800] text-white
+        text-center py-2 px-4 text-base font-medium"
     >
-      📵 Нет подключения к интернету. Данные будут синхронизированы при восстановлении связи.
+      📴 Нет подключения к интернету · Данные сохраняются локально
     </div>
   );
 }

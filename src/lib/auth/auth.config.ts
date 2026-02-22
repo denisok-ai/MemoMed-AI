@@ -1,7 +1,7 @@
 /**
  * @file auth.config.ts
- * @description NextAuth.js v5 (Auth.js) configuration with Credentials provider
- * @dependencies next-auth, @auth/prisma-adapter, bcryptjs, prisma
+ * @description Конфигурация NextAuth.js v5 — провайдер Credentials, JWT-коллбэки
+ * @dependencies next-auth, bcryptjs, prisma, zod
  * @created 2026-02-22
  */
 
@@ -11,6 +11,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 
+/** Схема валидации данных входа */
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -33,24 +34,24 @@ export const authConfig: NextAuthConfig = {
         return {
           id: user.id,
           email: user.email,
-          role: user.role as string,
+          role: user.role,
           name: null,
-        } as unknown as { id: string; email: string; role: string; name: null };
+        };
       },
     }),
   ],
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token['id'] = user.id;
-        token['role'] = (user as unknown as { role: string }).role;
+        token.id = user.id;
+        token.role = user.role as 'patient' | 'relative' | 'admin';
       }
       return token;
     },
     session({ session, token }) {
       if (token && session.user) {
-        (session.user as unknown as { id: string }).id = token['id'] as string;
-        (session.user as unknown as { role: string }).role = token['role'] as string;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },

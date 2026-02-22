@@ -1,6 +1,8 @@
 /**
  * @file bottom-nav.tsx
- * @description Mobile bottom navigation bar (48px+ tap targets)
+ * @description Нижняя навигация для мобильных устройств
+ * Для пациента: Главная, Лекарства, История, Чат
+ * Для родственника: Лента, Пациенты, Чат
  * @created 2026-02-22
  */
 
@@ -13,17 +15,20 @@ interface NavItem {
   href: string;
   label: string;
   icon: string;
+  activeIcon: string;
 }
 
-const patientNav: NavItem[] = [
-  { href: '/dashboard', label: 'Главная', icon: '🏠' },
-  { href: '/medications', label: 'Лекарства', icon: '💊' },
-  { href: '/chat', label: 'Помощник', icon: '🤖' },
+const patientNavItems: NavItem[] = [
+  { href: '/dashboard', label: 'Главная', icon: '🏠', activeIcon: '🏠' },
+  { href: '/medications', label: 'Лекарства', icon: '💊', activeIcon: '💊' },
+  { href: '/history', label: 'История', icon: '📋', activeIcon: '📋' },
+  { href: '/chat', label: 'ИИ-помощник', icon: '🤖', activeIcon: '🤖' },
 ];
 
-const relativeNav: NavItem[] = [
-  { href: '/feed', label: 'Лента', icon: '📋' },
-  { href: '/calendar', label: 'Календарь', icon: '📅' },
+const relativeNavItems: NavItem[] = [
+  { href: '/feed', label: 'Лента', icon: '📰', activeIcon: '📰' },
+  { href: '/patients', label: 'Пациенты', icon: '👤', activeIcon: '👤' },
+  { href: '/chat', label: 'ИИ-помощник', icon: '🤖', activeIcon: '🤖' },
 ];
 
 interface BottomNavProps {
@@ -32,30 +37,37 @@ interface BottomNavProps {
 
 export function BottomNav({ userRole }: BottomNavProps) {
   const pathname = usePathname();
-  const navItems = userRole === 'patient' ? patientNav : relativeNav;
+  const items = userRole === 'patient' ? patientNavItems : relativeNavItems;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40 md:hidden">
-      <div className="flex items-stretch">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md
+        border-t border-gray-100 md:hidden"
+      aria-label="Основная навигация"
+    >
+      <ul className="flex" role="list">
+        {items.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex-1 flex flex-col items-center justify-center py-3 min-h-[64px] transition-colors ${
-                isActive ? 'text-[#7e57c2]' : 'text-[#757575]'
-              }`}
-              aria-label={item.label}
-            >
-              <span className="text-2xl">{item.icon}</span>
-              <span className={`text-xs mt-1 font-medium ${isActive ? 'text-[#7e57c2]' : ''}`}>
-                {item.label}
-              </span>
-            </Link>
+            <li key={item.href} className="flex-1">
+              <Link
+                href={item.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex flex-col items-center gap-1 py-2 px-1 min-h-[64px]
+                  transition-colors ${isActive ? 'text-[#7e57c2]' : 'text-[#9e9e9e]'}`}
+              >
+                <span className="text-2xl" aria-hidden="true">
+                  {isActive ? item.activeIcon : item.icon}
+                </span>
+                <span className={`text-xs font-medium ${isActive ? 'font-semibold' : ''}`}>
+                  {item.label}
+                </span>
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </nav>
   );
 }

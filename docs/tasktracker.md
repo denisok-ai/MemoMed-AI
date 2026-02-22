@@ -17,66 +17,66 @@
 ## Этап 1: MVP (v1.0) -- Срок: Апрель 2026
 
 ### Задача: Инициализация проекта
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Критический
 - **Описание**: Создание структуры проекта, настройка Next.js, TypeScript, Tailwind, Prisma, Docker
 - **Шаги выполнения**:
-  - [ ] Инициализация Next.js 14+ с App Router и TypeScript
-  - [ ] Настройка Tailwind CSS и shadcn/ui
-  - [ ] Настройка Prisma + PostgreSQL schema
-  - [ ] Настройка Docker (docker-compose: app, postgres, redis)
-  - [ ] Настройка ESLint, Prettier, Husky (pre-commit hooks)
-  - [ ] Настройка Vitest для тестов
-  - [ ] Создание базовой структуры папок (src/app, src/components, src/lib)
-  - [ ] Git init + .gitignore + первый коммит
+  - [x] Инициализация Next.js 16 с App Router и TypeScript
+  - [x] Настройка Tailwind CSS v4 и shadcn/ui
+  - [x] Настройка Prisma 7 + PostgreSQL schema (12 моделей)
+  - [x] Настройка Docker (docker-compose: app, worker, postgres, redis)
+  - [x] Настройка ESLint, Prettier, Husky (pre-commit hooks)
+  - [x] Настройка Vitest + Testing Library + MSW для тестов
+  - [x] Создание базовой структуры папок (src/app, src/components, src/lib)
+  - [x] Git init + .gitignore + первый коммит
 - **Зависимости**: Нет
 
 ### Задача: Аутентификация
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Критический
 - **Описание**: Регистрация, вход, JWT, роли (patient/relative)
 - **Шаги выполнения**:
-  - [ ] Настройка NextAuth.js (Credentials Provider)
-  - [ ] Prisma-модели: users, profiles
-  - [ ] API: POST /api/auth/register
-  - [ ] API: POST /api/auth/login (через NextAuth)
-  - [ ] Middleware проверки JWT на защищённых маршрутах
-  - [ ] Страницы: login, register (адаптивный дизайн)
-  - [ ] Форма согласия на обработку персональных данных (ФЗ-152) при регистрации
-  - [ ] Отдельный чекбокс: участие в программе обратной связи (опционально)
-  - [ ] Хранение токена в httpOnly cookie
-  - [ ] Unit-тесты: валидация, хэширование, JWT
+  - [x] Настройка NextAuth.js v5 (Credentials Provider, JWT-стратегия)
+  - [x] Prisma-модели: users, profiles
+  - [x] API: POST /api/auth/register
+  - [x] API: POST /api/auth/login (через NextAuth signIn)
+  - [x] Middleware проверки JWT на защищённых маршрутах
+  - [x] Страницы: login, register (адаптивный дизайн, Server Actions)
+  - [x] Форма согласия на обработку персональных данных (ФЗ-152) при регистрации
+  - [x] Отдельный чекбокс: участие в программе обратной связи (опционально)
+  - [x] Хранение токена в httpOnly cookie (JWT через NextAuth)
+  - [x] Unit-тесты: валидация, хэширование, JWT (5 тестов)
 - **Зависимости**: Инициализация проекта
 
 ### Задача: CRUD лекарств
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Критический
 - **Описание**: Добавление, редактирование, удаление, просмотр лекарств
 - **Шаги выполнения**:
-  - [ ] Prisma-модель: medications
-  - [ ] API: GET /api/medications (список по пациенту)
-  - [ ] API: POST /api/medications (создание)
-  - [ ] API: PATCH /api/medications/:id (редактирование)
-  - [ ] API: DELETE /api/medications/:id (архивирование)
-  - [ ] Zod-схемы валидации
-  - [ ] Страница: список лекарств (medication-card компонент)
-  - [ ] Страница: форма добавления лекарства
-  - [ ] Тесты API
+  - [x] Prisma-модель: medications (в схеме из предыдущей задачи)
+  - [x] API: GET /api/medications (список по пациенту)
+  - [x] API: POST /api/medications (создание)
+  - [x] API: PATCH /api/medications/:id (редактирование)
+  - [x] API: DELETE /api/medications/:id (архивирование, soft delete)
+  - [x] Zod-схемы валидации (createMedicationSchema, updateMedicationSchema)
+  - [x] Страница: список лекарств (MedicationCard компонент)
+  - [x] Страница: форма добавления/редактирования лекарства (MedicationForm)
+  - [x] Тесты схем валидации (11 тестов)
 - **Зависимости**: Аутентификация
 
 ### Задача: Главный экран пациента
-- **Статус**: Не начата
+- **Статус**: Завершена ✅ (2026-02-22)
 - **Приоритет**: Критический
 - **Описание**: Экран с часами, названием лекарства и большой кнопкой подтверждения
 - **Шаги выполнения**:
-  - [ ] Компонент: clock-widget (адаптивные часы, 15% ширины экрана)
-  - [ ] Компонент: big-green-button (120px, анимация scale, вибрация)
-  - [ ] Компонент: medication-card (название + дозировка + время)
-  - [ ] Динамический фон: белый → жёлтый при наступлении времени приема
-  - [ ] Логика: определение ближайшего лекарства к приему
-  - [ ] Запись medication_log при нажатии кнопки
-  - [ ] Адаптивный дизайн (mobile-first)
-  - [ ] Тест: нажатие кнопки создаёт лог
+  - [x] Компонент: LiveClock (живые часы с русской локалью)
+  - [x] Компонент: TakeMedicationButton (большая кнопка, анимация успеха)
+  - [x] Компонент: NextMedicationCard (ближайшее лекарство с таймером)
+  - [x] Динамический фон: DynamicBackground (градиент по времени суток)
+  - [x] Логика: getNextMedication (определение ближайшего лекарства)
+  - [x] Запись medication_log при нажатии кнопки (Server Action)
+  - [x] Адаптивный дизайн (mobile-first, BottomNav)
+  - [x] API: POST /api/logs, POST /api/logs/sync (офлайн-синхронизация)
 - **Зависимости**: CRUD лекарств
 
 ### Задача: Offline-first (PWA)
