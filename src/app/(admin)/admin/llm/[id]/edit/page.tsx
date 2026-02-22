@@ -19,7 +19,10 @@ export default async function EditLlmProviderPage({ params }: { params: Promise<
   const provider = await prisma.llmProvider.findUnique({ where: { id } });
   if (!provider) notFound();
 
-  const action = updateLlmProviderAction.bind(null, id);
+  async function action(formData: FormData): Promise<void> {
+    'use server';
+    await updateLlmProviderAction(id, formData);
+  }
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -35,7 +38,7 @@ export default async function EditLlmProviderPage({ params }: { params: Promise<
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <form action={action} className="space-y-4">
+        <form action={action as (formData: FormData) => Promise<void>} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-[#757575] mb-1">Название *</label>
