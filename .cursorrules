@@ -1,0 +1,116 @@
+# MemoMed AI -- Правила для AI-ассистентов
+
+## Обязательные действия перед началом работы
+
+1. Прочитай `docs/project.md` для понимания архитектуры и стандартов.
+2. Проверь `docs/tasktracker.md` для актуального статуса задач.
+3. Сверься с `docs/diary.md` для контекста предыдущих решений.
+4. После каждого значимого изменения обнови документацию (diary, tasktracker).
+
+## Проект
+
+- **Название**: MemoMed AI
+- **Назначение**: AI-ассистент для контроля приема лекарств с заботой о пожилых пациентах
+- **Язык общения**: русский (код и комментарии на английском)
+- **Целевая аудитория**: пациенты 60+, их родственники/опекуны
+
+## Технологический стек
+
+- **Frontend**: Next.js 14+ (App Router), TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes + отдельный Worker-сервис
+- **Database**: PostgreSQL 14+ с Prisma ORM
+- **Cache/Queue**: Redis (BullMQ для фоновых задач)
+- **LLM**: DeepSeek API (OpenAI-совместимый SDK)
+- **Auth**: NextAuth.js (Auth.js)
+- **Offline**: PWA (Service Worker + IndexedDB через Dexie.js)
+- **Mobile**: PWA → Capacitor (при необходимости упаковки в сторы)
+- **Deploy**: Docker (docker-compose) на VPS
+
+## Структура проекта
+
+```
+src/app/          -- Next.js App Router (страницы и API)
+src/components/   -- React-компоненты (ui/, patient/, relative/, shared/)
+src/lib/          -- Утилиты (db/, ai/, auth/, notifications/, utils/)
+src/hooks/        -- Custom React hooks
+src/types/        -- TypeScript типы
+worker/           -- Фоновый Worker-сервис (jobs/)
+prisma/           -- Схема БД и миграции
+tests/            -- Тесты (unit/, integration/, e2e/)
+docs/             -- Документация проекта
+DOC/              -- Исходные документы (reference, не редактировать)
+```
+
+## Стандарты кодирования
+
+### TypeScript
+- Strict mode включен (`"strict": true` в tsconfig)
+- Никогда не используй `any` -- используй `unknown` и type guards
+- Все функции и компоненты должны иметь типизированные параметры и возвращаемые значения
+- Используй `interface` для объектов, `type` для union/intersection типов
+
+### React / Next.js
+- Server Components по умолчанию; `"use client"` только когда необходимо
+- Используй Server Actions для мутаций данных
+- Именование файлов: kebab-case (например `medication-card.tsx`)
+- Именование компонентов: PascalCase (например `MedicationCard`)
+- Один компонент на файл
+
+### Стили
+- Tailwind CSS utility classes (не CSS modules, не styled-components)
+- shadcn/ui как базовая UI-библиотека
+- Mobile-first подход: начинай с мобильных стилей, расширяй через `md:`, `lg:`
+- Минимальный размер шрифта: 18px (целевая аудитория -- пожилые люди)
+- Минимальная зона нажатия: 48x48px
+
+### База данных
+- Все изменения схемы через Prisma migrations
+- UUID для первичных ключей
+- Timestamps (`createdAt`, `updatedAt`) на всех таблицах
+- Логи приема лекарств (medication_logs) иммутабельны -- никогда не обновлять и не удалять
+
+### API
+- RESTful эндпоинты через Next.js Route Handlers
+- Всегда валидируй входные данные (Zod)
+- Всегда возвращай типизированные ответы
+- Rate limiting на AI-эндпоинтах
+- Все ошибки логируются с контекстом (userId, endpoint, timestamp)
+
+### LLM (DeepSeek)
+- Системные промпты хранятся в `src/lib/ai/prompts/` как отдельные файлы
+- Все вызовы LLM проходят через единый сервис `src/lib/ai/deepseek.service.ts`
+- Стриминг ответов для чата (Server-Sent Events)
+- Кэширование частых запросов в Redis (TTL 1 час)
+- Максимум 500 токенов на ответ в чате
+- Температура 0.7 для чата, 0.1 для парсинга/аналитики
+
+### Тестирование
+- Unit-тесты: Vitest
+- Integration-тесты: Vitest + Testing Library
+- E2E-тесты: Playwright
+- Минимальное покрытие: 80% для бизнес-логики
+
+## Принципы
+
+- **SOLID, KISS, DRY** -- следуй неукоснительно
+- **Accessibility first** -- WCAG 2.1 AAA контрастность, поддержка screen readers
+- **Offline-first** -- любая операция пациента должна работать без интернета
+- **Security by design** -- медицинские данные требуют аудит-логирования и шифрования
+- **Не оставляй** неиспользуемый код, TODO-комментарии или закомментированный код
+
+## Документирование
+
+При создании нового файла добавляй заголовок:
+```typescript
+/**
+ * @file имя-файла.ts
+ * @description краткое описание
+ * @dependencies связанные компоненты/файлы
+ * @created YYYY-MM-DD
+ */
+```
+
+После значимых изменений обнови:
+1. `docs/diary.md` -- запись о решении/проблеме
+2. `docs/tasktracker.md` -- статус задач
+3. `docs/project.md` -- если изменилась архитектура

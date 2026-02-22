@@ -1,0 +1,233 @@
+/**
+ * @file schema.prisma
+ * @description Prisma database schema for MemoMed AI
+ * @dependencies PostgreSQL 14+
+ * @created 2026-02-22
+ */
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  patient
+  relative
+  admin
+}
+
+enum MedicationLogStatus {
+  taken
+  missed
+  pending
+}
+
+enum SyncStatus {
+  pending
+  synced
+}
+
+enum ConnectionStatus {
+  active
+  pending
+  inactive
+}
+
+enum ChatRole {
+  user
+  assistant
+  system
+}
+
+enum PromptStatus {
+  draft
+  active
+  archived
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(patient)
+  inviteCode   String   @unique @default(cuid())
+  consentGiven Boolean  @default(false)
+  feedbackConsent Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile          Profile?
+  patientConnections  Connection[] @relation("PatientConnections")
+  relativeConnections Connection[] @relation("RelativeConnections")
+  medications      Medication[]
+  healthJournal    HealthJournal[]
+  medicationFeedback MedicationFeedback[]
+  auditLogs        AuditLog[]
+  chatMessages     ChatMessage[]
+  aiUsageStats     AiUsageStat[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  fullName    String
+  dateOfBirth DateTime?
+  timezone    String   @default("Europe/Moscow")
+  regionCode  String?
+  onboardingDone Boolean @default(false)
+  aiDisclaimerShown Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Connection {
+  id         String           @id @default(uuid())
+  patientId  String
+  relativeId String
+  status     ConnectionStatus @default(pending)
+  createdAt  DateTime         @default(now())
+
+  patient  User @relation("PatientConnections", fields: [patientId], references: [id], onDelete: Cascade)
+  relative User @relation("RelativeConnections", fields: [relativeId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, relativeId])
+  @@map("connections")
+}
+
+model Medication {
+  id            String    @id @default(uuid())
+  patientId     String
+  name          String
+  dosage        String
+  instruction   String?
+  photoUrl      String?
+  scheduledTime String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  archivedAt    DateTime?
+
+  patient  User             @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  logs     MedicationLog[]
+  feedback MedicationFeedback[]
+
+  @@index([patientId, isActive])
+  @@map("medications")
+}
+
+model MedicationLog {
+  id           String              @id @default(uuid())
+  medicationId String
+  scheduledAt  DateTime
+  actualAt     DateTime?
+  status       MedicationLogStatus @default(pending)
+  syncStatus   SyncStatus          @default(pending)
+  createdAt    DateTime            @default(now())
+
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@index([medicationId, scheduledAt])
+  @@index([scheduledAt])
+  @@map("medication_logs")
+}
+
+model HealthJournal {
+  id            String   @id @default(uuid())
+  patientId     String
+  logDate       DateTime @db.Date
+  moodScore     Int?
+  painLevel     Int?
+  sleepQuality  Int?
+  energyLevel   Int?
+  freeText      String?
+  syncStatus    SyncStatus @default(pending)
+  createdAt     DateTime @default(now())
+
+  patient User @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, logDate])
+  @@index([patientId, logDate])
+  @@map("health_journal")
+}
+
+model MedicationFeedback {
+  id                 String   @id @default(uuid())
+  patientId          String
+  medicationId       String
+  effectivenessScore Int?
+  sideEffects        String?
+  freeText           String?
+  aiAnalysis         Json?
+  createdAt          DateTime @default(now())
+
+  patient    User       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@map("medication_feedback")
+}
+
+model PromptTemplate {
+  id            String       @id @default(uuid())
+  name          String       @unique
+  category      String
+  personaBlock  String
+  contextBlock  String
+  taskBlock     String
+  status        PromptStatus @default(draft)
+  version       Int          @default(1)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("prompt_templates")
+}
+
+model ChatMessage {
+  id         String   @id @default(uuid())
+  userId     String
+  role       ChatRole
+  content    String
+  tokensUsed Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("chat_messages")
+}
+
+model AiUsageStat {
+  id           String   @id @default(uuid())
+  userId       String
+  monthKey     String
+  totalTokens  Int      @default(0)
+  messageCount Int      @default(0)
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, monthKey])
+  @@map("ai_usage_stats")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  resource   String
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

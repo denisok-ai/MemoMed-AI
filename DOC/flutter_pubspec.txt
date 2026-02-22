@@ -1,0 +1,71 @@
+name: smart_med_assistant
+description: Медицинский ассистент для контроля приема лекарств
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI компоненты
+  cupertino_icons: ^1.0.6
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # Локальная база данных (offline-first)
+  sqflite: ^2.3.0
+  path_provider: ^2.1.1
+  
+  # Работа с API
+  http: ^1.1.0
+  dio: ^5.4.0
+  
+  # Аутентификация и безопасность
+  jwt_decode: ^0.3.1
+  flutter_secure_storage: ^9.0.0
+  
+  # Проверка сети (для синхронизации)
+  connectivity_plus: ^5.0.2
+  
+  # Уведомления
+  flutter_local_notifications: ^16.3.0
+  firebase_messaging: ^14.7.9
+  
+  # Вибрация и тактильный отклик
+  vibration: ^1.8.4
+  
+  # Работа со временем
+  intl: ^0.18.1
+  timezone: ^0.9.2
+  
+  # UI-элементы
+  table_calendar: ^3.0.9
+  
+  # Логирование
+  logger: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  
+  # Шрифты (без засечек, стиль Medium)
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Montserrat-Regular.ttf
+          weight: 400
+  
+  # Ассеты
+  assets:
+    - assets/images/
+    - assets/icons/

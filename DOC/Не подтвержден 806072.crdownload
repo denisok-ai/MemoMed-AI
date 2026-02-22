@@ -1,0 +1,354 @@
+// Smart Med Assistant - Backend API Server
+// Node.js + Express + PostgreSQL
+
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const { Pool } = require('pg');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// ============================================
+// Database Connection Pool
+// ============================================
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// Проверка подключения к БД
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('❌ Ошибка подключения к PostgreSQL:', err.stack);
+  } else {
+    console.log('✅ PostgreSQL подключен успешно');
+    release();
+  }
+});
+
+// ============================================
+// Middleware
+// ============================================
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Логирование запросов
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
+// ============================================
+// Auth Middleware
+// ============================================
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Токен не предоставлен' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Недействительный токен' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// ============================================
+// ROUTES
+// ============================================
+
+// Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    server: '194.87.0.45',
+    database: 'connected'
+  });
+});
+
+// ============================================
+// AUTH ENDPOINTS
+// ============================================
+
+// Регистрация нового пользователя
+app.post('/api/auth/register', async (req, res) => {
+  const { email, password, role, full_name } = req.body;
+
+  try {
+    // Хеширование пароля
+    const password_hash = await bcrypt.hash(password, 10);
+    
+    // Генерация invite_code для пациентов
+    const invite_code = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      // Создание пользователя
+      const userResult = await client.query(
+        `INSERT INTO users (email, password_hash, role, invite_code) 
+         VALUES ($1, $2, $3, $4) RETURNING id`,
+        [email, password_hash, role, invite_code]
+      );
+
+      const userId = userResult.rows[0].id;
+
+      // Создание профиля
+      await client.query(
+        `INSERT INTO profiles (user_id, full_name) VALUES ($1, $2)`,
+        [userId, full_name]
+      );
+
+      await client.query('COMMIT');
+
+      res.status(201).json({
+        message: 'Пользователь зарегистрирован',
+        userId,
+        inviteCode: role === 'patient' ? invite_code : null
+      });
+
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+
+  } catch (error) {
+    console.error('Ошибка регистрации:', error);
+    res.status(500).json({ error: 'Ошибка при регистрации' });
+  }
+});
+
+// Вход (Login)
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const result = await pool.query(
+      `SELECT u.id, u.email, u.password_hash, u.role, p.full_name 
+       FROM users u 
+       LEFT JOIN profiles p ON u.id = p.user_id 
+       WHERE u.email = $1`,
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Неверные учетные данные' });
+    }
+
+    const user = result.rows[0];
+
+    // Проверка пароля
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Неверные учетные данные' });
+    }
+
+    // Генерация JWT
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        fullName: user.full_name
+      }
+    });
+
+  } catch (error) {
+    console.error('Ошибка входа:', error);
+    res.status(500).json({ error: 'Ошибка при входе' });
+  }
+});
+
+// ============================================
+// MEDICATION ENDPOINTS
+// ============================================
+
+// Получить список лекарств пациента
+app.get('/api/medications/:patientId', authenticateToken, async (req, res) => {
+  const { patientId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT id, name, dosage, scheduled_time, instruction, photo_url, is_active
+       FROM medications 
+       WHERE patient_id = $1 AND is_active = true
+       ORDER BY scheduled_time`,
+      [patientId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Ошибка получения лекарств:', error);
+    res.status(500).json({ error: 'Ошибка при получении списка лекарств' });
+  }
+});
+
+// Добавить новое лекарство
+app.post('/api/medications', authenticateToken, async (req, res) => {
+  const { patient_id, name, dosage, scheduled_time, instruction } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO medications (patient_id, name, dosage, scheduled_time, instruction) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [patient_id, name, dosage, scheduled_time, instruction]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Ошибка добавления лекарства:', error);
+    res.status(500).json({ error: 'Ошибка при добавлении лекарства' });
+  }
+});
+
+// ============================================
+// MEDICATION LOGS (Синхронизация)
+// ============================================
+
+// Пакетная синхронизация логов из offline-режима
+app.post('/api/logs/sync', authenticateToken, async (req, res) => {
+  const { logs } = req.body; // Массив логов
+
+  try {
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      const insertedLogs = [];
+
+      for (const log of logs) {
+        const result = await client.query(
+          `INSERT INTO medication_logs (med_id, scheduled_at, actual_at, status, sync_status) 
+           VALUES ($1, $2, $3, $4, 'synced') 
+           ON CONFLICT DO NOTHING
+           RETURNING id`,
+          [log.med_id, log.scheduled_at, log.actual_at, log.status]
+        );
+
+        if (result.rows.length > 0) {
+          insertedLogs.push(result.rows[0].id);
+        }
+      }
+
+      await client.query('COMMIT');
+
+      res.json({
+        message: 'Синхронизация завершена',
+        syncedCount: insertedLogs.length
+      });
+
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+
+  } catch (error) {
+    console.error('Ошибка синхронизации:', error);
+    res.status(500).json({ error: 'Ошибка при синхронизации' });
+  }
+});
+
+// Получить историю приемов за период
+app.get('/api/logs/:patientId', authenticateToken, async (req, res) => {
+  const { patientId } = req.params;
+  const { startDate, endDate } = req.query;
+
+  try {
+    const result = await pool.query(
+      `SELECT ml.*, m.name as medication_name, m.dosage
+       FROM medication_logs ml
+       JOIN medications m ON ml.med_id = m.id
+       WHERE m.patient_id = $1 
+       AND ml.scheduled_at BETWEEN $2 AND $3
+       ORDER BY ml.scheduled_at DESC`,
+      [patientId, startDate, endDate]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Ошибка получения логов:', error);
+    res.status(500).json({ error: 'Ошибка при получении истории' });
+  }
+});
+
+// ============================================
+// RELATIVE FEED (Живая лента для родственников)
+// ============================================
+app.get('/api/relative/feed/:relativeId', authenticateToken, async (req, res) => {
+  const { relativeId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT ml.*, m.name as medication_name, m.dosage, p.full_name as patient_name
+       FROM medication_logs ml
+       JOIN medications m ON ml.med_id = m.id
+       JOIN users u ON m.patient_id = u.id
+       JOIN profiles p ON u.id = p.user_id
+       JOIN connections c ON c.patient_id = u.id
+       WHERE c.relative_id = $1 AND c.status = 'active'
+       ORDER BY ml.created_at DESC
+       LIMIT 50`,
+      [relativeId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Ошибка получения ленты:', error);
+    res.status(500).json({ error: 'Ошибка при получении ленты событий' });
+  }
+});
+
+// ============================================
+// SERVER START
+// ============================================
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('==============================================');
+  console.log('🚀 Smart Med Assistant Backend API');
+  console.log('==============================================');
+  console.log(`✅ Сервер запущен на http://194.87.0.45:${PORT}`);
+  console.log(`📅 Время запуска: ${new Date().toISOString()}`);
+  console.log(`🌍 Окружение: ${process.env.NODE_ENV || 'development'}`);
+  console.log('==============================================');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('Получен SIGTERM. Закрытие соединений...');
+  pool.end(() => {
+    console.log('PostgreSQL pool закрыт');
+    process.exit(0);
+  });
+});
