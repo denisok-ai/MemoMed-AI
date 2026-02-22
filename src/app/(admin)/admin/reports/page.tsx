@@ -6,7 +6,7 @@
  * @created 2026-02-22
  */
 
-import type { MedicationLogStatus } from '@prisma/client';
+import { MedicationLogStatus } from '@prisma/client';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { prisma } from '@/lib/db/prisma';
@@ -70,7 +70,7 @@ export default async function AdminReportsPage({
     prisma.medicationLog.count({
       where: {
         scheduledAt: { gte: since30 },
-        status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
+        status: { in: [MedicationLogStatus.taken, MedicationLogStatus.missed] },
       },
     }),
     prisma.medicationLog.count({ where: { scheduledAt: { gte: since30 }, status: 'taken' } }),
@@ -87,7 +87,7 @@ export default async function AdminReportsPage({
     by: ['medicationId'],
     where: {
       scheduledAt: { gte: since30 },
-      status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
+      status: { in: [MedicationLogStatus.taken, MedicationLogStatus.missed] },
     },
     _count: { id: true },
   });

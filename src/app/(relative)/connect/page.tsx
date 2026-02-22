@@ -7,7 +7,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import type { ConnectionStatus } from '@prisma/client';
+import { ConnectionStatus } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { ConnectForm } from '@/components/relative/connect-form';
@@ -34,7 +34,10 @@ export default async function ConnectPage({
 
   const where = statusFilter
     ? { relativeId: session.user.id, status: statusFilter as ConnectionStatus }
-    : { relativeId: session.user.id, status: { in: ['active', 'pending'] as ConnectionStatus[] } };
+    : {
+        relativeId: session.user.id,
+        status: { in: [ConnectionStatus.active, ConnectionStatus.pending] },
+      };
 
   const [connections, total, activeCount] = await Promise.all([
     prisma.connection.findMany({

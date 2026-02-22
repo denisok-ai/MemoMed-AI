@@ -4,7 +4,7 @@
  * @created 2026-02-22
  */
 
-import type { MedicationLogStatus } from '@prisma/client';
+import { MedicationLogStatus } from '@prisma/client';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -86,7 +86,7 @@ export default async function DoctorDashboardPage({
     where: {
       medication: { patientId: { in: patientIds } },
       scheduledAt: { gte: since },
-      status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
+      status: { in: [MedicationLogStatus.taken, MedicationLogStatus.missed] },
     },
     select: { status: true, medication: { select: { patientId: true } } },
   });

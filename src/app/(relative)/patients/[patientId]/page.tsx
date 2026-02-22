@@ -5,7 +5,7 @@
  * @created 2026-02-22
  */
 
-import type { MedicationLogStatus } from '@prisma/client';
+import { MedicationLogStatus } from '@prisma/client';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
@@ -117,7 +117,7 @@ export default async function RelativePatientPage({
       where: {
         medicationId: { in: medIds },
         scheduledAt: { gte: since30 },
-        status: { in: ['taken', 'missed'] as MedicationLogStatus[] },
+        status: { in: [MedicationLogStatus.taken, MedicationLogStatus.missed] },
       },
       _count: { id: true },
     }),
