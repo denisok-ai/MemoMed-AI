@@ -7,6 +7,7 @@
 'use client';
 
 import { useState } from 'react';
+import { CheckIcon, ClipboardIcon } from '@/components/shared/nav-icons';
 
 interface CopyInviteCodeProps {
   code: string;
@@ -58,7 +59,17 @@ export function CopyInviteCode({ code }: CopyInviteCodeProps) {
         aria-label={copied ? 'Код скопирован' : 'Скопировать код'}
         aria-live="polite"
       >
-        {copied ? '✅ Скопировано!' : '📋 Скопировать код'}
+        {copied ? (
+          <>
+            <CheckIcon className="w-5 h-5 inline-block mr-2 -mt-0.5" aria-hidden />
+            Скопировано!
+          </>
+        ) : (
+          <>
+            <ClipboardIcon className="w-5 h-5 inline-block mr-2 -mt-0.5" aria-hidden />
+            Скопировать код
+          </>
+        )}
       </button>
     </div>
   );

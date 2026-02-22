@@ -1,7 +1,7 @@
 /**
  * @file seed.ts
  * @description Заполнение БД тестовыми данными для разработки:
- *   50 пациентов, 5 врачей, 5 родственников, 1 администратор.
+ *   50 пациентов, 5 врачей, 25 родственников, 1 администратор.
  *   Каждый пациент получает 5-10 лекарств, логи за 30 дней и записи дневника.
  * @dependencies prisma, bcryptjs, pg
  * @created 2026-02-22
@@ -395,12 +395,14 @@ async function main() {
     console.log(`✅ Врач ${i}: ${doctor.email}`);
   }
 
-  // ── 3. Родственники ──────────────────────────────────────────────────────────
+  // ── 3. Родственники (25 шт.) ─────────────────────────────────────────────────
   const relatives: { id: string; email: string }[] = [];
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 25; i++) {
     const isMale = i % 2 === 0;
-    const firstName = isMale ? MALE_FIRST[i + 5] : FEMALE_FIRST[i + 5];
-    const lastName = isMale ? MALE_LAST[i + 5] : FEMALE_LAST[i + 5];
+    const firstNames = isMale ? MALE_FIRST : FEMALE_FIRST;
+    const lastNames = isMale ? MALE_LAST : FEMALE_LAST;
+    const firstName = firstNames[(i + 10) % firstNames.length];
+    const lastName = lastNames[(i + 8) % lastNames.length];
     const email = `relative${i}@memomed.dev`;
 
     const relative = await prisma.user.upsert({
@@ -411,12 +413,12 @@ async function main() {
         passwordHash,
         role: Role.relative,
         consentGiven: true,
-        feedbackConsent: true,
+        feedbackConsent: i % 4 === 0,
         profile: {
           create: {
             fullName: `${lastName} ${firstName}`,
             onboardingDone: true,
-            aiDisclaimerShown: false,
+            aiDisclaimerShown: i % 5 === 0,
           },
         },
       },
@@ -462,19 +464,17 @@ async function main() {
       },
     });
 
-    // ── 4a. Связать с родственником (первые 25 пациентов) ──
-    if (i <= 25) {
-      const relative = relatives[(i - 1) % relatives.length];
-      await prisma.connection.upsert({
-        where: { patientId_relativeId: { patientId: patient.id, relativeId: relative.id } },
-        update: {},
-        create: {
-          patientId: patient.id,
-          relativeId: relative.id,
-          status: 'active',
-        },
-      });
-    }
+    // ── 4a. Связать с родственником (все 50 пациентов, распределение по 25 родственникам) ──
+    const relative = relatives[(i - 1) % relatives.length];
+    await prisma.connection.upsert({
+      where: { patientId_relativeId: { patientId: patient.id, relativeId: relative.id } },
+      update: {},
+      create: {
+        patientId: patient.id,
+        relativeId: relative.id,
+        status: 'active',
+      },
+    });
 
     // ── 4b. Назначить лекарства (5-10 штук) ───────────────────────────────────
     const medCount = rand(5, 10);
@@ -574,6 +574,51 @@ async function main() {
     if (i % 10 === 0) {
       console.log(`  ✅ Создано пациентов: ${i}/50`);
     }
+  }
+
+  // ── 4e. Дополнительные логи для ленты событий (последние 6 часов) ─────────────
+  console.log('\n📡 Добавляем тестовые события для ленты...');
+  const recentConnections = await prisma.connection.findMany({
+    where: { relativeId: relatives[0].id, status: 'active' },
+    select: { patientId: true },
+    take: 5,
+  });
+  const recentPatientIds = recentConnections.map((c) => c.patientId);
+  const recentMeds = await prisma.medication.findMany({
+    where: { patientId: { in: recentPatientIds }, isActive: true },
+    select: { id: true, name: true, dosage: true, scheduledTime: true, patientId: true },
+    take: 30,
+  });
+  const feedLogs: {
+    medicationId: string;
+    scheduledAt: Date;
+    actualAt: Date | null;
+    status: MedicationLogStatus;
+    syncStatus: SyncStatus;
+    createdAt: Date;
+  }[] = [];
+  const now = new Date();
+  for (let i = 0; i < 25; i++) {
+    const med = recentMeds[i % recentMeds.length];
+    if (!med) break;
+    const hoursAgo = rand(1, 6);
+    const createdAt = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
+    const scheduledAt = new Date(createdAt);
+    scheduledAt.setMinutes(scheduledAt.getMinutes() - rand(0, 15));
+    const status: MedicationLogStatus = rand(1, 10) <= 8 ? 'taken' : 'missed';
+    const actualAt = status === 'taken' ? new Date(createdAt) : null;
+    feedLogs.push({
+      medicationId: med.id,
+      scheduledAt,
+      actualAt,
+      status,
+      syncStatus: SyncStatus.synced,
+      createdAt,
+    });
+  }
+  if (feedLogs.length > 0) {
+    await prisma.medicationLog.createMany({ data: feedLogs });
+    console.log(`  ✅ Добавлено ${feedLogs.length} событий для ленты (relative1)`);
   }
 
   // ── 5. Связи врач-пациент ─────────────────────────────────────────────────────
@@ -711,7 +756,7 @@ async function main() {
   console.log('📋 Тестовые аккаунты:');
   console.log('   admin@memomed.dev   → /admin');
   console.log('   doctor1@memomed.dev → /doctor/dashboard');
-  console.log('   relative1@memomed.dev → /feed');
+  console.log('   relative1@memomed.dev … relative25@memomed.dev → /feed');
   console.log('   patient1@memomed.dev → /dashboard');
 }
 

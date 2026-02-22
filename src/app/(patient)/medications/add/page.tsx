@@ -19,7 +19,7 @@ export default function AddMedicationPage() {
       <div className="flex items-center gap-4">
         <Link
           href="/medications"
-          className="p-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors
+          className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors
             min-h-[48px] min-w-[48px] flex items-center justify-center text-xl"
           aria-label="Назад к списку"
         >
@@ -28,7 +28,7 @@ export default function AddMedicationPage() {
         <h1 className="text-2xl font-bold text-[#212121]">Добавить лекарство</h1>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+      <div className="med-card p-8">
         <MedicationForm />
       </div>
     </div>

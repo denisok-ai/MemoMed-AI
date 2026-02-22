@@ -5,6 +5,7 @@
  */
 
 import type { ChatMessage } from '@/hooks/use-ai-chat';
+import { BotIcon } from '@/components/shared/nav-icons';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -22,10 +23,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       {!isUser && (
         <div
           className="w-9 h-9 rounded-full bg-[#1565C0] flex items-center justify-center
-            flex-shrink-0 text-lg mt-1"
+            flex-shrink-0 mt-1"
           aria-hidden="true"
         >
-          🤖
+          <BotIcon className="w-5 h-5 text-white" />
         </div>
       )}
 
@@ -43,7 +44,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             return (
               <p
                 key={i}
-                className="text-sm text-[#9e9e9e] italic border-t border-gray-200 pt-2 mt-2"
+                className="text-sm text-slate-500 italic border-t border-slate-200 pt-2 mt-2"
               >
                 {paragraph.replace(/^---\n/, '').replace(/_/g, '')}
               </p>

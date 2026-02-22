@@ -142,16 +142,16 @@ export default async function DoctorDashboardPage({
   }
 
   return (
-    <div className="med-page">
+    <div className="med-page med-animate">
       {/* Заголовок */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#0D1B2A]">Мои пациенты</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Дисциплина приёма лекарств за 30 дней</p>
+          <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Мои пациенты</h1>
+          <p className="text-slate-500 text-base mt-0.5">Дисциплина приёма лекарств за 30 дней</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-xl">
-          <UsersIcon className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-semibold text-slate-600">{allConnections.length}</span>
+        <div className="med-badge-info inline-flex items-center gap-2 px-4 py-2.5 w-fit">
+          <UsersIcon className="w-4 h-4" />
+          <span>{allConnections.length}</span>
         </div>
       </div>
 
@@ -159,31 +159,26 @@ export default async function DoctorDashboardPage({
       <form method="GET" className="mb-4">
         {filter !== 'all' && <input type="hidden" name="filter" value={filter} />}
         <div className="relative">
-          <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="search"
             name="q"
             defaultValue={query}
             placeholder="Поиск по имени пациента..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
-              text-sm focus:border-[#1565C0] focus:outline-none transition-colors"
+            className="med-input pl-12"
           />
         </div>
       </form>
 
-      {/* Фильтры */}
+      {/* Фильтры — pills */}
       <div className="flex gap-2 overflow-x-auto pb-1 mb-5">
         {FILTER_OPTS.map((opt) => (
           <Link
             key={opt.id}
             href={href({ filter: opt.id, q: query || undefined })}
-            className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap
-              transition-all min-h-[auto]
-              ${
-                filter === opt.id
-                  ? 'bg-[#1565C0] text-white'
-                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-              }`}
+            className={`px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap
+              transition-all min-h-[48px] flex items-center
+              ${filter === opt.id ? 'med-btn-primary' : 'med-btn-secondary'}`}
           >
             {opt.label}
           </Link>
@@ -192,10 +187,7 @@ export default async function DoctorDashboardPage({
 
       {/* Список пациентов */}
       {allConnections.length === 0 ? (
-        <div
-          className="flex flex-col items-center justify-center py-16 text-center
-          bg-white rounded-3xl border border-dashed border-slate-200 space-y-4"
-        >
+        <div className="med-card flex flex-col items-center justify-center py-16 text-center space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center">
             <UsersIcon className="w-8 h-8 text-slate-300" />
           </div>
@@ -205,11 +197,7 @@ export default async function DoctorDashboardPage({
               Попросите пациента поделиться инвайт-кодом
             </p>
           </div>
-          <Link
-            href="/doctor/connect"
-            className="px-5 py-2.5 bg-[#1565C0] text-white rounded-xl text-sm font-semibold
-              hover:bg-[#0D47A1] transition-colors min-h-[auto]"
-          >
+          <Link href="/doctor/connect" className="med-btn-primary rounded-2xl">
             Подключить пациента
           </Link>
         </div>
@@ -237,9 +225,8 @@ export default async function DoctorDashboardPage({
                 <li key={c.id}>
                   <Link
                     href={`/doctor/patients/${c.patientId}`}
-                    className="flex items-center gap-4 p-5 bg-white rounded-2xl
-                      border border-slate-100 hover:border-[#1565C0] hover:shadow-sm
-                      transition-all group"
+                    className="med-card flex items-center gap-4 p-5
+                      hover:shadow-lg hover:-translate-y-0.5 transition-all group"
                   >
                     <div
                       className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100
@@ -275,30 +262,28 @@ export default async function DoctorDashboardPage({
           </ul>
 
           {/* Пагинация */}
-          <div className="flex items-center justify-between mt-6">
-            <p className="text-sm text-slate-400">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between mt-6">
+            <p className="text-sm text-slate-500">
               {from}–{to} из {totalFiltered}
             </p>
             <div className="flex gap-2">
               {page > 1 && (
                 <Link
                   href={href({ page: page - 1, filter, q: query || undefined })}
-                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
-                    hover:border-[#1565C0] transition-colors min-h-[auto]"
+                  className="med-btn-secondary rounded-xl"
                 >
                   ←
                 </Link>
               )}
               {totalPages > 1 && (
-                <span className="px-4 py-2 text-sm text-slate-500">
+                <span className="px-4 py-2.5 text-sm text-slate-500 flex items-center">
                   {page} / {totalPages}
                 </span>
               )}
               {page < totalPages && (
                 <Link
                   href={href({ page: page + 1, filter, q: query || undefined })}
-                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
-                    hover:border-[#1565C0] transition-colors min-h-[auto]"
+                  className="med-btn-secondary rounded-xl"
                 >
                   →
                 </Link>
@@ -307,7 +292,7 @@ export default async function DoctorDashboardPage({
           </div>
 
           {/* Легенда */}
-          <div className="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="mt-4 med-card p-4">
             <p className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
               Легенда
             </p>

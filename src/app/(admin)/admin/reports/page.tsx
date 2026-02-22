@@ -7,7 +7,17 @@
  */
 
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { prisma } from '@/lib/db/prisma';
+import {
+  AdminUsersIcon,
+  AdminPillIcon,
+  AdminCheckIcon,
+  AdminLinkIcon,
+  AdminFeedbackIcon,
+  AdminChartIcon,
+} from '@/components/admin/admin-icons';
+import { AdminReportFilters } from '@/components/admin/admin-report-filters';
 
 export const metadata: Metadata = {
   title: 'Отчёты — Админ — MemoMed AI',
@@ -18,7 +28,7 @@ function DisciplineBar({ pct }: { pct: number }) {
   const textColor = pct >= 90 ? 'text-green-700' : pct >= 70 ? 'text-amber-700' : 'text-red-700';
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
       </div>
       <span className={`text-sm font-bold w-10 text-right ${textColor}`}>{pct}%</span>
@@ -26,7 +36,12 @@ function DisciplineBar({ pct }: { pct: number }) {
   );
 }
 
-export default async function AdminReportsPage() {
+export default async function AdminReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ discipline?: string }>;
+}) {
+  const { discipline: disciplineFilter } = await searchParams;
   const since30 = new Date();
   since30.setDate(since30.getDate() - 30);
   const since7 = new Date();
@@ -101,19 +116,17 @@ export default async function AdminReportsPage() {
     }))
     .sort((a, b) => b.pct - a.pct);
 
-  const topPatientIds = [
-    ...patientDiscipline.slice(0, 5).map((p) => p.id),
-    ...patientDiscipline.slice(-5).map((p) => p.id),
-  ].filter((v, i, arr) => arr.indexOf(v) === i);
+  const filterByDiscipline = (list: typeof patientDiscipline) => {
+    if (!disciplineFilter || disciplineFilter === 'all') return list;
+    if (disciplineFilter === 'high') return list.filter((p) => p.pct >= 90);
+    if (disciplineFilter === 'medium') return list.filter((p) => p.pct >= 70 && p.pct < 90);
+    if (disciplineFilter === 'low') return list.filter((p) => p.pct < 70);
+    return list;
+  };
 
-  const patientProfiles = await prisma.user.findMany({
-    where: { id: { in: topPatientIds } },
-    select: { id: true, email: true, profile: { select: { fullName: true } } },
-  });
-  const profileMap = new Map(patientProfiles.map((u) => [u.id, u]));
-
-  const topBest = patientDiscipline.slice(0, 5);
-  const topWorst = [...patientDiscipline].reverse().slice(0, 5);
+  const filteredDiscipline = filterByDiscipline(patientDiscipline);
+  const topBest = filteredDiscipline.slice(0, 5);
+  const topWorst = [...filteredDiscipline].reverse().slice(0, 5);
 
   // ── Топ-10 лекарств ───────────────────────────────────────────────────────────
   const topMeds = await prisma.medication.groupBy({
@@ -155,44 +168,57 @@ export default async function AdminReportsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#212121]">Отчёты платформы</h1>
-        <span className="text-sm text-[#9e9e9e]">За последние 30 дней</span>
+      <div>
+        <h1 className="text-2xl font-bold text-[#0D1B2A]">Отчёты платформы</h1>
+        <span className="text-sm text-slate-500">За последние 30 дней</span>
       </div>
+
+      {/* ── PDF-отчёт: поиск пациента + фильтры (пациенты скрыты) ─────────────────── */}
+      <Suspense fallback={<div className="med-card p-5 animate-pulse h-48 rounded-2xl" />}>
+        <AdminReportFilters />
+      </Suspense>
 
       {/* ── Сводные метрики ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
-            icon: '👤',
+            Icon: AdminUsersIcon,
+            gradient: 'from-blue-500 to-blue-600',
             label: 'Пациентов',
             value: totalPatients,
             sub: `+${newUsersWeek} за неделю`,
           },
           {
-            icon: '💊',
+            Icon: AdminPillIcon,
+            gradient: 'from-emerald-500 to-teal-600',
             label: 'Активных лекарств',
             value: activeMedications,
             sub: `у ${totalPatients} пациентов`,
           },
           {
-            icon: '✅',
+            Icon: AdminCheckIcon,
+            gradient: 'from-slate-500 to-slate-600',
             label: 'Дисциплина (30 дн)',
             value: `${overallDiscipline}%`,
             sub: `${takenLogs30.toLocaleString('ru')} из ${totalLogs30.toLocaleString('ru')}`,
           },
           {
-            icon: '🔗',
+            Icon: AdminLinkIcon,
+            gradient: 'from-cyan-500 to-cyan-600',
             label: 'Связей',
             value: totalConnections,
             sub: `${totalDoctors} врачей · ${totalRelatives} родств.`,
           },
         ].map((c) => (
-          <div key={c.label} className="bg-white rounded-2xl border border-gray-100 p-5">
-            <p className="text-3xl mb-1">{c.icon}</p>
-            <p className="text-2xl font-bold text-[#212121]">{c.value}</p>
-            <p className="text-sm text-[#424242] font-medium mt-0.5">{c.label}</p>
-            <p className="text-xs text-[#9e9e9e] mt-0.5">{c.sub}</p>
+          <div key={c.label} className="med-stat p-5">
+            <div
+              className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.gradient} flex items-center justify-center text-white mb-3`}
+            >
+              <c.Icon className="w-6 h-6" aria-hidden />
+            </div>
+            <p className="text-2xl font-bold text-[#0D1B2A]">{c.value}</p>
+            <p className="text-sm text-slate-600 font-medium mt-0.5">{c.label}</p>
+            <p className="text-xs text-slate-500 mt-0.5">{c.sub}</p>
           </div>
         ))}
       </div>
@@ -201,101 +227,98 @@ export default async function AdminReportsPage() {
       <div className="grid grid-cols-3 gap-4">
         {[
           {
-            icon: '📋',
+            Icon: AdminCheckIcon,
+            gradient: 'from-green-500 to-green-600',
             label: 'Приёмов зафиксировано',
             value: takenLogs30.toLocaleString('ru'),
             color: 'text-green-600',
           },
           {
-            icon: '⚠️',
+            Icon: AdminChartIcon,
+            gradient: 'from-red-500 to-red-600',
             label: 'Пропусков',
             value: missedLogs30.toLocaleString('ru'),
             color: 'text-red-600',
           },
           {
-            icon: '📓',
+            Icon: AdminFeedbackIcon,
+            gradient: 'from-blue-500 to-blue-600',
             label: 'Записей дневника',
             value: journalEntries30.toLocaleString('ru'),
             color: 'text-blue-600',
           },
         ].map((c) => (
-          <div
-            key={c.label}
-            className="bg-white rounded-2xl border border-gray-100 p-4 text-center"
-          >
-            <p className="text-2xl mb-1">{c.icon}</p>
+          <div key={c.label} className="med-stat p-4 text-center">
+            <div
+              className={`w-10 h-10 mx-auto rounded-xl bg-gradient-to-br ${c.gradient} flex items-center justify-center text-white mb-2`}
+            >
+              <c.Icon className="w-5 h-5" aria-hidden />
+            </div>
             <p className={`text-xl font-bold ${c.color}`}>{c.value}</p>
-            <p className="text-xs text-[#9e9e9e] mt-0.5">{c.label}</p>
+            <p className="text-xs text-slate-500 mt-0.5">{c.label}</p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ── Лучшие пациенты ──────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-          <h2 className="text-sm font-bold text-[#424242] flex items-center gap-2">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-4">
+          <h2 className="text-sm font-bold text-[#0D1B2A] flex items-center gap-2">
             <span className="text-green-500">▲</span> Топ-5 по дисциплине
           </h2>
           {topBest.length === 0 ? (
-            <p className="text-sm text-[#9e9e9e]">Нет данных</p>
+            <p className="text-sm text-slate-500">Нет данных</p>
           ) : (
             <ul className="space-y-3">
-              {topBest.map((p, i) => {
-                const user = profileMap.get(p.id);
-                return (
-                  <li key={p.id} className="space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#9e9e9e] w-4">{i + 1}</span>
-                        <span className="text-[#212121] truncate max-w-[180px]">
-                          {user?.profile?.fullName ?? user?.email ?? p.id.slice(0, 8)}
-                        </span>
-                      </div>
-                      <span className="text-xs text-[#9e9e9e]">{p.total} приёмов</span>
+              {topBest.map((p, i) => (
+                <li key={p.id} className="space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-500 w-4">{i + 1}</span>
+                      <span className="text-[#0D1B2A]">Пациент №{i + 1}</span>
                     </div>
-                    <DisciplineBar pct={p.pct} />
-                  </li>
-                );
-              })}
+                    <span className="text-xs text-slate-500">{p.total} приёмов</span>
+                  </div>
+                  <DisciplineBar pct={p.pct} />
+                </li>
+              ))}
             </ul>
           )}
         </div>
 
         {/* ── Худшие пациенты ──────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-          <h2 className="text-sm font-bold text-[#424242] flex items-center gap-2">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-4">
+          <h2 className="text-sm font-bold text-[#0D1B2A] flex items-center gap-2">
             <span className="text-red-500">▼</span> Требуют внимания (наихудшая дисциплина)
           </h2>
           {topWorst.length === 0 ? (
-            <p className="text-sm text-[#9e9e9e]">Нет данных</p>
+            <p className="text-sm text-slate-500">Нет данных</p>
           ) : (
             <ul className="space-y-3">
-              {topWorst.map((p, i) => {
-                const user = profileMap.get(p.id);
-                return (
-                  <li key={p.id} className="space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#9e9e9e] w-4">{i + 1}</span>
-                        <span className="text-[#212121] truncate max-w-[180px]">
-                          {user?.profile?.fullName ?? user?.email ?? p.id.slice(0, 8)}
-                        </span>
-                      </div>
-                      <span className="text-xs text-[#9e9e9e]">{p.total} приёмов</span>
+              {topWorst.map((p, i) => (
+                <li key={p.id} className="space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-500 w-4">{i + 1}</span>
+                      <span className="text-[#0D1B2A]">Пациент №{i + 1}</span>
                     </div>
-                    <DisciplineBar pct={p.pct} />
-                  </li>
-                );
-              })}
+                    <span className="text-xs text-slate-500">{p.total} приёмов</span>
+                  </div>
+                  <DisciplineBar pct={p.pct} />
+                </li>
+              ))}
             </ul>
           )}
         </div>
 
         {/* ── Топ препаратов ────────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-          <h2 className="text-sm font-bold text-[#424242]">💊 Топ-10 назначаемых препаратов</h2>
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-4">
+          <h2 className="text-sm font-bold text-[#0D1B2A] flex items-center gap-2">
+            <AdminPillIcon className="w-4 h-4 text-[#1565C0]" aria-hidden />
+            Топ-10 назначаемых препаратов
+          </h2>
           {topMeds.length === 0 ? (
-            <p className="text-sm text-[#9e9e9e]">Нет данных</p>
+            <p className="text-sm text-slate-500">Нет данных</p>
           ) : (
             <ul className="space-y-2">
               {topMeds.map((m, i) => {
@@ -305,12 +328,12 @@ export default async function AdminReportsPage() {
                   <li key={m.name} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#9e9e9e] w-4">{i + 1}</span>
+                        <span className="text-xs text-slate-500 w-4">{i + 1}</span>
                         <span className="font-medium text-[#212121]">{m.name}</span>
                       </div>
                       <span className="text-xs font-bold text-[#1565C0]">{m._count.id}</span>
                     </div>
-                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden ml-6">
+                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden ml-6">
                       <div
                         className="h-full bg-blue-400 rounded-full"
                         style={{ width: `${pct}%` }}
@@ -324,10 +347,10 @@ export default async function AdminReportsPage() {
         </div>
 
         {/* ── Статистика врачей ─────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-          <h2 className="text-sm font-bold text-[#424242]">👨‍⚕️ Врачи — пациенты под наблюдением</h2>
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-4">
+          <h2 className="text-sm font-bold text-[#0D1B2A]">Врачи — пациенты под наблюдением</h2>
           {doctorStats.length === 0 ? (
-            <p className="text-sm text-[#9e9e9e]">Нет связей врач-пациент</p>
+            <p className="text-sm text-slate-500">Нет связей врач-пациент</p>
           ) : (
             <ul className="space-y-3">
               {doctorStats.map((d, i) => {
@@ -337,7 +360,7 @@ export default async function AdminReportsPage() {
                   <li key={d.relativeId} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#9e9e9e] w-4">{i + 1}</span>
+                        <span className="text-xs text-slate-500 w-4">{i + 1}</span>
                         <span className="font-medium text-[#212121] truncate max-w-[180px]">
                           {d.doctor?.profile?.fullName ?? d.doctor?.email ?? '—'}
                         </span>
@@ -346,7 +369,7 @@ export default async function AdminReportsPage() {
                         {d._count.patientId} пац.
                       </span>
                     </div>
-                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden ml-6">
+                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden ml-6">
                       <div
                         className="h-full bg-indigo-400 rounded-full"
                         style={{ width: `${pct}%` }}
@@ -362,8 +385,8 @@ export default async function AdminReportsPage() {
 
       {/* ── Регистрации по дням ───────────────────────────────────────────────────── */}
       {Object.keys(regByDay).length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-          <h2 className="text-sm font-bold text-[#424242]">📅 Новые регистрации (30 дней)</h2>
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-4">
+          <h2 className="text-sm font-bold text-[#0D1B2A]">Новые регистрации (30 дней)</h2>
           <div className="flex items-end gap-1 h-20 overflow-x-auto">
             {Object.entries(regByDay).map(([day, count]) => {
               const maxVal = Math.max(...Object.values(regByDay));
@@ -374,12 +397,12 @@ export default async function AdminReportsPage() {
                   className="flex flex-col items-center gap-1 min-w-[28px]"
                   title={`${day}: ${count}`}
                 >
-                  <span className="text-xs text-[#bdbdbd]">{count}</span>
+                  <span className="text-xs text-slate-400">{count}</span>
                   <div
                     className="w-full bg-blue-400 rounded-t-sm"
                     style={{ height: `${Math.max(heightPct, 4)}%` }}
                   />
-                  <span className="text-[9px] text-[#bdbdbd] rotate-45 origin-left translate-x-1">
+                  <span className="text-[9px] text-slate-400 rotate-45 origin-left translate-x-1">
                     {day}
                   </span>
                 </div>
@@ -391,12 +414,15 @@ export default async function AdminReportsPage() {
 
       {/* ── Отзывы о лекарствах ──────────────────────────────────────────────────── */}
       {feedbackCount > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+        <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[#424242]">📝 Отзывы о препаратах</h2>
+            <h2 className="text-sm font-bold text-[#0D1B2A] flex items-center gap-2">
+              <AdminFeedbackIcon className="w-4 h-4 text-[#1565C0]" aria-hidden />
+              Отзывы о препаратах
+            </h2>
             <span className="text-2xl font-bold text-[#1565C0]">{feedbackCount}</span>
           </div>
-          <p className="text-sm text-[#757575]">
+          <p className="text-sm text-slate-500">
             Собранные отзывы анонимизируются и используются для аналитики эффективности препаратов.
           </p>
           <a href="/admin/users?role=patient" className="text-sm text-[#1565C0] hover:underline">

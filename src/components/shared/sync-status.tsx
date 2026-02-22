@@ -9,6 +9,7 @@
 'use client';
 
 import { useOfflineSync } from '@/hooks/use-offline-sync';
+import { InfoIcon } from '@/components/shared/nav-icons';
 
 export function SyncStatus() {
   const { pendingCount, isSyncing, syncNow } = useOfflineSync();
@@ -30,7 +31,7 @@ export function SyncStatus() {
             aria-hidden="true"
           />
         ) : (
-          <span aria-hidden="true">⏳</span>
+          <InfoIcon className="w-4 h-4 shrink-0 text-amber-600" aria-hidden />
         )}
         <span className="text-[#e65100] font-medium">
           {isSyncing

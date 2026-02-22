@@ -15,6 +15,16 @@ import { StatsDashboard } from '@/components/shared/stats-dashboard';
 import { AnalysisResults } from '@/components/shared/analysis-results';
 import { DownloadReportButton } from '@/components/shared/download-report-button';
 import { CalendarView } from '@/components/shared/calendar-view';
+import { AdminPillIcon, AdminCheckIcon } from '@/components/admin/admin-icons';
+import {
+  AlertTriangleIcon,
+  BookIcon,
+  ClipboardIcon,
+  CheckIcon,
+  HeartPulseIcon,
+  ActivityIcon,
+  XIcon,
+} from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Пациент — MemoMed AI',
@@ -54,10 +64,10 @@ function disciplineColor(pct: number) {
 
 function timeLabel(time: string): string {
   const [h] = time.split(':').map(Number);
-  if (h < 10) return '🌅 Утро';
-  if (h < 14) return '☀️ День';
-  if (h < 19) return '🌆 Вечер';
-  return '🌙 Ночь';
+  if (h < 10) return 'Утро';
+  if (h < 14) return 'День';
+  if (h < 19) return 'Вечер';
+  return 'Ночь';
 }
 
 export default async function DoctorPatientPage({
@@ -180,12 +190,12 @@ export default async function DoctorPatientPage({
   }
 
   return (
-    <div className="med-page space-y-0 !pb-0">
+    <div className="med-page med-animate space-y-0 !pb-0">
       {/* ── Назад ─────────────────────────────────────────────────────────────── */}
       <Link
         href="/doctor/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#1565C0]
-          transition-colors mb-4 min-h-[auto]"
+        className="inline-flex items-center gap-2 text-base text-slate-500 hover:text-[#1565C0]
+          transition-colors mb-4 py-2 min-h-[48px] items-center"
       >
         ← Все пациенты
       </Link>
@@ -207,13 +217,15 @@ export default async function DoctorPatientPage({
 
             {/* Данные пациента */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-[#0D1B2A] leading-tight">{name}</h1>
+              <h1 className="text-xl md:text-2xl font-black text-[#0D1B2A] leading-tight">
+                {name}
+              </h1>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-sm text-slate-500">
-                {age !== null && <span>🎂 {age} лет</span>}
-                <span>📧 {patient.email}</span>
-                {patient.profile?.timezone && <span>🕐 {patient.profile.timezone}</span>}
-                {patient.profile?.regionCode && <span>📍 {patient.profile.regionCode}</span>}
-                <span>🔗 Связан с {new Date(connection.createdAt).toLocaleDateString('ru')}</span>
+                {age !== null && <span>{age} лет</span>}
+                <span>{patient.email}</span>
+                {patient.profile?.timezone && <span>{patient.profile.timezone}</span>}
+                {patient.profile?.regionCode && <span>{patient.profile.regionCode}</span>}
+                <span>Связан с {new Date(connection.createdAt).toLocaleDateString('ru')}</span>
               </div>
             </div>
 
@@ -231,15 +243,34 @@ export default async function DoctorPatientPage({
           {/* Быстрая статистика */}
           <div className="grid grid-cols-3 gap-3 mt-5">
             {[
-              { icon: '💊', label: 'Лекарств', value: patient.medications.length },
-              { icon: '✅', label: 'Принято', value: takenAll },
-              { icon: '❌', label: 'Пропущено', value: totalAll - takenAll },
+              {
+                Icon: AdminPillIcon,
+                gradient: 'from-blue-500 to-blue-600',
+                label: 'Лекарств',
+                value: patient.medications.length,
+              },
+              {
+                Icon: AdminCheckIcon,
+                gradient: 'from-green-500 to-green-600',
+                label: 'Принято',
+                value: takenAll,
+              },
+              {
+                Icon: AlertTriangleIcon,
+                gradient: 'from-red-500 to-red-600',
+                label: 'Пропущено',
+                value: totalAll - takenAll,
+              },
             ].map((s) => (
               <div
                 key={s.label}
                 className="bg-white/70 rounded-xl p-3 text-center border border-slate-100"
               >
-                <p className="text-lg mb-0.5">{s.icon}</p>
+                <div
+                  className={`w-10 h-10 mx-auto rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-1`}
+                >
+                  <s.Icon className="w-5 h-5 text-white" aria-hidden />
+                </div>
                 <p className="text-lg font-bold text-[#0D1B2A]">{s.value}</p>
                 <p className="text-sm text-slate-400">{s.label}</p>
               </div>
@@ -254,8 +285,8 @@ export default async function DoctorPatientPage({
           <Link
             key={t.id}
             href={tabHref(t.id)}
-            className={`flex-1 text-center px-4 py-2.5 rounded-xl text-sm font-semibold
-              transition-all whitespace-nowrap min-h-[auto]
+            className={`flex-1 text-center px-4 py-3 rounded-xl text-sm font-semibold
+              transition-all whitespace-nowrap min-h-[48px] flex items-center justify-center
               ${
                 tab === t.id
                   ? 'bg-white text-[#1565C0] shadow-sm'
@@ -270,6 +301,26 @@ export default async function DoctorPatientPage({
       {/* ══════════════════ ВКЛАДКА: ОБЗОР ══════════════════ */}
       {tab === 'overview' && (
         <div className="space-y-6 pb-8">
+          {/* PDF-отчёт — виден сразу при открытии карточки */}
+          <div className="med-card p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-base font-bold text-[#0D1B2A] flex items-center gap-2">
+                  <ClipboardIcon className="w-4 h-4 text-[#1565C0]" aria-hidden />
+                  PDF-отчёт для врача
+                </h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  Скачайте отчёт с историей приёмов и AI-заключением
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <DownloadReportButton patientId={patientId} period="30d" label="30 дней" compact />
+                <DownloadReportButton patientId={patientId} period="90d" label="3 мес" compact />
+                <DownloadReportButton patientId={patientId} period="180d" label="6 мес" compact />
+              </div>
+            </div>
+          </div>
+
           <StatsDashboard patientId={patientId} />
 
           {/* Последние приёмы */}
@@ -283,11 +334,16 @@ export default async function DoctorPatientPage({
                   return (
                     <li key={log.id} className="flex items-center gap-3 py-2.5">
                       <span
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center
-                        text-sm flex-shrink-0
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0
                         ${isTaken ? 'bg-green-50 text-green-600' : isMissed ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}
                       >
-                        {isTaken ? '✓' : isMissed ? '✗' : '⏳'}
+                        {isTaken ? (
+                          <CheckIcon className="w-4 h-4" aria-hidden />
+                        ) : isMissed ? (
+                          <XIcon className="w-4 h-4" aria-hidden />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden />
+                        )}
                       </span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#0D1B2A] truncate">
@@ -345,7 +401,9 @@ export default async function DoctorPatientPage({
 
           {medStats.length === 0 ? (
             <div className="med-card flex flex-col items-center py-12 text-center space-y-3">
-              <p className="text-4xl">💊</p>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <AdminPillIcon className="w-8 h-8 text-white" aria-hidden />
+              </div>
               <p className="text-lg font-semibold text-[#0D1B2A]">Нет активных лекарств</p>
               <p className="text-sm text-slate-400">Пациент не добавил ни одного препарата</p>
             </div>
@@ -359,9 +417,9 @@ export default async function DoctorPatientPage({
                       {/* Иконка */}
                       <div
                         className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100
-                        flex items-center justify-center text-xl flex-shrink-0"
+                        flex items-center justify-center flex-shrink-0"
                       >
-                        💊
+                        <AdminPillIcon className="w-5 h-5 text-blue-600" aria-hidden />
                       </div>
                       {/* Название и время */}
                       <div className="flex-1 min-w-0">
@@ -382,9 +440,9 @@ export default async function DoctorPatientPage({
                     {/* Прогресс-бар */}
                     <div>
                       <div className="flex justify-between text-sm text-slate-400 mb-1.5">
-                        <span>✅ {med.taken} принято</span>
-                        <span>❌ {med.missed} пропущено</span>
-                        <span>📅 {med.total} всего</span>
+                        <span>{med.taken} принято</span>
+                        <span>{med.missed} пропущено</span>
+                        <span>{med.total} всего</span>
                       </div>
                       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div
@@ -413,7 +471,9 @@ export default async function DoctorPatientPage({
         <div className="space-y-4 pb-8">
           {journalEntries.length === 0 ? (
             <div className="med-card flex flex-col items-center py-12 text-center space-y-3">
-              <p className="text-4xl">📓</p>
+              <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
+                <BookIcon className="w-8 h-8 text-slate-400" aria-hidden />
+              </div>
               <p className="text-lg font-semibold text-[#0D1B2A]">Записей пока нет</p>
               <p className="text-sm text-slate-400">Пациент ещё не вёл дневник самочувствия</p>
             </div>
@@ -422,15 +482,35 @@ export default async function DoctorPatientPage({
               <p className="text-sm text-slate-400">{journalTotal} записей</p>
               <ul className="space-y-3">
                 {journalEntries.map((entry) => {
-                  const scores = [
-                    { label: 'Настроение', icon: '😊', value: entry.moodScore, invert: false },
-                    { label: 'Боль', icon: '💢', value: entry.painLevel, invert: true },
-                    { label: 'Сон', icon: '💤', value: entry.sleepQuality, invert: false },
-                    { label: 'Энергия', icon: '⚡', value: entry.energyLevel, invert: false },
-                  ].filter((s) => s.value !== null);
+                  const scoreConfig = [
+                    {
+                      label: 'Настроение',
+                      Icon: HeartPulseIcon,
+                      value: entry.moodScore,
+                      invert: false,
+                    },
+                    {
+                      label: 'Боль',
+                      Icon: AlertTriangleIcon,
+                      value: entry.painLevel,
+                      invert: true,
+                    },
+                    { label: 'Сон', Icon: ActivityIcon, value: entry.sleepQuality, invert: false },
+                    {
+                      label: 'Энергия',
+                      Icon: ActivityIcon,
+                      value: entry.energyLevel,
+                      invert: false,
+                    },
+                  ].filter((s) => s.value !== null) as Array<{
+                    label: string;
+                    Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+                    value: number;
+                    invert: boolean;
+                  }>;
 
                   // Шкала 1-5: инвертируем боль
-                  const avgRaw = scores.map((s) =>
+                  const avgRaw = scoreConfig.map((s) =>
                     s.invert ? 6 - (s.value ?? 0) : (s.value ?? 0)
                   );
                   const avg =
@@ -467,33 +547,48 @@ export default async function DoctorPatientPage({
                         </span>
                       </div>
 
-                      {scores.length > 0 && (
+                      {scoreConfig.length > 0 && (
                         <div className="grid grid-cols-2 gap-2">
-                          {scores.map((s) => (
-                            <div
-                              key={s.label}
-                              className="bg-white/70 rounded-xl px-3 py-2 flex items-center gap-2"
-                            >
-                              <span className="text-base">{s.icon}</span>
-                              <div>
-                                <p className="text-sm text-slate-400">{s.label}</p>
-                                <div className="flex items-center gap-1 mt-0.5">
-                                  <div className="flex gap-0.5">
-                                    {Array.from({ length: 5 }, (_, i) => (
-                                      <div
-                                        key={i}
-                                        className={`w-2.5 h-2.5 rounded-full
+                          {scoreConfig.map((s) => {
+                            const Icon = s.Icon;
+                            const color =
+                              s.label === 'Боль'
+                                ? s.value <= 2
+                                  ? 'text-green-600'
+                                  : s.value >= 4
+                                    ? 'text-red-600'
+                                    : 'text-amber-600'
+                                : s.value >= 4
+                                  ? 'text-green-600'
+                                  : s.value <= 2
+                                    ? 'text-red-600'
+                                    : 'text-amber-600';
+                            return (
+                              <div
+                                key={s.label}
+                                className="bg-white/70 rounded-xl px-3 py-2 flex items-center gap-2"
+                              >
+                                <Icon className={`w-5 h-5 shrink-0 ${color}`} aria-hidden />
+                                <div>
+                                  <p className="text-sm text-slate-400">{s.label}</p>
+                                  <div className="flex items-center gap-1 mt-0.5">
+                                    <div className="flex gap-0.5">
+                                      {Array.from({ length: 5 }, (_, i) => (
+                                        <div
+                                          key={i}
+                                          className={`w-2.5 h-2.5 rounded-full
                                         ${i < (s.value ?? 0) ? 'bg-[#1565C0]' : 'bg-slate-200'}`}
-                                      />
-                                    ))}
+                                        />
+                                      ))}
+                                    </div>
+                                    <span className="text-sm font-bold text-[#0D1B2A] ml-1">
+                                      {s.value}/5
+                                    </span>
                                   </div>
-                                  <span className="text-sm font-bold text-[#0D1B2A] ml-1">
-                                    {s.value}/5
-                                  </span>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 
@@ -521,7 +616,7 @@ export default async function DoctorPatientPage({
                       <Link
                         href={tabHref('journal', page - 1)}
                         className="px-4 py-2 bg-white border border-slate-200 rounded-xl
-                          text-sm text-[#424242] hover:border-[#1565C0] transition-colors min-h-[auto]"
+                          text-sm text-[#0D1B2A] hover:border-[#1565C0] transition-colors min-h-[auto]"
                       >
                         ‹ Новее
                       </Link>
@@ -530,7 +625,7 @@ export default async function DoctorPatientPage({
                       <Link
                         href={tabHref('journal', page + 1)}
                         className="px-4 py-2 bg-white border border-slate-200 rounded-xl
-                          text-sm text-[#424242] hover:border-[#1565C0] transition-colors min-h-[auto]"
+                          text-sm text-[#0D1B2A] hover:border-[#1565C0] transition-colors min-h-[auto]"
                       >
                         Старше ›
                       </Link>
@@ -563,22 +658,27 @@ export default async function DoctorPatientPage({
           {/* PDF отчёты */}
           <div className="med-card p-5 space-y-4">
             <div>
-              <h2 className="text-base font-bold text-[#0D1B2A]">📄 PDF-отчёты</h2>
+              <h2 className="text-base font-bold text-[#0D1B2A] flex items-center gap-2">
+                <ClipboardIcon className="w-4 h-4 text-[#1565C0]" aria-hidden />
+                PDF-отчёты
+              </h2>
               <p className="text-sm text-slate-400 mt-1">
                 Скачайте отчёт с историей приёмов, статистикой и AI-заключением
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { period: '30d', label: '30 дней', sub: 'Последний месяц', icon: '📅' },
-                { period: '90d', label: '3 месяца', sub: 'Квартальный отчёт', icon: '📆' },
-                { period: '180d', label: '6 месяцев', sub: 'Полугодовой отчёт', icon: '📋' },
+                { period: '30d', label: '30 дней', sub: 'Последний месяц' },
+                { period: '90d', label: '3 месяца', sub: 'Квартальный отчёт' },
+                { period: '180d', label: '6 месяцев', sub: 'Полугодовой отчёт' },
               ].map((r) => (
                 <div
                   key={r.period}
                   className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2"
                 >
-                  <p className="text-2xl">{r.icon}</p>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                    <ClipboardIcon className="w-6 h-6 text-white" aria-hidden />
+                  </div>
                   <p className="font-bold text-[#0D1B2A]">{r.label}</p>
                   <p className="text-sm text-slate-400">{r.sub}</p>
                   <DownloadReportButton
@@ -593,7 +693,7 @@ export default async function DoctorPatientPage({
 
           {/* Общий дисциплинарный отчёт */}
           <div className="med-card p-5 space-y-4">
-            <h2 className="text-base font-bold text-[#0D1B2A]">📊 Сводка за 30 дней</h2>
+            <h2 className="text-base font-bold text-[#0D1B2A]">Сводка за 30 дней</h2>
             <div className="space-y-3">
               {medStats.map((med) => {
                 const c = disciplineColor(med.pct);

@@ -1,0 +1,54 @@
+---
+description: MedTech дизайн-система MemoMed AI — стиль, доступность, адаптивность
+globs: "**/*.tsx,**/*.css"
+alwaysApply: false
+---
+
+# MemoMed AI — MedTech Design System
+
+## Эталон: Dashboard пациента (/dashboard)
+
+Главный экран — образец стиля для всех страниц:
+- **Hero-секция**: градиентный фон (DynamicBackground), часы, карточка лекарства
+- **Панель действий**: скруглённая сверху (rounded-t-[2rem]), тень, max-w-lg
+- **Быстрые ссылки**: grid grid-cols-3, med-card с градиентными иконками
+- **Анимации**: med-animate, med-stagger для появления
+
+## Принципы MedTech
+
+1. **Доверие** — чистые цвета, медицинский брендинг (#1565C0), без агрессивных акцентов
+2. **Ясность** — крупный текст (18px+), чёткие заголовки, минимум визуального шума
+3. **Доступность** — WCAG 2.1 AAA, touch targets 48×48px, focus-visible
+
+## Обязательные классы
+
+| Элемент | Класс | Использование |
+|---------|-------|---------------|
+| Контейнер страницы | `med-page` | max-w-lg mx-auto, padding |
+| Карточка | `med-card` | glassmorphism, rounded-2xl |
+| Карточка с акцентом | `med-card-accent` | левая полоса primary |
+| Кнопка primary | `med-btn-primary` | основные действия |
+| Кнопка secondary | `med-btn-secondary` | второстепенные действия |
+| Заголовок секции | `med-section-title` | uppercase, muted |
+| Анимация появления | `med-animate` | fade-up |
+| Список с stagger | `med-stagger` | поочерёдное появление |
+
+## Цвета (из globals.css)
+
+- Primary: `#1565C0` / `var(--color-primary)`
+- Text: `#0D1B2A` / `var(--color-text-primary)`
+- Background: `#F0F4F8` / `var(--color-background)`
+- Success: `var(--color-success)`, Warning: `var(--color-warning)`, Error: `var(--color-error)`
+
+## Адаптивность (mobile-first)
+
+- **Mobile**: px-4–6, grid-cols-2/3, BottomNav, pb-20
+- **Desktop (md+)**: md:pt-20, md:grid-cols-3/4, md:pb-0, sidebar вместо BottomNav
+- **Breakpoints**: sm:640px, md:768px, lg:1024px
+
+## Запрещено
+
+- `text-xs` (12px) — минимум text-sm для вторичного текста
+- `min-h-[40px]` — минимум 48px для touch targets
+- Хардкод hex вместо CSS-переменных
+- Разные стили для одинаковых элементов на разных страницах

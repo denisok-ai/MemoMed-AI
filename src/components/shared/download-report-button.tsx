@@ -8,11 +8,14 @@
 'use client';
 
 import { useState } from 'react';
+import { DownloadIcon, AlertTriangleIcon } from '@/components/shared/nav-icons';
 
 interface DownloadReportButtonProps {
   patientId: string;
   period?: '30d' | '90d' | '180d';
   label?: string;
+  /** Компактный вариант для встроенного отображения */
+  compact?: boolean;
 }
 
 const PERIOD_LABELS: Record<string, string> = {
@@ -25,6 +28,7 @@ export function DownloadReportButton({
   patientId,
   period = '30d',
   label,
+  compact = false,
 }: DownloadReportButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,9 +65,9 @@ export function DownloadReportButton({
       <button
         onClick={handleDownload}
         disabled={isLoading}
-        className="flex items-center gap-3 px-6 py-4 text-base font-semibold
-          text-white bg-[#1565C0] rounded-2xl hover:bg-[#0D47A1]
-          transition-colors min-h-[56px] disabled:opacity-50"
+        className={`flex items-center gap-2 text-white bg-[#1565C0] rounded-2xl hover:bg-[#0D47A1]
+          transition-colors disabled:opacity-50
+          ${compact ? 'px-4 py-2.5 text-sm font-semibold min-h-[44px]' : 'px-6 py-4 text-base font-semibold min-h-[56px] gap-3'}`}
         aria-label={`Скачать PDF-отчёт за ${PERIOD_LABELS[period]}`}
       >
         {isLoading ? (
@@ -73,17 +77,16 @@ export function DownloadReportButton({
           </>
         ) : (
           <>
-            <span className="text-xl" aria-hidden="true">
-              📄
-            </span>
+            <DownloadIcon className="w-5 h-5 shrink-0" aria-hidden />
             {label ?? `Отчёт для врача (${PERIOD_LABELS[period]})`}
           </>
         )}
       </button>
 
       {error && (
-        <p role="alert" className="text-sm text-[#f44336]">
-          ⚠️ {error}
+        <p role="alert" className="text-sm text-[#f44336] flex items-center gap-2">
+          <AlertTriangleIcon className="w-4 h-4 shrink-0" aria-hidden />
+          {error}
         </p>
       )}
     </div>

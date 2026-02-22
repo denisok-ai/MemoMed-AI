@@ -43,8 +43,8 @@ export function DisciplineChart({ data }: DisciplineChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 text-center">
-        <p className="text-[#9e9e9e] text-lg">Нет данных для отображения графика</p>
+      <div className="rounded-2xl border border-slate-100 bg-white p-6 text-center">
+        <p className="text-slate-500 text-lg">Нет данных для отображения графика</p>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export function DisciplineChart({ data }: DisciplineChartProps) {
   const barGap = (chartWidth - barWidth * chartData.length) / (chartData.length - 1 || 1);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 md:p-6">
+    <div className="rounded-2xl border border-slate-100 bg-white p-4 md:p-6">
       <h3 className="text-lg font-semibold text-[#212121] mb-4">Тренд дисциплины</h3>
 
       <div className="relative overflow-x-auto">
@@ -176,7 +176,7 @@ export function DisciplineChart({ data }: DisciplineChartProps) {
       </div>
 
       {/* Легенда */}
-      <div className="flex flex-wrap gap-4 mt-3 text-sm text-[#757575]">
+      <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-500">
         <span className="flex items-center gap-1">
           <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" /> 90-100%
         </span>
@@ -187,7 +187,7 @@ export function DisciplineChart({ data }: DisciplineChartProps) {
           <span className="w-3 h-3 rounded-sm bg-red-500 inline-block" /> {'<'}70%
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-sm bg-gray-200 inline-block" /> нет приёмов
+          <span className="w-3 h-3 rounded-sm bg-slate-200 inline-block" /> нет приёмов
         </span>
       </div>
     </div>

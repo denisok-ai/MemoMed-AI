@@ -351,6 +351,20 @@ a,
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
+.med-stat-admin {
+  padding: 1.25rem 1rem;
+}
+@media (min-width: 640px) {
+  .med-stat-admin {
+    padding: 1.5rem 1.25rem;
+  }
+}
+@media (min-width: 1024px) {
+  .med-stat-admin {
+    padding: 1.5rem;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ANIMATIONS
 ═══════════════════════════════════════════════════════════════ */
@@ -456,6 +470,25 @@ a,
   background: var(--color-text-muted);
 }
 
+/* Admin sidebar — тонкая прокрутка MedTech */
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+.admin-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    LANDING PAGE — WOW Animations
 ═══════════════════════════════════════════════════════════════ */
@@ -508,4 +541,108 @@ a,
 @keyframes landing-scroll-bounce {
   0%, 100% { transform: translateY(0); opacity: 0.4; }
   50%      { transform: translateY(6px); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MEDTECH CUSTOM CURSOR (2025–2026)
+   Минималистичный, футуристичный, клинические оттенки
+   Темы: light, dark, contrast
+═══════════════════════════════════════════════════════════════ */
+
+.medtech-cursor {
+  position: fixed;
+  left: var(--cursor-x, -100px);
+  top: var(--cursor-y, -100px);
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 99999;
+  transition: opacity 0.2s ease;
+}
+.medtech-cursor:not([data-visible="true"]) {
+  opacity: 0;
+}
+
+.medtech-cursor__glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--cursor-glow-color, rgba(21, 101, 192, 0.25)) 0%,
+    transparent 70%
+  );
+  animation: medtech-cursor-pulse 3s ease-in-out infinite;
+}
+.medtech-cursor__dot {
+  position: absolute;
+  inset: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--cursor-dot-color, #1565C0);
+  box-shadow: 0 0 8px var(--cursor-dot-color, #1565C0);
+}
+.medtech-cursor__ring {
+  position: absolute;
+  inset: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cursor-ring-color, rgba(21, 101, 192, 0.5));
+  opacity: 0.8;
+}
+
+/* Светлая тема */
+.medtech-cursor[data-theme="light"] {
+  --cursor-dot-color: #1565C0;
+  --cursor-ring-color: rgba(21, 101, 192, 0.45);
+  --cursor-glow-color: rgba(21, 101, 192, 0.2);
+}
+
+/* Тёмная тема */
+.medtech-cursor[data-theme="dark"] {
+  --cursor-dot-color: #64B5F6;
+  --cursor-ring-color: rgba(100, 181, 246, 0.6);
+  --cursor-glow-color: rgba(100, 181, 246, 0.3);
+}
+
+/* Повышенный контраст */
+.medtech-cursor[data-theme="contrast"] {
+  --cursor-dot-color: #0D47A1;
+  --cursor-ring-color: #1565C0;
+  --cursor-glow-color: rgba(21, 101, 192, 0.4);
+}
+.medtech-cursor[data-theme="contrast"] .medtech-cursor__ring {
+  border-width: 2px;
+  opacity: 1;
+}
+
+@keyframes medtech-cursor-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Скрываем системный курсор при кастомном */
+.medtech-cursor-active {
+  cursor: none !important;
+}
+.medtech-cursor-active * {
+  cursor: none !important;
+}
+
+/* На touch-устройствах скрываем курсор */
+@media (pointer: coarse) {
+  .medtech-cursor {
+    display: none !important;
+  }
+  .medtech-cursor-active {
+    cursor: auto !important;
+  }
+  .medtech-cursor-active * {
+    cursor: inherit !important;
+  }
 }

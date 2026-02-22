@@ -9,7 +9,13 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
-import { BookIcon, PlusIcon } from '@/components/shared/nav-icons';
+import {
+  AlertTriangleIcon,
+  BookIcon,
+  HeartPulseIcon,
+  ActivityIcon,
+  PlusIcon,
+} from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Дневник самочувствия — MemoMed AI',
@@ -92,15 +98,13 @@ export default async function JournalPage({
   return (
     <div className="med-page med-animate">
       {/* Заголовок */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-[#0D1B2A]">Дневник самочувствия</h1>
-          {total > 0 && (
-            <p className="text-slate-500 text-sm mt-0.5">
-              {total} {total === 1 ? 'запись' : 'записей'}
-            </p>
-          )}
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Дневник самочувствия</h1>
+        {total > 0 && (
+          <p className="text-slate-500 text-base mt-0.5">
+            {total} {total === 1 ? 'запись' : 'записей'}
+          </p>
+        )}
       </div>
 
       {/* Кнопка сегодняшней записи */}
@@ -163,11 +167,16 @@ export default async function JournalPage({
               const w = entryWellbeing(entry);
 
               const SCORES = [
-                { label: 'Настроение', icon: '😊', value: entry.moodScore, warn: false },
-                { label: 'Боль', icon: '💢', value: entry.painLevel, warn: true },
-                { label: 'Сон', icon: '💤', value: entry.sleepQuality, warn: false },
-                { label: 'Энергия', icon: '⚡', value: entry.energyLevel, warn: false },
-              ].filter((s) => s.value !== null);
+                { label: 'Настроение', Icon: HeartPulseIcon, value: entry.moodScore, warn: false },
+                { label: 'Боль', Icon: AlertTriangleIcon, value: entry.painLevel, warn: true },
+                { label: 'Сон', Icon: ActivityIcon, value: entry.sleepQuality, warn: false },
+                { label: 'Энергия', Icon: ActivityIcon, value: entry.energyLevel, warn: false },
+              ].filter((s) => s.value !== null) as Array<{
+                label: string;
+                Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+                value: number;
+                warn: boolean;
+              }>;
 
               return (
                 <li key={entry.id}>
@@ -193,17 +202,21 @@ export default async function JournalPage({
                     {/* Шкалы */}
                     {SCORES.length > 0 && (
                       <div className="grid grid-cols-2 gap-2">
-                        {SCORES.map((s) => (
-                          <div key={s.label} className="bg-white/70 rounded-xl px-3 py-2">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-slate-500 flex items-center gap-1">
-                                <span>{s.icon}</span> {s.label}
-                              </span>
-                              <span className="text-sm font-bold text-[#0D1B2A]">{s.value}/5</span>
-                            </div>
-                            <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full
+                        {SCORES.map((s) => {
+                          const Icon = s.Icon;
+                          return (
+                            <div key={s.label} className="bg-white/70 rounded-xl px-3 py-2">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm text-slate-500 flex items-center gap-1">
+                                  <Icon className="w-4 h-4 shrink-0" aria-hidden /> {s.label}
+                                </span>
+                                <span className="text-sm font-bold text-[#0D1B2A]">
+                                  {s.value}/5
+                                </span>
+                              </div>
+                              <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full
                                   ${
                                     s.warn
                                       ? (s.value ?? 0) >= 4
@@ -217,11 +230,12 @@ export default async function JournalPage({
                                           ? 'bg-amber-400'
                                           : 'bg-red-400'
                                   }`}
-                                style={{ width: `${((s.value ?? 0) / 5) * 100}%` }}
-                              />
+                                  style={{ width: `${((s.value ?? 0) / 5) * 100}%` }}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 
@@ -242,26 +256,18 @@ export default async function JournalPage({
 
           {/* Пагинация */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-2">
-              <p className="text-sm text-slate-400">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between pt-4">
+              <p className="text-sm text-slate-500">
                 {from}–{to} из {total}
               </p>
               <div className="flex gap-2">
                 {page > 1 && (
-                  <Link
-                    href={`/journal?page=${page - 1}`}
-                    className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
-                      hover:border-[#1565C0] transition-colors min-h-[auto]"
-                  >
+                  <Link href={`/journal?page=${page - 1}`} className="med-btn-secondary rounded-xl">
                     ‹ Новее
                   </Link>
                 )}
                 {page < totalPages && (
-                  <Link
-                    href={`/journal?page=${page + 1}`}
-                    className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
-                      hover:border-[#1565C0] transition-colors min-h-[auto]"
-                  >
+                  <Link href={`/journal?page=${page + 1}`} className="med-btn-secondary rounded-xl">
                     Старше ›
                   </Link>
                 )}

@@ -65,18 +65,19 @@ export function FeedItem({ event }: FeedItemProps) {
   const delayText = formatDelay(event.delayMinutes);
   const timeText = formatTimestamp(event.timestamp);
 
+  const IconComp = style.IconComp;
   return (
     <Link
       href={`/patients/${event.patientId}`}
-      className={`flex gap-4 p-4 rounded-2xl border backdrop-blur-sm
+      className={`flex gap-4 p-4 min-h-[56px] rounded-2xl border backdrop-blur-sm
         ${style.card} transition-all hover:shadow-md block`}
       aria-label={`${event.patientName}: ${event.medicationName} — ${style.label}`}
     >
       <div
-        className={`w-10 h-10 rounded-xl ${style.icon}
+        className={`w-12 h-12 rounded-xl ${style.icon}
         flex items-center justify-center flex-shrink-0 shadow-sm`}
       >
-        <style.IconComp className="w-5 h-5 text-white" />
+        <IconComp className="w-6 h-6 text-white" />
       </div>
 
       <div className="flex-1 min-w-0 space-y-1">
@@ -94,7 +95,7 @@ export function FeedItem({ event }: FeedItemProps) {
             {delayText || style.label}
           </span>
         </div>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-500">
           Запланировано на {event.scheduledTime} · {timeText}
         </p>
       </div>

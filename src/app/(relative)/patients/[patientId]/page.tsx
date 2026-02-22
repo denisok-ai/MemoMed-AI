@@ -12,6 +12,15 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { StatsDashboard } from '@/components/shared/stats-dashboard';
 import { CalendarView } from '@/components/shared/calendar-view';
+import { AdminPillIcon, AdminCheckIcon } from '@/components/admin/admin-icons';
+import {
+  AlertTriangleIcon,
+  BookIcon,
+  CheckIcon,
+  HeartPulseIcon,
+  ActivityIcon,
+  XIcon,
+} from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Пациент — MemoMed AI',
@@ -50,10 +59,10 @@ function disciplineColor(pct: number) {
 
 function timeLabel(time: string): string {
   const [h] = time.split(':').map(Number);
-  if (h < 10) return '🌅 Утро';
-  if (h < 14) return '☀️ День';
-  if (h < 19) return '🌆 Вечер';
-  return '🌙 Ночь';
+  if (h < 10) return 'Утро';
+  if (h < 14) return 'День';
+  if (h < 19) return 'Вечер';
+  return 'Ночь';
 }
 
 export default async function RelativePatientPage({
@@ -161,11 +170,11 @@ export default async function RelativePatientPage({
   }
 
   return (
-    <div className="med-page space-y-0 !pb-0">
+    <div className="med-page med-animate space-y-0 !pb-0">
       <Link
         href="/feed"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#1565C0]
-          transition-colors mb-4 min-h-[auto]"
+        className="inline-flex items-center gap-2 text-base text-slate-500 hover:text-[#1565C0]
+          transition-colors mb-4 py-2 min-h-[48px] items-center"
       >
         ← К ленте событий
       </Link>
@@ -182,11 +191,13 @@ export default async function RelativePatientPage({
               <span className="text-2xl font-black text-indigo-600">{patientInitial}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-[#0D1B2A] leading-tight">{name}</h1>
+              <h1 className="text-xl md:text-2xl font-black text-[#0D1B2A] leading-tight">
+                {name}
+              </h1>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-sm text-slate-500">
-                {age !== null && <span>🎂 {age} лет</span>}
-                {patient.profile?.timezone && <span>🕐 {patient.profile.timezone}</span>}
-                <span>📅 С {new Date(connection.createdAt).toLocaleDateString('ru')}</span>
+                {age !== null && <span>{age} лет</span>}
+                {patient.profile?.timezone && <span>{patient.profile.timezone}</span>}
+                <span>С {new Date(connection.createdAt).toLocaleDateString('ru')}</span>
               </div>
             </div>
             <div
@@ -201,15 +212,34 @@ export default async function RelativePatientPage({
 
           <div className="grid grid-cols-3 gap-3 mt-5">
             {[
-              { icon: '💊', label: 'Лекарств', value: patient.medications.length },
-              { icon: '✅', label: 'Принято', value: takenAll },
-              { icon: '❌', label: 'Пропущено', value: totalAll - takenAll },
+              {
+                Icon: AdminPillIcon,
+                gradient: 'from-blue-500 to-blue-600',
+                label: 'Лекарств',
+                value: patient.medications.length,
+              },
+              {
+                Icon: AdminCheckIcon,
+                gradient: 'from-green-500 to-green-600',
+                label: 'Принято',
+                value: takenAll,
+              },
+              {
+                Icon: AlertTriangleIcon,
+                gradient: 'from-red-500 to-red-600',
+                label: 'Пропущено',
+                value: totalAll - takenAll,
+              },
             ].map((s) => (
               <div
                 key={s.label}
                 className="bg-white/70 rounded-xl p-3 text-center border border-slate-100"
               >
-                <p className="text-lg mb-0.5">{s.icon}</p>
+                <div
+                  className={`w-10 h-10 mx-auto rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-1`}
+                >
+                  <s.Icon className="w-5 h-5 text-white" aria-hidden />
+                </div>
                 <p className="text-lg font-bold text-[#0D1B2A]">{s.value}</p>
                 <p className="text-sm text-slate-400">{s.label}</p>
               </div>
@@ -224,8 +254,8 @@ export default async function RelativePatientPage({
           <Link
             key={t.id}
             href={tabHref(t.id)}
-            className={`flex-1 text-center px-4 py-2.5 rounded-xl text-sm font-semibold
-              transition-all whitespace-nowrap min-h-[auto]
+            className={`flex-1 text-center px-4 py-3 rounded-xl text-sm font-semibold
+              transition-all whitespace-nowrap min-h-[48px] flex items-center justify-center
               ${
                 tab === t.id
                   ? 'bg-white text-indigo-600 shadow-sm'
@@ -252,11 +282,16 @@ export default async function RelativePatientPage({
                   return (
                     <li key={log.id} className="flex items-center gap-3 py-2.5">
                       <span
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center
-                        text-sm flex-shrink-0
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0
                         ${isTaken ? 'bg-green-50 text-green-600' : isMissed ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'}`}
                       >
-                        {isTaken ? '✓' : isMissed ? '✗' : '⏳'}
+                        {isTaken ? (
+                          <CheckIcon className="w-4 h-4" aria-hidden />
+                        ) : isMissed ? (
+                          <XIcon className="w-4 h-4" aria-hidden />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden />
+                        )}
                       </span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#0D1B2A] truncate">
@@ -304,7 +339,9 @@ export default async function RelativePatientPage({
           </p>
           {medStats.length === 0 ? (
             <div className="med-card flex flex-col items-center py-12 text-center space-y-3">
-              <p className="text-4xl">💊</p>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <AdminPillIcon className="w-8 h-8 text-white" aria-hidden />
+              </div>
               <p className="text-lg font-semibold text-[#0D1B2A]">Нет активных лекарств</p>
             </div>
           ) : (
@@ -316,9 +353,9 @@ export default async function RelativePatientPage({
                     <div className="flex items-start gap-3">
                       <div
                         className="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100
-                        flex items-center justify-center text-xl flex-shrink-0"
+                        flex items-center justify-center flex-shrink-0"
                       >
-                        💊
+                        <AdminPillIcon className="w-5 h-5 text-indigo-600" aria-hidden />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-[#0D1B2A] truncate">{med.name}</p>
@@ -335,8 +372,8 @@ export default async function RelativePatientPage({
                     </div>
                     <div>
                       <div className="flex justify-between text-sm text-slate-400 mb-1.5">
-                        <span>✅ {med.taken} принято</span>
-                        <span>❌ {med.missed} пропущено</span>
+                        <span>{med.taken} принято</span>
+                        <span>{med.missed} пропущено</span>
                       </div>
                       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div
@@ -363,7 +400,9 @@ export default async function RelativePatientPage({
         <div className="space-y-4 pb-8">
           {journalEntries.length === 0 ? (
             <div className="med-card flex flex-col items-center py-12 text-center space-y-3">
-              <p className="text-4xl">📓</p>
+              <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
+                <BookIcon className="w-8 h-8 text-slate-400" aria-hidden />
+              </div>
               <p className="text-lg font-semibold text-[#0D1B2A]">Записей пока нет</p>
               <p className="text-sm text-slate-400">Пациент ещё не вёл дневник</p>
             </div>
@@ -372,12 +411,16 @@ export default async function RelativePatientPage({
               <p className="text-sm text-slate-400">{journalTotal} записей</p>
               <ul className="space-y-3">
                 {journalEntries.map((entry) => {
-                  const scores = [
-                    { label: 'Настроение', icon: '😊', value: entry.moodScore },
-                    { label: 'Боль', icon: '💢', value: entry.painLevel },
-                    { label: 'Сон', icon: '💤', value: entry.sleepQuality },
-                    { label: 'Энергия', icon: '⚡', value: entry.energyLevel },
-                  ].filter((s) => s.value !== null);
+                  const scoreConfig = [
+                    { label: 'Настроение', Icon: HeartPulseIcon, value: entry.moodScore },
+                    { label: 'Боль', Icon: AlertTriangleIcon, value: entry.painLevel },
+                    { label: 'Сон', Icon: ActivityIcon, value: entry.sleepQuality },
+                    { label: 'Энергия', Icon: ActivityIcon, value: entry.energyLevel },
+                  ].filter((s) => s.value !== null) as Array<{
+                    label: string;
+                    Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+                    value: number;
+                  }>;
 
                   const avgRaw = [
                     entry.moodScore,
@@ -418,31 +461,46 @@ export default async function RelativePatientPage({
                           {badgeLabel}
                         </span>
                       </div>
-                      {scores.length > 0 && (
+                      {scoreConfig.length > 0 && (
                         <div className="grid grid-cols-2 gap-2">
-                          {scores.map((s) => (
-                            <div
-                              key={s.label}
-                              className="bg-white/70 rounded-xl px-3 py-2 flex items-center gap-2"
-                            >
-                              <span>{s.icon}</span>
-                              <div>
-                                <p className="text-sm text-slate-400">{s.label}</p>
-                                <div className="flex gap-0.5 mt-0.5">
-                                  {Array.from({ length: 5 }, (_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`w-2.5 h-2.5 rounded-full
+                          {scoreConfig.map((s) => {
+                            const Icon = s.Icon;
+                            const color =
+                              s.label === 'Боль'
+                                ? s.value <= 2
+                                  ? 'text-green-600'
+                                  : s.value >= 4
+                                    ? 'text-red-600'
+                                    : 'text-amber-600'
+                                : s.value >= 4
+                                  ? 'text-green-600'
+                                  : s.value <= 2
+                                    ? 'text-red-600'
+                                    : 'text-amber-600';
+                            return (
+                              <div
+                                key={s.label}
+                                className="bg-white/70 rounded-xl px-3 py-2 flex items-center gap-2"
+                              >
+                                <Icon className={`w-5 h-5 shrink-0 ${color}`} aria-hidden />
+                                <div>
+                                  <p className="text-sm text-slate-400">{s.label}</p>
+                                  <div className="flex gap-0.5 mt-0.5">
+                                    {Array.from({ length: 5 }, (_, i) => (
+                                      <div
+                                        key={i}
+                                        className={`w-2.5 h-2.5 rounded-full
                                       ${i < (s.value ?? 0) ? 'bg-indigo-500' : 'bg-slate-200'}`}
-                                    />
-                                  ))}
-                                  <span className="text-sm font-bold text-[#0D1B2A] ml-1">
-                                    {s.value}/5
-                                  </span>
+                                      />
+                                    ))}
+                                    <span className="text-sm font-bold text-[#0D1B2A] ml-1">
+                                      {s.value}/5
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                       {entry.freeText && (

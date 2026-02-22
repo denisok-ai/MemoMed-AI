@@ -18,7 +18,7 @@ interface PromptEditorProps {
 const statusLabels: Record<string, { label: string; className: string }> = {
   active: { label: 'Активен', className: 'bg-green-50 text-green-700' },
   draft: { label: 'Черновик', className: 'bg-yellow-50 text-yellow-700' },
-  archived: { label: 'Архив', className: 'bg-gray-100 text-gray-500' },
+  archived: { label: 'Архив', className: 'bg-slate-100 text-slate-500' },
 };
 
 export function PromptEditor({ prompt }: PromptEditorProps) {
@@ -51,7 +51,7 @@ export function PromptEditor({ prompt }: PromptEditorProps) {
   const statusInfo = statusLabels[prompt.status] ?? statusLabels.draft;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+    <div className="bg-white rounded-2xl border border-slate-100 p-5 space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export function PromptEditor({ prompt }: PromptEditorProps) {
               {prompt.category}
             </span>
           </div>
-          <p className="text-xs text-[#9e9e9e] mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             v{prompt.version} · обновлён {new Date(prompt.updatedAt).toLocaleDateString('ru')}
           </p>
         </div>
@@ -94,12 +94,12 @@ export function PromptEditor({ prompt }: PromptEditorProps) {
             { label: 'Задача (task)', value: taskBlock, onChange: setTaskBlock },
           ].map(({ label, value, onChange }) => (
             <div key={label} className="space-y-1">
-              <label className="text-xs font-medium text-[#757575]">{label}</label>
+              <label className="text-xs font-medium text-slate-500">{label}</label>
               <textarea
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 rows={5}
-                className="w-full px-4 py-3 text-sm font-mono border-2 border-gray-200 rounded-xl
+                className="w-full px-4 py-3 text-sm font-mono border-2 border-slate-200 rounded-xl
                   focus:border-[#1565C0] focus:outline-none resize-y transition-colors"
               />
             </div>
@@ -122,11 +122,11 @@ export function PromptEditor({ prompt }: PromptEditorProps) {
             { label: 'Задача', value: prompt.taskBlock },
           ].map(({ label, value }) => (
             <details key={label} className="group">
-              <summary className="cursor-pointer text-sm font-medium text-[#757575] hover:text-[#1565C0] py-1">
+              <summary className="cursor-pointer text-sm font-medium text-slate-500 hover:text-[#1565C0] py-1">
                 {label}
               </summary>
               <pre
-                className="text-sm text-[#424242] bg-gray-50 rounded-xl p-3 mt-1
+                className="text-sm text-[#0D1B2A] bg-slate-50 rounded-xl p-3 mt-1
                 overflow-x-auto whitespace-pre-wrap font-mono max-h-32 overflow-y-auto"
               >
                 {value || '—'}

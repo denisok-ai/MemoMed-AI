@@ -1,0 +1,53 @@
+---
+description: Рабочие настройки деплоя и отладки MemoMed-AI
+alwaysApply: true
+---
+
+# MemoMed-AI — настройки деплоя и отладки
+
+## Сервер (Docker standalone)
+
+### Обязательные переменные .env
+
+```
+ENABLE_DEV_LOGIN=true
+NEXTAUTH_URL=http://<IP-сервера>:3000
+AUTH_TRUST_HOST=true
+NEXTAUTH_SECRET=<минимум 16 символов>
+MEMOMED_PG_PASSWORD=<пароль PostgreSQL>
+```
+
+**Важно:** `NEXTAUTH_URL` должен совпадать с адресом доступа (IP или домен). Иначе — UntrustedHost и редирект на /login.
+
+### Миграции и seed
+
+```bash
+# Миграции (если migrate deploy не срабатывает)
+sudo docker compose -f docker-compose.standalone.yml exec worker npx prisma db push --config prisma.config.cjs
+
+# Seed (тестовые данные)
+sudo docker compose -f docker-compose.standalone.yml exec worker npx tsx prisma/seed.ts
+# или если worker перезапускается:
+sudo docker compose -f docker-compose.standalone.yml run --rm worker npx tsx prisma/seed.ts
+```
+
+### Dev-login на сервере
+
+- http://IP:3000/dev-login
+- Пароль всех аккаунтов: `Test1234!`
+
+## Локальная разработка
+
+```bash
+npm run run:dev    # Первый раз — setup, затем postgres+redis+next dev
+npm run db:seed    # Тестовые данные
+npm run worker:dev # В отдельном терминале — напоминания
+```
+
+- http://localhost:3000/dev-login — доступен при NODE_ENV=development
+
+## Типовые исправления
+
+- **Form action** (Promise<{error}> vs Promise<void>): `as unknown as (formData: FormData) => Promise<void>`
+- **VAPID невалидны**: push.service.ts — try/catch, не падать при плейсхолдерах
+- **@ts-expect-error unused**: удалить директиву, если пакет теперь в зависимостях

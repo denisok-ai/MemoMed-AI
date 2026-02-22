@@ -27,68 +27,56 @@ export default async function FeedPage() {
   });
 
   return (
-    <div className="med-page">
+    <div className="med-page med-animate">
       {/* Заголовок */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#0D1B2A]">Лента событий</h1>
-          <p className="text-[#475569] text-sm mt-0.5">Приёмы лекарств в реальном времени</p>
+          <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Лента событий</h1>
+          <p className="text-[#475569] text-base mt-0.5">Приёмы лекарств в реальном времени</p>
         </div>
         <Link
           href="/connect"
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#1565C0] text-white
-            rounded-xl font-semibold text-sm hover:bg-[#0D47A1] transition-colors
-            shadow-sm shadow-blue-200 min-h-[48px]"
+          className="med-btn-primary rounded-2xl gap-2 w-full sm:w-auto justify-center"
           aria-label="Подключиться к пациенту"
         >
-          <PlusIcon className="w-4 h-4" />
+          <PlusIcon className="w-5 h-5" />
           Пациент
         </Link>
       </div>
 
       {connectionsCount === 0 ? (
-        /* Пустое состояние */
-        <div
-          className="flex flex-col items-center justify-center py-16 space-y-6
-          text-center bg-white rounded-3xl border border-dashed border-slate-200"
-        >
-          <div className="space-y-3">
-            <div
-              className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center
-              justify-center mx-auto"
-            >
-              <UsersIcon className="w-8 h-8 text-slate-300" />
-            </div>
-            <div>
-              <p className="text-xl font-semibold text-[#0D1B2A]">Нет подключённых пациентов</p>
-              <p className="text-[#475569] mt-1.5 max-w-xs mx-auto text-base">
-                Введите инвайт-код от пациента, чтобы следить за приёмом лекарств
-              </p>
-            </div>
+        /* Пустое состояние — med-card, градиентная иконка */
+        <div className="med-card flex flex-col items-center justify-center py-16 md:py-20 space-y-6 text-center">
+          <div
+            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600
+              flex items-center justify-center shadow-lg shadow-blue-200/50 med-float"
+          >
+            <UsersIcon className="w-10 h-10 text-white" />
           </div>
-
+          <div className="space-y-2">
+            <p className="text-xl md:text-2xl font-bold text-[#0D1B2A]">
+              Нет подключённых пациентов
+            </p>
+            <p className="text-[#475569] max-w-sm mx-auto text-base">
+              Введите инвайт-код от пациента, чтобы следить за приёмом лекарств
+            </p>
+          </div>
           <Link
             href="/connect"
-            className="flex items-center gap-2 px-6 py-3.5 bg-[#1565C0] text-white
-              rounded-xl font-semibold hover:bg-[#0D47A1] transition-colors
-              shadow-sm shadow-blue-200"
+            className="med-btn-primary rounded-2xl gap-2"
+            aria-label="Подключиться к пациенту"
           >
-            <PlusIcon className="w-4 h-4" />
+            <PlusIcon className="w-5 h-5" />
             Подключиться к пациенту
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Заголовок с иконкой живого обновления */}
-          <div
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-50
-            rounded-xl border border-blue-100 w-fit"
-          >
-            <ActivityIcon className="w-4 h-4 text-[#1565C0]" />
-            <span className="text-sm font-semibold text-[#1565C0]">
-              Обновляется в реальном времени
-            </span>
-            <span className="w-2 h-2 rounded-full bg-[#1565C0] animate-pulse" />
+        <div className="space-y-4 med-animate" style={{ animationDelay: '80ms' }}>
+          {/* Бейдж живого обновления — med-badge-info */}
+          <div className="med-badge-info inline-flex items-center gap-2 px-4 py-2.5 w-fit">
+            <ActivityIcon className="w-4 h-4" />
+            <span>Обновляется в реальном времени</span>
+            <span className="w-2 h-2 rounded-full bg-[#1565C0] animate-pulse" aria-hidden />
           </div>
 
           <LiveFeed />

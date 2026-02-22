@@ -19,16 +19,16 @@ const PAGE_SIZE = 20;
 
 const STATUS_OPTS = [
   { id: 'all', label: 'Все' },
-  { id: 'taken', label: '✅ Принято' },
-  { id: 'missed', label: '❌ Пропущено' },
-  { id: 'pending', label: '⏳ Ожидает' },
+  { id: 'taken', label: 'Принято' },
+  { id: 'missed', label: 'Пропущено' },
+  { id: 'pending', label: 'Ожидает' },
 ] as const;
 type StatusOpt = (typeof STATUS_OPTS)[number]['id'];
 
 const STATUS_UI: Record<string, { icon: string; label: string; bg: string; text: string }> = {
   taken: { icon: '✓', label: 'Принято', bg: 'bg-green-100', text: 'text-green-700' },
   missed: { icon: '✗', label: 'Пропущено', bg: 'bg-red-100', text: 'text-red-600' },
-  pending: { icon: '⏳', label: 'Ожидает', bg: 'bg-amber-100', text: 'text-amber-700' },
+  pending: { icon: '○', label: 'Ожидает', bg: 'bg-amber-100', text: 'text-amber-700' },
 };
 
 export default async function HistoryPage({
@@ -91,11 +91,9 @@ export default async function HistoryPage({
   return (
     <div className="med-page med-animate">
       {/* Заголовок */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-[#0D1B2A]">История приёма</h1>
-          {total > 0 && <p className="text-slate-500 text-sm mt-0.5">{total} записей</p>}
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">История приёма</h1>
+        {total > 0 && <p className="text-slate-500 text-base mt-0.5">{total} записей</p>}
       </div>
 
       {/* Фильтры */}
@@ -104,13 +102,9 @@ export default async function HistoryPage({
           <Link
             key={opt.id}
             href={filterHref(opt.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap
-              transition-all min-h-[auto]
-              ${
-                statusFilter === opt.id
-                  ? 'bg-[#1565C0] text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-              }`}
+            className={`px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap
+              transition-all min-h-[48px] flex items-center
+              ${statusFilter === opt.id ? 'med-btn-primary' : 'med-btn-secondary'}`}
           >
             {opt.label}
           </Link>
@@ -134,11 +128,7 @@ export default async function HistoryPage({
             </p>
           </div>
           {statusFilter !== 'all' && (
-            <Link
-              href="/history"
-              className="px-4 py-2 bg-[#1565C0] text-white rounded-xl text-sm font-semibold
-                hover:bg-[#0D47A1] transition-colors min-h-[auto]"
-            >
+            <Link href="/history" className="med-btn-primary rounded-xl">
               Показать все
             </Link>
           )}
@@ -168,36 +158,34 @@ export default async function HistoryPage({
                     : null;
 
                   return (
-                    <li
-                      key={log.id}
-                      className="flex items-center gap-3 px-4 py-3 bg-white
-                        rounded-2xl border border-slate-100 hover:border-slate-200 transition-all"
-                    >
-                      {/* Статус */}
-                      <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center
+                    <li key={log.id}>
+                      <div className="med-card flex items-center gap-3 px-4 py-3 hover:shadow-md transition-all">
+                        {/* Статус */}
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center
                         text-sm font-bold flex-shrink-0 ${ui.bg} ${ui.text}`}
-                      >
-                        {ui.icon}
-                      </div>
+                        >
+                          {ui.icon}
+                        </div>
 
-                      {/* Препарат */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-[#0D1B2A] truncate text-sm">
-                          {log.medication.name}
-                        </p>
-                        <p className="text-sm text-slate-400">{log.medication.dosage}</p>
-                      </div>
+                        {/* Препарат */}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-[#0D1B2A] truncate text-sm">
+                            {log.medication.name}
+                          </p>
+                          <p className="text-sm text-slate-400">{log.medication.dosage}</p>
+                        </div>
 
-                      {/* Время */}
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-mono text-slate-500">план {timeStr}</p>
-                        {actualStr && log.status === 'taken' && (
-                          <p className="text-sm font-mono text-green-500">факт {actualStr}</p>
-                        )}
-                        {log.status !== 'taken' && (
-                          <p className={`text-sm font-semibold ${ui.text}`}>{ui.label}</p>
-                        )}
+                        {/* Время */}
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-sm font-mono text-slate-500">план {timeStr}</p>
+                          {actualStr && log.status === 'taken' && (
+                            <p className="text-sm font-mono text-green-500">факт {actualStr}</p>
+                          )}
+                          {log.status !== 'taken' && (
+                            <p className={`text-sm font-semibold ${ui.text}`}>{ui.label}</p>
+                          )}
+                        </div>
                       </div>
                     </li>
                   );
@@ -207,33 +195,28 @@ export default async function HistoryPage({
           ))}
 
           {/* Пагинация */}
-          <div className="flex items-center justify-between pt-2">
-            <p className="text-sm text-slate-400">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between pt-4">
+            <p className="text-sm text-slate-500">
               {from}–{to} из {total}
             </p>
             <div className="flex gap-2">
               {page > 1 && (
                 <Link
                   href={filterHref(statusFilter, page - 1)}
-                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
-                    hover:border-[#1565C0] transition-colors min-h-[auto]"
+                  className="med-btn-secondary rounded-xl"
                 >
                   ← Новее
                 </Link>
               )}
-
-              {/* Номер страницы */}
               {totalPages > 1 && (
-                <span className="px-4 py-2 text-sm text-slate-500">
+                <span className="px-4 py-2.5 text-sm text-slate-500 flex items-center">
                   {page} / {totalPages}
                 </span>
               )}
-
               {page < totalPages && (
                 <Link
                   href={filterHref(statusFilter, page + 1)}
-                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm
-                    hover:border-[#1565C0] transition-colors min-h-[auto]"
+                  className="med-btn-secondary rounded-xl"
                 >
                   Старше →
                 </Link>

@@ -19,7 +19,7 @@ const SUGGESTIONS = [
 export function ChatSuggestions({ onSelect }: ChatSuggestionsProps) {
   return (
     <div className="px-4 py-3 space-y-2" role="list" aria-label="Быстрые вопросы">
-      <p className="text-sm text-[#9e9e9e] font-medium">Быстрые вопросы:</p>
+      <p className="text-sm text-slate-500 font-medium">Быстрые вопросы:</p>
       <div className="flex flex-wrap gap-2">
         {SUGGESTIONS.map((suggestion) => (
           <button

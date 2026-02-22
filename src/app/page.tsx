@@ -18,6 +18,7 @@ import {
   CheckIcon,
   ChevronRightIcon,
   LockIcon,
+  UserIcon,
 } from '@/components/shared/nav-icons';
 
 const FEATURES = [
@@ -348,25 +349,25 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                avatar: '👴',
+                Icon: UserIcon,
                 role: 'Пациент',
                 quote: 'Крупные кнопки, понятный интерфейс — даже мне всё ясно с первого раза.',
                 gradient: 'from-blue-500 to-blue-600',
               },
               {
-                avatar: '👩',
+                Icon: UsersIcon,
                 role: 'Родственник',
                 quote:
                   'Вижу в ленте, что мама приняла лекарство. Не нужно звонить по 5 раз в день.',
                 gradient: 'from-emerald-500 to-green-600',
               },
               {
-                avatar: '👨‍⚕️',
+                Icon: HeartPulseIcon,
                 role: 'Врач',
                 quote: 'PDF-отчёты экономят время на приёме. Сразу вижу дисциплину пациента.',
                 gradient: 'from-teal-500 to-teal-600',
               },
-            ].map(({ avatar, role, quote, gradient }) => (
+            ].map(({ Icon, role, quote, gradient }) => (
               <div
                 key={role}
                 className="med-card p-6 space-y-4
@@ -375,9 +376,9 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient}
-                    flex items-center justify-center text-2xl shadow-sm`}
+                    flex items-center justify-center shadow-sm`}
                   >
-                    {avatar}
+                    <Icon className="w-6 h-6 text-white" aria-hidden />
                   </div>
                   <p className="font-bold text-[#0D1B2A]">{role}</p>
                 </div>

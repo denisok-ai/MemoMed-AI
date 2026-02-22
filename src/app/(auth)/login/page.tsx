@@ -78,7 +78,7 @@ export default function LoginPage() {
       </div>
 
       {/* Правая панель — форма */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-[#F0F5FA]">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-[#F0F4F8]">
         <div className="w-full max-w-md space-y-8">
           {/* Мобильный логотип */}
           <div className="lg:hidden flex items-center justify-center gap-3">
@@ -128,7 +128,7 @@ export default function LoginPage() {
           {(process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_LOGIN === 'true') && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center space-y-1">
               <p className="text-yellow-700 text-xs font-mono font-bold tracking-wide">
-                🔧 РЕЖИМ РАЗРАБОТКИ
+                РЕЖИМ РАЗРАБОТКИ
               </p>
               <Link
                 href="/dev-login"

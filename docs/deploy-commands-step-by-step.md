@@ -159,7 +159,7 @@ sudo docker compose -f docker-compose.standalone.yml up -d
 
 ### Добавить тестовые данные (seed)
 
-Скрипт создаёт 50 пациентов, 5 врачей, 5 родственников, 1 администратора, лекарства, логи приёмов и записи дневника. **Пароль всех аккаунтов: `Test1234!`**
+Скрипт создаёт 50 пациентов, 5 врачей, 25 родственников, 1 администратора, лекарства, логи приёмов и записи дневника. **Пароль всех аккаунтов: `Test1234!`**
 
 **На сервере (Docker):**
 
@@ -179,7 +179,7 @@ npm run db:seed
 
 - `admin@memomed.dev` → админ-панель
 - `doctor1@memomed.dev` … `doctor5@memomed.dev` → врачи
-- `relative1@memomed.dev` … `relative5@memomed.dev` → родственники
+- `relative1@memomed.dev` … `relative25@memomed.dev` → родственники
 - `patient1@memomed.dev` … `patient50@memomed.dev` → пациенты
 
 ---

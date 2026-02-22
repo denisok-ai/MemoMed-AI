@@ -8,6 +8,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { AdminLinkIcon, AdminAiIcon } from '@/components/admin/admin-icons';
+import { BarChartIcon, AlertTriangleIcon } from '@/components/shared/nav-icons';
 
 interface Pattern {
   type: 'correlation' | 'trend' | 'anomaly';
@@ -28,17 +30,18 @@ interface AnalysisResultsProps {
   patientId: string;
 }
 
-function getPatternIcon(type: string): string {
-  if (type === 'correlation') return '🔗';
-  if (type === 'trend') return '📈';
-  return '⚠️';
+function getPatternIcon(type: string): React.ReactNode {
+  if (type === 'correlation')
+    return <AdminLinkIcon className="w-5 h-5 text-[#1565C0]" aria-hidden />;
+  if (type === 'trend') return <BarChartIcon className="w-5 h-5 text-[#1565C0]" aria-hidden />;
+  return <AlertTriangleIcon className="w-5 h-5 text-amber-600" aria-hidden />;
 }
 
 function getConfidenceBadge(confidence: string): { text: string; className: string } {
   if (confidence === 'high')
     return { text: 'Высокая', className: 'bg-emerald-100 text-emerald-700' };
   if (confidence === 'medium') return { text: 'Средняя', className: 'bg-amber-100 text-amber-700' };
-  return { text: 'Низкая', className: 'bg-gray-100 text-gray-600' };
+  return { text: 'Низкая', className: 'bg-slate-100 text-slate-600' };
 }
 
 function getRiskBadge(level: string): { text: string; className: string } {
@@ -75,9 +78,11 @@ export function AnalysisResults({ patientId }: AnalysisResultsProps) {
   if (!data && !loading && !error) {
     return (
       <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6 text-center space-y-4">
-        <p className="text-4xl">🧠</p>
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+          <AdminAiIcon className="w-8 h-8 text-white" aria-hidden />
+        </div>
         <h3 className="text-lg font-semibold text-[#212121]">AI-анализ корреляций</h3>
-        <p className="text-sm text-[#757575]">
+        <p className="text-sm text-slate-500">
           ИИ проанализирует связь между приёмом лекарств и вашим самочувствием за 30 дней
         </p>
         <button
@@ -97,9 +102,11 @@ export function AnalysisResults({ patientId }: AnalysisResultsProps) {
         className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6 text-center space-y-3
         animate-pulse"
       >
-        <p className="text-4xl">🧠</p>
-        <p className="text-base text-[#757575]">Анализирую данные...</p>
-        <p className="text-sm text-[#9e9e9e]">Это может занять 10-20 секунд</p>
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-indigo-200 flex items-center justify-center">
+          <AdminAiIcon className="w-8 h-8 text-indigo-400" aria-hidden />
+        </div>
+        <p className="text-base text-slate-500">Анализирую данные...</p>
+        <p className="text-sm text-slate-500">Это может занять 10-20 секунд</p>
       </div>
     );
   }
@@ -124,33 +131,36 @@ export function AnalysisResults({ patientId }: AnalysisResultsProps) {
   const risk = getRiskBadge(data.riskLevel);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 space-y-5">
+    <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h3 className="text-lg font-semibold text-[#212121]">🧠 AI-анализ</h3>
+        <h3 className="text-lg font-semibold text-[#212121] flex items-center gap-2">
+          <AdminAiIcon className="w-5 h-5 text-[#1565C0]" aria-hidden />
+          AI-анализ
+        </h3>
         <div className="flex items-center gap-2">
           <span className={`text-sm px-3 py-1 rounded-full border ${risk.className}`}>
             {risk.text}
           </span>
-          {data.cached && <span className="text-sm text-[#9e9e9e]">(из кэша)</span>}
+          {data.cached && <span className="text-sm text-slate-500">(из кэша)</span>}
         </div>
       </div>
 
       {/* Общая оценка */}
-      <div className="bg-gray-50 rounded-xl p-4">
-        <p className="text-base text-[#424242] leading-relaxed">{data.overallAssessment}</p>
+      <div className="bg-slate-50 rounded-xl p-4">
+        <p className="text-base text-[#0D1B2A] leading-relaxed">{data.overallAssessment}</p>
       </div>
 
       {/* Паттерны */}
       {data.patterns.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-base font-medium text-[#424242]">Обнаруженные паттерны</h4>
+          <h4 className="text-base font-medium text-[#0D1B2A]">Обнаруженные паттерны</h4>
           {data.patterns.map((pattern, i) => {
             const badge = getConfidenceBadge(pattern.confidence);
             return (
-              <div key={i} className="flex gap-3 p-3 rounded-xl bg-gray-50">
-                <span className="text-xl flex-shrink-0">{getPatternIcon(pattern.type)}</span>
+              <div key={i} className="flex gap-3 p-3 rounded-xl bg-slate-50">
+                <span className="flex-shrink-0">{getPatternIcon(pattern.type)}</span>
                 <div className="flex-1 space-y-1">
-                  <p className="text-sm text-[#424242] leading-relaxed">{pattern.description}</p>
+                  <p className="text-sm text-[#0D1B2A] leading-relaxed">{pattern.description}</p>
                   <span
                     className={`inline-block text-sm px-2 py-0.5 rounded-full ${badge.className}`}
                   >
@@ -166,10 +176,10 @@ export function AnalysisResults({ patientId }: AnalysisResultsProps) {
       {/* Рекомендации */}
       {data.recommendations.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-base font-medium text-[#424242]">Рекомендации</h4>
+          <h4 className="text-base font-medium text-[#0D1B2A]">Рекомендации</h4>
           <ul className="space-y-2">
             {data.recommendations.map((rec, i) => (
-              <li key={i} className="flex gap-2 text-sm text-[#616161]">
+              <li key={i} className="flex gap-2 text-sm text-slate-600">
                 <span className="text-emerald-500 flex-shrink-0">✓</span>
                 {rec}
               </li>
@@ -179,17 +189,17 @@ export function AnalysisResults({ patientId }: AnalysisResultsProps) {
       )}
 
       {/* Дисклеймер */}
-      <p className="text-sm text-[#bdbdbd] pt-2 border-t border-gray-100">
-        ⚕️ Это предварительный AI-анализ, а не медицинский диагноз. Обсудите результаты с вашим
-        лечащим врачом.
+      <p className="text-sm text-slate-400 pt-2 border-t border-slate-100">
+        Это предварительный AI-анализ, а не медицинский диагноз. Обсудите результаты с вашим лечащим
+        врачом.
       </p>
 
       {/* Кнопка обновления */}
       <button
         onClick={runAnalysis}
         disabled={loading}
-        className="w-full py-3 rounded-xl border border-gray-200 text-sm text-[#757575]
-          hover:bg-gray-50 transition-colors disabled:opacity-50"
+        className="w-full py-3 rounded-xl border border-slate-200 text-sm text-slate-500
+          hover:bg-slate-50 transition-colors disabled:opacity-50"
       >
         {loading ? 'Анализирую...' : 'Обновить анализ'}
       </button>

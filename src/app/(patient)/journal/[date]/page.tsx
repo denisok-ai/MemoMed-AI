@@ -11,6 +11,7 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { JournalForm } from '@/components/patient/journal-form';
+import { InfoIcon } from '@/components/shared/nav-icons';
 
 interface PageProps {
   params: Promise<{ date: string }>;
@@ -55,7 +56,7 @@ export default async function JournalEntryPage({ params }: PageProps) {
       <div className="flex items-center gap-4">
         <Link
           href="/journal"
-          className="p-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors
+          className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors
             min-h-[48px] min-w-[48px] flex items-center justify-center text-xl"
           aria-label="Назад к дневнику"
         >
@@ -67,7 +68,7 @@ export default async function JournalEntryPage({ params }: PageProps) {
       </div>
 
       {/* Форма */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+      <div className="med-card p-8">
         <JournalForm
           date={date}
           initialData={
@@ -86,9 +87,12 @@ export default async function JournalEntryPage({ params }: PageProps) {
 
       {/* Подсказка */}
       <div className="bg-[#e3f2fd] rounded-2xl p-4">
-        <p className="text-sm text-[#1565c0]">
-          💡 <strong>Совет:</strong> Регулярные записи помогают врачу выявить закономерности между
-          вашим самочувствием и приёмом лекарств.
+        <p className="text-sm text-[#1565c0] flex items-start gap-2">
+          <InfoIcon className="w-4 h-4 shrink-0 mt-0.5" aria-hidden />
+          <span>
+            <strong>Совет:</strong> Регулярные записи помогают врачу выявить закономерности между
+            вашим самочувствием и приёмом лекарств.
+          </span>
         </p>
       </div>
     </div>

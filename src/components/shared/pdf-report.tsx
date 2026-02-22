@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   title: { fontSize: 22, fontWeight: 700, color: '#1565C0' },
-  subtitle: { fontSize: 12, color: '#757575', marginTop: 4 },
+  subtitle: { fontSize: 12, color: '#64748b', marginTop: 4 },
   section: { marginBottom: 20 },
   sectionTitle: {
     fontSize: 14,
@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E3F2FD',
   },
   row: { flexDirection: 'row', marginBottom: 4 },
-  label: { width: 160, fontWeight: 700, color: '#424242' },
-  value: { flex: 1, color: '#616161' },
+  label: { width: 160, fontWeight: 700, color: '#0D1B2A' },
+  value: { flex: 1, color: '#475569' },
   table: { marginTop: 8 },
   tableHeader: {
     flexDirection: 'row',
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   col1: { flex: 2 },
   col2: { flex: 1, textAlign: 'center' },
-  colHeader: { fontWeight: 700, fontSize: 10, color: '#616161' },
+  colHeader: { fontWeight: 700, fontSize: 10, color: '#475569' },
   badge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -101,9 +101,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff8e1',
     borderRadius: 8,
   },
-  disclaimerText: { fontSize: 9, color: '#616161', lineHeight: 1.4 },
+  disclaimerText: { fontSize: 9, color: '#475569', lineHeight: 1.4 },
   footer: { position: 'absolute', bottom: 30, left: 40, right: 40 },
-  footerText: { fontSize: 9, color: '#bdbdbd', textAlign: 'center' },
+  footerText: { fontSize: 9, color: '#94a3b8', textAlign: 'center' },
 });
 
 interface PdfReportProps {
@@ -160,7 +160,7 @@ export function PdfReport({ data, summary, generatedAt }: PdfReportProps) {
                   {med.name} {med.dosage}
                 </Text>
                 <Text style={[styles.col2, { color: '#2e7d32' }]}>{med.takenCount}</Text>
-                <Text style={[styles.col2, { color: med.missedCount > 0 ? '#c62828' : '#616161' }]}>
+                <Text style={[styles.col2, { color: med.missedCount > 0 ? '#c62828' : '#475569' }]}>
                   {med.missedCount}
                 </Text>
                 <Text style={styles.col2}>{med.disciplinePercent}%</Text>
@@ -218,7 +218,7 @@ export function PdfReport({ data, summary, generatedAt }: PdfReportProps) {
                 <Text style={styles.col2}>
                   {f.effectivenessScore ? `${f.effectivenessScore}/5` : '—'}
                 </Text>
-                <Text style={[styles.col1, { fontSize: 10, color: '#616161' }]}>
+                <Text style={[styles.col1, { fontSize: 10, color: '#475569' }]}>
                   {f.sideEffects ?? 'Побочек нет'}
                 </Text>
               </View>

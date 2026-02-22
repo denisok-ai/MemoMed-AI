@@ -53,7 +53,7 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           type="text"
           required
           defaultValue={defaultValues?.name}
-          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
+          className="w-full px-4 py-3 text-lg border-2 border-slate-200 rounded-xl
             focus:border-[#1565C0] focus:outline-none transition-colors"
           placeholder="Например: Аспирин"
         />
@@ -69,7 +69,7 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           type="text"
           required
           defaultValue={defaultValues?.dosage}
-          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
+          className="w-full px-4 py-3 text-lg border-2 border-slate-200 rounded-xl
             focus:border-[#1565C0] focus:outline-none transition-colors"
           placeholder="Например: 1 таблетка 500 мг"
         />
@@ -85,21 +85,21 @@ export function MedicationForm({ medicationId, defaultValues }: MedicationFormPr
           type="time"
           required
           defaultValue={defaultValues?.scheduledTime}
-          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
+          className="w-full px-4 py-3 text-lg border-2 border-slate-200 rounded-xl
             focus:border-[#1565C0] focus:outline-none transition-colors"
         />
       </div>
 
       <div className="space-y-2">
         <label htmlFor="instruction" className="block text-lg font-medium text-[#212121]">
-          Инструкция <span className="text-[#757575] font-normal text-base">(необязательно)</span>
+          Инструкция <span className="text-slate-500 font-normal text-base">(необязательно)</span>
         </label>
         <textarea
           id="instruction"
           name="instruction"
           rows={3}
           defaultValue={defaultValues?.instruction}
-          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl
+          className="w-full px-4 py-3 text-lg border-2 border-slate-200 rounded-xl
             focus:border-[#1565C0] focus:outline-none transition-colors resize-none"
           placeholder="Особые указания: принимать после еды, запивать водой..."
         />

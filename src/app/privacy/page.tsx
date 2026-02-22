@@ -6,6 +6,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { LockIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Политика конфиденциальности — MemoMed AI',
@@ -14,10 +15,20 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-[#F8FAFC] py-12 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm p-8 md:p-10">
-        <h1 className="text-2xl font-bold text-[#0D1B2A] mb-2">Политика конфиденциальности</h1>
-        <p className="text-sm text-[#64748B] mb-8">MemoMed AI | Обновлено: 2026-02-22</p>
+    <main className="min-h-screen bg-[#F0F4F8] py-12 px-4">
+      <div className="max-w-2xl mx-auto med-card p-8 md:p-10">
+        <div className="flex items-center gap-3 mb-8">
+          <div
+            className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600
+              flex items-center justify-center shadow-lg"
+          >
+            <LockIcon className="w-6 h-6 text-white" aria-hidden />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-[#0D1B2A]">Политика конфиденциальности</h1>
+            <p className="text-sm text-slate-500">MemoMed AI | Обновлено: 2026-02-22</p>
+          </div>
+        </div>
 
         <div className="prose prose-slate max-w-none space-y-6 text-[#334155]">
           <section>
@@ -65,8 +76,11 @@ export default function PrivacyPage() {
           </section>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-[#E2E8F0]">
-          <Link href="/login" className="text-[#1565C0] font-medium hover:underline">
+        <div className="mt-10 pt-6 border-t border-slate-200">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 text-[#1565C0] font-semibold hover:underline"
+          >
             ← Вернуться к входу
           </Link>
         </div>

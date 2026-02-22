@@ -42,9 +42,10 @@ export async function GET(request: NextRequest, { params }: RouteParams): Promis
   const periodParam = searchParams.get('period') ?? '30d';
   const periodDays = parseInt(periodParam.replace('d', ''), 10) || 30;
 
-  // Проверяем права доступа: сам пациент или его родственник
+  // Проверяем права доступа: пациент (для себя), врач/родственник (по связи) или админ
+  const isAdmin = session.user.role === 'admin';
   const isOwn = session.user.id === patientId;
-  if (!isOwn) {
+  if (!isAdmin && !isOwn) {
     const connection = await prisma.connection.findFirst({
       where: {
         patientId,

@@ -10,9 +10,10 @@
 
 import { useState, useTransition } from 'react';
 import { markOnboardingDoneAction } from '@/lib/onboarding/actions';
+import { PillIcon, CheckIcon, RssIcon, UsersIcon } from '@/components/shared/nav-icons';
 
 interface OnboardingSlide {
-  emoji: string;
+  Icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
   title: string;
   description: string;
   bgColor: string;
@@ -20,27 +21,27 @@ interface OnboardingSlide {
 
 const SLIDES: OnboardingSlide[] = [
   {
-    emoji: '💊',
+    Icon: PillIcon,
     title: 'Ваши лекарства',
     description:
       'Добавьте список лекарств — время приёма и дозировку. Приложение напомнит в нужный момент.',
     bgColor: 'from-[#1565C0] to-[#42A5F5]',
   },
   {
-    emoji: '✅',
+    Icon: CheckIcon,
     title: 'Нажмите кнопку',
     description: 'Когда придёт время — нажмите большую зелёную кнопку. Каждый приём будет записан.',
     bgColor: 'from-[#4caf50] to-[#66bb6a]',
   },
   {
-    emoji: '📡',
+    Icon: RssIcon,
     title: 'Работает офлайн',
     description:
       'Приложение работает даже без интернета. Данные синхронизируются автоматически при подключении.',
     bgColor: 'from-[#42a5f5] to-[#26c6da]',
   },
   {
-    emoji: '👥',
+    Icon: UsersIcon,
     title: 'Для близких',
     description:
       'Поделитесь кодом с родственниками — они смогут следить за приёмом лекарств в реальном времени.',
@@ -99,11 +100,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         px-8 text-center space-y-8"
       >
         <div
-          className="text-[120px] leading-none"
+          className="w-32 h-32 flex items-center justify-center text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.2)]"
           aria-hidden="true"
-          style={{ filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.2))' }}
         >
-          {current.emoji}
+          <current.Icon className="w-24 h-24" aria-hidden />
         </div>
 
         <div className="space-y-4 max-w-sm">
@@ -137,7 +137,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             className="w-full py-5 bg-white text-[#1565C0] text-xl font-bold rounded-3xl
               hover:bg-white/90 transition-colors min-h-[64px] disabled:opacity-60"
           >
-            {isPending ? 'Подготовка...' : 'Начать 🚀'}
+            {isPending ? 'Подготовка...' : 'Начать'}
           </button>
         ) : (
           <button

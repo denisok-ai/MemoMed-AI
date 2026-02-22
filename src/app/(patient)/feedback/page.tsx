@@ -1,7 +1,7 @@
 /**
  * @file page.tsx
  * @description Страница отзывов о лекарствах в стиле MedTech:
- * форма отзыва + история последних отзывов
+ * форма отзыва + история отзывов с пагинацией
  * @dependencies FeedbackForm, prisma, next-auth
  * @created 2026-02-22
  */
@@ -11,16 +11,27 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { FeedbackForm } from '@/components/shared/feedback-form';
+import { Pagination } from '@/components/shared/pagination';
 import { PillIcon, StarIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Отзывы о лекарствах — MemoMed AI',
 };
 
-export default async function FeedbackPage() {
+const PAGE_SIZE = 10;
+
+export default async function FeedbackPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect('/login');
   if (session.user.role !== 'patient') redirect('/dashboard');
+
+  const { page: pageStr } = await searchParams;
+  const page = Math.max(1, parseInt(pageStr ?? '1'));
+  const skip = (page - 1) * PAGE_SIZE;
 
   const medications = await prisma.medication.findMany({
     where: { patientId: session.user.id, isActive: true },
@@ -28,35 +39,41 @@ export default async function FeedbackPage() {
     orderBy: { name: 'asc' },
   });
 
-  const recentFeedbacks = await prisma.medicationFeedback.findMany({
-    where: { patientId: session.user.id },
-    include: { medication: { select: { name: true } } },
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-  });
+  const [feedbacks, total] = await Promise.all([
+    prisma.medicationFeedback.findMany({
+      where: { patientId: session.user.id },
+      include: { medication: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: PAGE_SIZE,
+      skip,
+    }),
+    prisma.medicationFeedback.count({ where: { patientId: session.user.id } }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="med-page">
+    <div className="med-page med-animate">
       {/* Заголовок */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#0D1B2A]">Отзывы о лекарствах</h1>
-        <p className="text-[#475569] mt-1">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Отзывы о лекарствах</h1>
+        <p className="text-slate-500 text-base mt-1">
           Ваши отзывы помогают врачу и исследованиям. Данные анонимизируются.
         </p>
       </div>
 
       {medications.length === 0 ? (
         /* Пустое состояние */
-        <div
-          className="flex flex-col items-center justify-center py-16 text-center
-          bg-white rounded-3xl border border-dashed border-slate-200 space-y-4"
-        >
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center">
-            <PillIcon className="w-8 h-8 text-[#1565C0]" />
+        <div className="med-card flex flex-col items-center justify-center py-16 text-center space-y-4">
+          <div
+            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500
+              flex items-center justify-center shadow-lg shadow-amber-200/50"
+          >
+            <PillIcon className="w-10 h-10 text-white" />
           </div>
           <div>
-            <p className="text-lg font-semibold text-[#0D1B2A]">Нет активных лекарств</p>
-            <p className="text-[#475569] mt-1">Добавьте лекарство, чтобы оставить отзыв</p>
+            <p className="text-xl font-bold text-[#0D1B2A]">Нет активных лекарств</p>
+            <p className="text-slate-500 mt-1">Добавьте лекарство, чтобы оставить отзыв</p>
           </div>
         </div>
       ) : (
@@ -64,20 +81,17 @@ export default async function FeedbackPage() {
       )}
 
       {/* История отзывов */}
-      {recentFeedbacks.length > 0 && (
+      {total > 0 && (
         <div className="mt-8 space-y-4">
           <div className="flex items-center gap-2">
             <StarIcon className="w-4 h-4 text-amber-500" />
-            <h2 className="text-base font-bold text-[#0D1B2A]">Мои последние отзывы</h2>
+            <h2 className="text-base font-bold text-[#0D1B2A]">Мои отзывы</h2>
+            <span className="text-sm text-slate-500">({total})</span>
           </div>
 
-          <div className="space-y-3">
-            {recentFeedbacks.map((fb) => (
-              <div
-                key={fb.id}
-                className="bg-white rounded-2xl border border-slate-100 p-4 space-y-2.5
-                  shadow-sm"
-              >
+          <div className="space-y-3 med-stagger">
+            {feedbacks.map((fb) => (
+              <div key={fb.id} className="med-card p-4 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-[#1565C0]" />
@@ -137,6 +151,15 @@ export default async function FeedbackPage() {
               </div>
             ))}
           </div>
+          {totalPages > 1 && (
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={PAGE_SIZE}
+              buildHref={(p) => `/feedback?page=${p}`}
+            />
+          )}
         </div>
       )}
     </div>

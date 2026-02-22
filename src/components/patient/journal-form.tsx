@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { AlertTriangleIcon, CheckIcon, XIcon } from '@/components/shared/nav-icons';
 
 interface JournalFormProps {
   date: string; // YYYY-MM-DD
@@ -25,36 +26,15 @@ interface JournalFormProps {
 interface ScoreField {
   key: 'moodScore' | 'painLevel' | 'sleepQuality' | 'energyLevel';
   label: string;
-  emoji: string[];
   /** Что означает высокий балл — хорошо или плохо */
   highIsGood: boolean;
 }
 
 const SCORE_FIELDS: ScoreField[] = [
-  {
-    key: 'moodScore',
-    label: 'Настроение',
-    emoji: ['😔', '😕', '😐', '🙂', '😄'],
-    highIsGood: true,
-  },
-  {
-    key: 'painLevel',
-    label: 'Боль',
-    emoji: ['😌', '🤔', '😣', '😖', '🤕'],
-    highIsGood: false,
-  },
-  {
-    key: 'sleepQuality',
-    label: 'Сон',
-    emoji: ['😴', '🥱', '😐', '🙂', '😴✨'],
-    highIsGood: true,
-  },
-  {
-    key: 'energyLevel',
-    label: 'Энергия',
-    emoji: ['🪫', '😓', '😐', '⚡', '🔋'],
-    highIsGood: true,
-  },
+  { key: 'moodScore', label: 'Настроение', highIsGood: true },
+  { key: 'painLevel', label: 'Боль', highIsGood: false },
+  { key: 'sleepQuality', label: 'Сон', highIsGood: true },
+  { key: 'energyLevel', label: 'Энергия', highIsGood: true },
 ];
 
 /** Цвет ползунка в зависимости от значения и направления */
@@ -164,17 +144,20 @@ export function JournalForm({ date, initialData }: JournalFormProps) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Заголовок с датой */}
       <div>
-        <p className="text-sm text-[#9e9e9e] capitalize">{formatDate(date)}</p>
+        <p className="text-sm text-slate-500 capitalize">{formatDate(date)}</p>
         {isOffline && (
-          <p className="mt-1 text-sm text-[#ffa726]">📵 Офлайн — запись сохранится локально</p>
+          <p className="mt-1 text-sm text-[#ffa726] flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-[#ffa726] animate-pulse" aria-hidden />
+            Офлайн — запись сохранится локально
+          </p>
         )}
       </div>
 
       {/* Ползунки для метрик */}
       <div className="space-y-6">
-        {SCORE_FIELDS.map(({ key, label, emoji, highIsGood }) => {
+        {SCORE_FIELDS.map(({ key, label, highIsGood }) => {
           const value = scores[key];
-          const color = value ? getSliderColor(value, highIsGood) : '#bdbdbd';
+          const color = value ? getSliderColor(value, highIsGood) : '#94a3b8';
 
           return (
             <div key={key} className="space-y-2">
@@ -182,13 +165,23 @@ export function JournalForm({ date, initialData }: JournalFormProps) {
                 <label htmlFor={key} className="text-base font-medium text-[#212121]">
                   {label}
                 </label>
-                <span className="text-2xl" aria-label={`${label}: ${value ?? 'не задано'}`}>
-                  {value ? emoji[value - 1] : '—'}
+                <span className="flex gap-0.5" aria-label={`${label}: ${value ?? 'не задано'}`}>
+                  {value
+                    ? Array.from({ length: 5 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className="w-2 h-2 rounded-full transition-colors"
+                          style={{
+                            backgroundColor: i < value ? color : '#e2e8f0',
+                          }}
+                        />
+                      ))
+                    : '—'}
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-sm text-[#9e9e9e] w-3">1</span>
+                <span className="text-sm text-slate-500 w-3">1</span>
                 <input
                   id={key}
                   type="range"
@@ -205,24 +198,24 @@ export function JournalForm({ date, initialData }: JournalFormProps) {
                   aria-valuemax={5}
                   aria-valuenow={value ?? undefined}
                 />
-                <span className="text-sm text-[#9e9e9e] w-3">5</span>
+                <span className="text-sm text-slate-500 w-3">5</span>
 
                 {/* Кнопка сброса */}
                 {value !== null && (
                   <button
                     type="button"
                     onClick={() => setScores((prev) => ({ ...prev, [key]: null }))}
-                    className="text-[#bdbdbd] hover:text-[#9e9e9e] text-sm"
+                    className="text-slate-400 hover:text-slate-500 text-sm"
                     aria-label={`Сбросить ${label}`}
                   >
-                    ✕
+                    <XIcon className="w-4 h-4 text-slate-400" aria-hidden />
                   </button>
                 )}
               </div>
 
               {/* Значение */}
               {value && (
-                <div className="flex justify-between text-sm text-[#9e9e9e]">
+                <div className="flex justify-between text-sm text-slate-500">
                   {highIsGood ? (
                     <>
                       <span>плохо</span>
@@ -253,22 +246,24 @@ export function JournalForm({ date, initialData }: JournalFormProps) {
           placeholder="Как вы себя чувствуете? Что произошло сегодня?"
           maxLength={2000}
           rows={4}
-          className="w-full px-4 py-3 text-base rounded-2xl border border-gray-200
+          className="w-full px-4 py-3 text-base rounded-2xl border border-slate-200
             focus:outline-none focus:border-[#1565C0] focus:ring-2 focus:ring-[#E3F2FD]
             resize-none transition-colors"
         />
-        <p className="text-sm text-[#9e9e9e] text-right">{freeText.length}/2000</p>
+        <p className="text-sm text-slate-500 text-right">{freeText.length}/2000</p>
       </div>
 
       {/* Сообщения */}
       {error && (
-        <p role="alert" className="text-sm text-[#f44336]">
-          ⚠️ {error}
+        <p role="alert" className="text-sm text-[#f44336] flex items-center gap-2">
+          <AlertTriangleIcon className="w-4 h-4 shrink-0" aria-hidden />
+          {error}
         </p>
       )}
       {saved && (
-        <p role="status" className="text-sm text-[#4caf50]">
-          ✅ {isOffline ? 'Сохранено офлайн' : 'Запись сохранена'}
+        <p role="status" className="text-sm text-[#4caf50] flex items-center gap-2">
+          <CheckIcon className="w-4 h-4 shrink-0" aria-hidden />
+          {isOffline ? 'Сохранено офлайн' : 'Запись сохранена'}
         </p>
       )}
 
@@ -280,7 +275,7 @@ export function JournalForm({ date, initialData }: JournalFormProps) {
           rounded-2xl hover:bg-[#0D47A1] transition-colors min-h-[56px]
           disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'Сохраняю...' : '💾 Сохранить запись'}
+        {isPending ? 'Сохраняю...' : 'Сохранить запись'}
       </button>
     </form>
   );

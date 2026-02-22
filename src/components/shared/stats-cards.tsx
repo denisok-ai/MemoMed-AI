@@ -48,42 +48,42 @@ export function StatsCards({
         role="status"
         aria-label={`Дисциплина: ${disciplinePercent}%`}
       >
-        <p className="text-sm text-[#757575] mb-1">Дисциплина</p>
+        <p className="text-sm text-slate-500 mb-1">Дисциплина</p>
         <p className={`text-3xl font-bold ${getColorByPercent(disciplinePercent)}`}>
           {disciplinePercent}%
         </p>
-        <p className="text-sm text-[#9e9e9e] mt-1">за {periodDays} дн.</p>
+        <p className="text-sm text-slate-500 mt-1">за {periodDays} дн.</p>
       </div>
 
       {/* Серия */}
       <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-        <p className="text-sm text-[#757575] mb-1">Серия без пропусков</p>
+        <p className="text-sm text-slate-500 mb-1">Серия без пропусков</p>
         <p className="text-3xl font-bold text-blue-700">{currentStreak}</p>
-        <p className="text-sm text-[#9e9e9e] mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           дн.{longestStreak > currentStreak ? ` (рекорд: ${longestStreak})` : ''}
         </p>
       </div>
 
       {/* Средняя задержка */}
       <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-        <p className="text-sm text-[#757575] mb-1">Ср. задержка</p>
+        <p className="text-sm text-slate-500 mb-1">Ср. задержка</p>
         <p className="text-3xl font-bold text-blue-600">
           {avgDelayMinutes < 60 ? `${avgDelayMinutes}` : `${Math.floor(avgDelayMinutes / 60)}ч`}
         </p>
-        <p className="text-sm text-[#9e9e9e] mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           {avgDelayMinutes < 60 ? 'мин.' : `${avgDelayMinutes % 60} мин.`}
         </p>
       </div>
 
       {/* Принято / Пропущено */}
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-        <p className="text-sm text-[#757575] mb-1">Приёмы</p>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-sm text-slate-500 mb-1">Приёмы</p>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-bold text-emerald-600">{takenCount}</span>
-          <span className="text-sm text-[#9e9e9e]">/</span>
+          <span className="text-sm text-slate-500">/</span>
           <span className="text-2xl font-bold text-red-500">{missedCount}</span>
         </div>
-        <p className="text-sm text-[#9e9e9e] mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           принято / пропущено • {activeMedicationsCount} лек.
         </p>
       </div>

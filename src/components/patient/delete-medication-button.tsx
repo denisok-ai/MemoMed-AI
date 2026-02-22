@@ -30,18 +30,18 @@ export function DeleteMedicationButton({ id, name }: DeleteMedicationButtonProps
       onClick={handleDelete}
       disabled={isPending}
       aria-label={`Удалить ${name}`}
-      className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400
+      className="w-12 h-12 min-w-[48px] rounded-xl bg-slate-50 text-slate-400
         hover:bg-red-50 hover:text-red-500
         flex items-center justify-center transition-colors
         disabled:opacity-50"
     >
       {isPending ? (
         <span
-          className="w-4 h-4 border-2 border-red-400 border-t-transparent
+          className="w-5 h-5 border-2 border-red-400 border-t-transparent
           rounded-full animate-spin"
         />
       ) : (
-        <TrashIcon className="w-4 h-4" />
+        <TrashIcon className="w-5 h-5" />
       )}
     </button>
   );

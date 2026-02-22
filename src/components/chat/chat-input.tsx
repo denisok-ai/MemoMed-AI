@@ -31,7 +31,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
   }
 
   return (
-    <div className="flex items-end gap-3 p-4 bg-white border-t border-gray-100">
+    <div className="flex items-end gap-3 p-4 bg-white border-t border-slate-100">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -39,7 +39,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
         disabled={isLoading}
         rows={1}
         placeholder="Спросите об этом лекарстве..."
-        className="flex-1 px-4 py-3 text-base border-2 border-gray-200 rounded-2xl
+        className="flex-1 px-4 py-3 text-base border-2 border-slate-200 rounded-2xl
           resize-none focus:border-[#1565C0] focus:outline-none transition-colors
           disabled:opacity-60 max-h-[120px] overflow-y-auto"
         style={{ minHeight: '52px' }}

@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { MedCrossIcon } from '@/components/shared/nav-icons';
 
 const DISCLAIMER_KEY = 'memomed_ai_disclaimer_shown';
 
@@ -37,15 +38,15 @@ export function AiDisclaimerModal() {
     >
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 space-y-6">
         <div className="space-y-3">
-          <div className="text-4xl text-center" aria-hidden="true">
-            ⚕️
+          <div className="flex justify-center" aria-hidden="true">
+            <MedCrossIcon className="w-12 h-12 text-[#1565C0]" />
           </div>
           <h2 id="disclaimer-title" className="text-xl font-bold text-[#212121] text-center">
             Важная информация
           </h2>
         </div>
 
-        <div className="space-y-3 text-base text-[#424242]">
+        <div className="space-y-3 text-base text-[#0D1B2A]">
           <p>
             ИИ-помощник MemoMed отвечает на общие вопросы о лекарствах и здоровье, но
             <strong> не заменяет консультацию врача.</strong>

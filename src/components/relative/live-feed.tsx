@@ -12,7 +12,8 @@ import { FeedItem } from './feed-item';
 import { ActivityIcon } from '@/components/shared/nav-icons';
 
 export function LiveFeed() {
-  const { events, isConnected, connectionMode, error, refresh } = useLiveFeed();
+  const { events, isConnected, connectionMode, error, refresh, loadMore, hasMore, isLoadingMore } =
+    useLiveFeed();
 
   return (
     <div className="space-y-4">
@@ -74,17 +75,32 @@ export function LiveFeed() {
           </div>
         </div>
       ) : (
-        <ul
-          className="space-y-3 med-stagger"
-          role="list"
-          aria-label="Лента событий приёма лекарств"
-        >
-          {events.map((event) => (
-            <li key={event.logId}>
-              <FeedItem event={event} />
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-4">
+          <ul
+            className="space-y-3 med-stagger"
+            role="list"
+            aria-label="Лента событий приёма лекарств"
+          >
+            {events.map((event) => (
+              <li key={event.logId}>
+                <FeedItem event={event} />
+              </li>
+            ))}
+          </ul>
+          {hasMore && (
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={loadMore}
+                disabled={isLoadingMore}
+                className="med-btn-secondary rounded-2xl gap-2 min-h-[48px] px-6
+                  disabled:opacity-60 disabled:cursor-not-allowed"
+                aria-label={isLoadingMore ? 'Загрузка...' : 'Показать ещё'}
+              >
+                {isLoadingMore ? 'Загрузка...' : 'Показать ещё'}
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

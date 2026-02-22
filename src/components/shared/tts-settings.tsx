@@ -8,15 +8,17 @@
 'use client';
 
 import { useTts } from '@/hooks/use-tts';
+import { AlertTriangleIcon, VolumeIcon, XIcon } from '@/components/shared/nav-icons';
 
 export function TtsSettings() {
   const { isSupported, isSpeaking, settings, voices, updateSettings, speak, stop } = useTts();
 
   if (!isSupported) {
     return (
-      <div className="bg-[#fff8e1] rounded-2xl p-4">
+      <div className="bg-[#fff8e1] rounded-2xl p-4 flex items-start gap-2">
+        <AlertTriangleIcon className="w-5 h-5 shrink-0 text-[#e65100]" aria-hidden />
         <p className="text-sm text-[#e65100]">
-          📵 Ваш браузер не поддерживает Text-to-Speech. Попробуйте Chrome или Safari.
+          Ваш браузер не поддерживает Text-to-Speech. Попробуйте Chrome или Safari.
         </p>
       </div>
     );
@@ -36,14 +38,14 @@ export function TtsSettings() {
       <div className="flex items-center justify-between p-4 bg-[#f5f5f5] rounded-2xl">
         <div>
           <p className="text-base font-semibold text-[#212121]">Голосовые напоминания</p>
-          <p className="text-sm text-[#757575]">Озвучивать напоминания о приёме лекарств</p>
+          <p className="text-sm text-slate-500">Озвучивать напоминания о приёме лекарств</p>
         </div>
         <button
           role="switch"
           aria-checked={settings.enabled}
           onClick={() => updateSettings({ enabled: !settings.enabled })}
           className={`relative w-14 h-7 rounded-full transition-colors
-            ${settings.enabled ? 'bg-[#1565C0]' : 'bg-gray-300'}`}
+            ${settings.enabled ? 'bg-[#1565C0]' : 'bg-slate-300'}`}
         >
           <span
             className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform
@@ -65,7 +67,7 @@ export function TtsSettings() {
                 id="voice-select"
                 value={settings.voiceName ?? ''}
                 onChange={(e) => updateSettings({ voiceName: e.target.value || null })}
-                className="w-full px-4 py-3 text-base rounded-2xl border border-gray-200
+                className="w-full px-4 py-3 text-base rounded-2xl border border-slate-200
                   focus:outline-none focus:border-[#1565C0] bg-white"
               >
                 <option value="">По умолчанию</option>
@@ -97,7 +99,7 @@ export function TtsSettings() {
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
               style={{ accentColor: '#1565C0' }}
             />
-            <div className="flex justify-between text-sm text-[#9e9e9e]">
+            <div className="flex justify-between text-sm text-slate-500">
               <span>Медленно</span>
               <span>Быстро</span>
             </div>
@@ -130,13 +132,24 @@ export function TtsSettings() {
           <button
             onClick={handleTestVoice}
             className={`w-full py-3 text-base font-medium rounded-2xl transition-colors min-h-[48px]
+              flex items-center justify-center gap-2
               ${
                 isSpeaking
                   ? 'bg-[#ffebee] text-[#c62828] hover:bg-[#ffcdd2]'
                   : 'bg-[#E3F2FD] text-[#1565C0] hover:bg-[#BBDEFB]'
               }`}
           >
-            {isSpeaking ? '⏹️ Остановить' : '🔊 Проверить голос'}
+            {isSpeaking ? (
+              <>
+                <XIcon className="w-5 h-5 shrink-0" aria-hidden />
+                Остановить
+              </>
+            ) : (
+              <>
+                <VolumeIcon className="w-5 h-5 shrink-0" aria-hidden />
+                Проверить голос
+              </>
+            )}
           </button>
         </>
       )}

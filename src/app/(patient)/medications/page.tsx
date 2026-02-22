@@ -1,7 +1,7 @@
 /**
  * @file page.tsx
  * @description Страница списка лекарств — MedTech 2025/2026:
- * glassmorphism карточки, staggered анимации, профессиональные иконки
+ * glassmorphism карточки, staggered анимации, пагинация
  * @created 2026-02-22
  */
 
@@ -12,48 +12,57 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { MedicationCard } from '@/components/patient/medication-card';
 import { DeleteMedicationButton } from '@/components/patient/delete-medication-button';
+import { Pagination } from '@/components/shared/pagination';
 import { PillIcon, PlusIcon, EditIcon, ChevronRightIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Мои лекарства — MemoMed AI',
 };
 
-export default async function MedicationsPage() {
+const PAGE_SIZE = 12;
+
+export default async function MedicationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect('/login');
 
-  const medications = await prisma.medication.findMany({
-    where: { patientId: session.user.id, isActive: true },
-    orderBy: { scheduledTime: 'asc' },
-  });
+  const { page: pageStr } = await searchParams;
+  const page = Math.max(1, parseInt(pageStr ?? '1'));
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const [medications, total] = await Promise.all([
+    prisma.medication.findMany({
+      where: { patientId: session.user.id, isActive: true },
+      orderBy: { scheduledTime: 'asc' },
+      take: PAGE_SIZE,
+      skip,
+    }),
+    prisma.medication.count({ where: { patientId: session.user.id, isActive: true } }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="med-page med-animate">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-black text-[#0D1B2A]">Мои лекарства</h1>
+          <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Мои лекарства</h1>
           {medications.length > 0 && (
-            <p className="text-slate-500 text-sm mt-0.5">
-              {medications.length}{' '}
-              {medications.length === 1
-                ? 'препарат'
-                : medications.length < 5
-                  ? 'препарата'
-                  : 'препаратов'}
+            <p className="text-slate-500 text-base mt-0.5">
+              {total} {total === 1 ? 'препарат' : total < 5 ? 'препарата' : 'препаратов'}
             </p>
           )}
         </div>
         <Link
           href="/medications/add"
-          className="flex items-center gap-2 px-5 py-2.5
-            bg-gradient-to-r from-[#1565C0] to-[#1976D2]
-            text-white rounded-xl font-bold text-sm
-            hover:shadow-lg hover:shadow-blue-200/50
-            active:scale-[0.97] transition-all min-h-[48px]"
+          className="med-btn-primary rounded-2xl gap-2 w-full sm:w-auto justify-center"
           aria-label="Добавить лекарство"
         >
-          <PlusIcon className="w-4 h-4" />
+          <PlusIcon className="w-5 h-5" />
           Добавить
         </Link>
       </div>
@@ -76,47 +85,58 @@ export default async function MedicationsPage() {
             </p>
           </div>
           <Link href="/medications/add" className="med-btn-primary rounded-2xl gap-3">
-            <PlusIcon className="w-4 h-4" />
+            <PlusIcon className="w-5 h-5" />
             Добавить первое лекарство
             <ChevronRightIcon className="w-4 h-4 opacity-60" />
           </Link>
         </div>
       ) : (
-        <ul className="space-y-3 med-stagger" role="list" aria-label="Список лекарств">
-          {medications.map((med) => (
-            <li key={med.id}>
-              <div
-                className="med-card-accent group flex items-center gap-3
-                hover:translate-x-1 transition-all"
-              >
-                <div className="flex-1 min-w-0">
-                  <MedicationCard
-                    name={med.name}
-                    dosage={med.dosage}
-                    scheduledTime={med.scheduledTime}
-                    photoUrl={med.photoUrl}
-                  />
-                </div>
-
+        <div className="space-y-4">
+          <ul className="space-y-3 med-stagger" role="list" aria-label="Список лекарств">
+            {medications.map((med) => (
+              <li key={med.id}>
                 <div
-                  className="flex gap-1.5 items-center opacity-60
-                  group-hover:opacity-100 transition-opacity"
+                  className="med-card-accent group flex items-center gap-3
+                  hover:translate-x-1 transition-all"
                 >
-                  <Link
-                    href={`/medications/${med.id}/edit`}
-                    className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400
-                      hover:bg-blue-50 hover:text-[#1565C0]
-                      flex items-center justify-center transition-all"
-                    aria-label={`Редактировать ${med.name}`}
+                  <div className="flex-1 min-w-0">
+                    <MedicationCard
+                      name={med.name}
+                      dosage={med.dosage}
+                      scheduledTime={med.scheduledTime}
+                      photoUrl={med.photoUrl}
+                    />
+                  </div>
+
+                  <div
+                    className="flex gap-1.5 items-center opacity-60
+                    group-hover:opacity-100 transition-opacity"
                   >
-                    <EditIcon className="w-4 h-4" />
-                  </Link>
-                  <DeleteMedicationButton id={med.id} name={med.name} />
+                    <Link
+                      href={`/medications/${med.id}/edit`}
+                      className="w-12 h-12 min-w-[48px] rounded-xl bg-slate-50 text-slate-400
+                        hover:bg-blue-50 hover:text-[#1565C0]
+                        flex items-center justify-center transition-all"
+                      aria-label={`Редактировать ${med.name}`}
+                    >
+                      <EditIcon className="w-5 h-5" />
+                    </Link>
+                    <DeleteMedicationButton id={med.id} name={med.name} />
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+          {totalPages > 1 && (
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={PAGE_SIZE}
+              buildHref={(p) => `/medications?page=${p}`}
+            />
+          )}
+        </div>
       )}
     </div>
   );

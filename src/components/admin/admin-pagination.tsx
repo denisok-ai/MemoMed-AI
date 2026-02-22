@@ -27,48 +27,41 @@ export function AdminPagination({
   const pages = buildPageList(page, totalPages);
 
   return (
-    <div className="flex items-center justify-between flex-wrap gap-3">
-      <p className="text-sm text-[#9e9e9e]">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p className="text-sm text-slate-500">
         Показано{' '}
-        <span className="font-medium text-[#424242]">
+        <span className="font-medium text-[#0D1B2A]">
           {from}–{to}
         </span>{' '}
-        из <span className="font-medium text-[#424242]">{total.toLocaleString('ru')}</span>
+        из <span className="font-medium text-[#0D1B2A]">{total.toLocaleString('ru')}</span>
       </p>
 
       <div className="flex items-center gap-1">
-        {/* Первая */}
         {page > 1 && (
           <a
             href={buildHref(1)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-sm
-              bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]
-              hover:text-[#1565C0] transition-colors"
+            className="w-10 h-10 min-w-[48px] flex items-center justify-center rounded-xl text-sm
+              med-btn-secondary"
             aria-label="Первая страница"
           >
             «
           </a>
         )}
-
-        {/* Предыдущая */}
         {page > 1 && (
           <a
             href={buildHref(page - 1)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-sm
-              bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]
-              hover:text-[#1565C0] transition-colors"
+            className="w-10 h-10 min-w-[48px] flex items-center justify-center rounded-xl text-sm
+              med-btn-secondary"
             aria-label="Предыдущая"
           >
             ‹
           </a>
         )}
-
-        {/* Страницы с многоточием */}
         {pages.map((p, i) =>
           p === '...' ? (
             <span
               key={`dots-${i}`}
-              className="w-9 h-9 flex items-center justify-center text-[#bdbdbd] text-sm"
+              className="w-10 h-10 flex items-center justify-center text-slate-400 text-sm"
             >
               …
             </span>
@@ -76,39 +69,29 @@ export function AdminPagination({
             <a
               key={p}
               href={buildHref(p as number)}
-              className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-medium
+              className={`w-10 h-10 min-w-[48px] flex items-center justify-center rounded-xl text-sm font-medium
                 transition-colors
-                ${
-                  p === page
-                    ? 'bg-[#1565C0] text-white shadow-sm shadow-blue-200'
-                    : 'bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0] hover:text-[#1565C0]'
-                }`}
+                ${p === page ? 'med-btn-primary' : 'med-btn-secondary'}`}
             >
               {p}
             </a>
           )
         )}
-
-        {/* Следующая */}
         {page < totalPages && (
           <a
             href={buildHref(page + 1)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-sm
-              bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]
-              hover:text-[#1565C0] transition-colors"
+            className="w-10 h-10 min-w-[48px] flex items-center justify-center rounded-xl text-sm
+              med-btn-secondary"
             aria-label="Следующая"
           >
             ›
           </a>
         )}
-
-        {/* Последняя */}
         {page < totalPages && (
           <a
             href={buildHref(totalPages)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-sm
-              bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]
-              hover:text-[#1565C0] transition-colors"
+            className="w-10 h-10 min-w-[48px] flex items-center justify-center rounded-xl text-sm
+              med-btn-secondary"
             aria-label="Последняя страница"
           >
             »

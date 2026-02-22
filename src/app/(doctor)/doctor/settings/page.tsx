@@ -12,6 +12,7 @@ import { prisma } from '@/lib/db/prisma';
 import { LanguageSwitcher } from '@/components/shared/language-switcher';
 import { BuildInfo } from '@/components/shared/build-info';
 import { SignOutButton } from '@/components/shared/sign-out-button';
+import { LockIcon, InfoIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Настройки — MemoMed AI',
@@ -32,23 +33,23 @@ export default async function DoctorSettingsPage() {
   ]);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-      <h1 className="text-2xl font-bold text-[#212121]">Настройки</h1>
+    <div className="med-page med-animate max-w-2xl mx-auto space-y-6">
+      <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Настройки</h1>
 
       {/* Профиль */}
-      <section className="bg-white rounded-3xl border border-gray-100 p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#212121]">👤 Профиль</h2>
+      <section className="med-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-[#0D1B2A]">Профиль</h2>
         <div className="space-y-2">
-          <div className="flex justify-between py-2 border-b border-gray-50">
-            <span className="text-[#757575]">Имя</span>
-            <span className="text-[#212121] font-medium">{profile?.fullName ?? '—'}</span>
+          <div className="flex justify-between py-2 border-b border-slate-100">
+            <span className="text-slate-500">Имя</span>
+            <span className="text-[#0D1B2A] font-medium">{profile?.fullName ?? '—'}</span>
           </div>
-          <div className="flex justify-between py-2 border-b border-gray-50">
-            <span className="text-[#757575]">Email</span>
-            <span className="text-[#212121] font-medium text-sm">{session.user.email ?? '—'}</span>
+          <div className="flex justify-between py-2 border-b border-slate-100">
+            <span className="text-slate-500">Email</span>
+            <span className="text-[#0D1B2A] font-medium text-sm">{session.user.email ?? '—'}</span>
           </div>
           <div className="flex justify-between py-2">
-            <span className="text-[#757575]">Роль</span>
+            <span className="text-slate-500">Роль</span>
             <span className="inline-flex items-center gap-1.5 text-[#212121] font-medium">
               <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
               Врач
@@ -58,12 +59,12 @@ export default async function DoctorSettingsPage() {
       </section>
 
       {/* Язык интерфейса */}
-      <section className="bg-white rounded-3xl border border-gray-100 p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#212121]">🌐 Язык интерфейса</h2>
+      <section className="med-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-[#0D1B2A]">Язык интерфейса</h2>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[#424242] font-medium">{locale === 'ru' ? 'Русский' : 'English'}</p>
-            <p className="text-sm text-[#757575]">
+            <p className="text-[#0D1B2A] font-medium">{locale === 'ru' ? 'Русский' : 'English'}</p>
+            <p className="text-sm text-slate-500">
               {locale === 'ru'
                 ? 'Нажмите кнопку, чтобы переключить на английский'
                 : 'Click the button to switch to Russian'}
@@ -74,26 +75,31 @@ export default async function DoctorSettingsPage() {
       </section>
 
       {/* Конфиденциальность */}
-      <section className="bg-white rounded-3xl border border-gray-100 p-6 space-y-3">
-        <h2 className="text-lg font-semibold text-[#212121]">🔒 Конфиденциальность</h2>
-        <p className="text-sm text-[#757575]">
+      <section className="med-card p-6 space-y-3">
+        <h2 className="text-lg font-semibold text-[#0D1B2A]">Конфиденциальность</h2>
+        <p className="text-sm text-slate-500">
           Данные ваших пациентов хранятся в зашифрованном виде. Доступ к данным предоставляется
           только с явного согласия пациента.
         </p>
-        <p className="text-xs text-[#bdbdbd]">
+        <p className="text-xs text-slate-400">
           MemoMed AI соответствует требованиям GDPR и 152-ФЗ.
         </p>
       </section>
 
       {/* Аккаунт */}
-      <section className="bg-white rounded-3xl border border-gray-100 p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#212121]">🔐 Аккаунт</h2>
+      <section className="med-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-[#0D1B2A] flex items-center gap-2">
+          <LockIcon className="w-5 h-5 text-[#1565C0]" aria-hidden />
+          Аккаунт
+        </h2>
         <SignOutButton />
       </section>
 
       {/* О приложении */}
-      <section className="bg-[#f5f5f5] rounded-3xl p-6 space-y-3">
-        <h2 className="text-lg font-semibold text-[#212121]">ℹ️ О приложении</h2>
+      <section className="med-card bg-slate-50/80 p-6 space-y-3">
+        <h2 className="text-lg font-semibold text-[#0D1B2A] flex items-center gap-2">
+          <InfoIcon className="w-5 h-5 text-[#1565C0]" aria-hidden />О приложении
+        </h2>
         <BuildInfo variant="full" />
       </section>
     </div>

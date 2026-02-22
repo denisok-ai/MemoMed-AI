@@ -58,7 +58,7 @@ const colorStyles: Record<DayColor, string> = {
   green: 'bg-[#4caf50] text-white',
   yellow: 'bg-[#ff9800] text-white',
   red: 'bg-[#f44336] text-white',
-  empty: 'bg-gray-100 text-[#9e9e9e]',
+  empty: 'bg-slate-100 text-slate-500',
 };
 
 export function CalendarView({ patientId }: CalendarViewProps) {
@@ -117,7 +117,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
       <div className="flex items-center justify-between">
         <button
           onClick={prevMonth}
-          className="p-3 rounded-xl hover:bg-gray-100 transition-colors min-h-[48px] min-w-[48px]
+          className="p-3 rounded-xl hover:bg-slate-100 transition-colors min-h-[48px] min-w-[48px]
             text-xl text-[#1565C0]"
           aria-label="Предыдущий месяц"
         >
@@ -128,7 +128,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
         </h3>
         <button
           onClick={nextMonth}
-          className="p-3 rounded-xl hover:bg-gray-100 transition-colors min-h-[48px] min-w-[48px]
+          className="p-3 rounded-xl hover:bg-slate-100 transition-colors min-h-[48px] min-w-[48px]
             text-xl text-[#1565C0]"
           aria-label="Следующий месяц"
         >
@@ -139,7 +139,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
       {/* Заголовки дней недели */}
       <div className="grid grid-cols-7 gap-1">
         {DAY_NAMES.map((name) => (
-          <div key={name} className="text-center text-sm font-medium text-[#9e9e9e] py-1">
+          <div key={name} className="text-center text-sm font-medium text-slate-500 py-1">
             {name}
           </div>
         ))}
@@ -149,7 +149,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
       {isLoading ? (
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: 35 }).map((_, i) => (
-            <div key={i} className="aspect-square rounded-xl bg-gray-100 animate-pulse" />
+            <div key={i} className="aspect-square rounded-xl bg-slate-100 animate-pulse" />
           ))}
         </div>
       ) : (
@@ -206,9 +206,9 @@ export function CalendarView({ patientId }: CalendarViewProps) {
             })}
           </p>
           <div className="flex gap-4 text-sm">
-            <span className="text-[#4caf50]">✅ Принято: {selectedDay.takenCount}</span>
-            <span className="text-[#f44336]">❌ Пропущено: {selectedDay.missedCount}</span>
-            <span className="text-[#1565C0]">📊 {selectedDay.disciplinePercent}%</span>
+            <span className="text-[#4caf50]">Принято: {selectedDay.takenCount}</span>
+            <span className="text-[#f44336]">Пропущено: {selectedDay.missedCount}</span>
+            <span className="text-[#1565C0]">{selectedDay.disciplinePercent}%</span>
           </div>
         </div>
       )}
@@ -222,7 +222,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
           </div>
           <div className="bg-[#E3F2FD] rounded-2xl p-4 text-center">
             <p className="text-2xl font-bold text-[#1565C0]">{data.stats.currentStreak}</p>
-            <p className="text-sm text-[#42A5F5]">Дней подряд 🔥</p>
+            <p className="text-sm text-[#42A5F5]">Дней подряд</p>
           </div>
           <div className="bg-[#e3f2fd] rounded-2xl p-4 text-center">
             <p className="text-2xl font-bold text-[#1976d2]">{data.stats.perfectDays}</p>
@@ -244,7 +244,7 @@ export function CalendarView({ patientId }: CalendarViewProps) {
         ].map(({ color, label }) => (
           <div key={label} className="flex items-center gap-1.5">
             <span className={`w-4 h-4 rounded ${color}`} aria-hidden="true" />
-            <span className="text-[#757575]">{label}</span>
+            <span className="text-slate-500">{label}</span>
           </div>
         ))}
       </div>

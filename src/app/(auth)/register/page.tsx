@@ -18,7 +18,7 @@ export default function RegisterPage() {
   return (
     <main
       className="min-h-screen flex items-start justify-center
-      bg-[#F0F5FA] px-6 py-10"
+      bg-[#F0F4F8] px-6 py-10"
     >
       <div className="w-full max-w-md space-y-6">
         {/* Логотип */}

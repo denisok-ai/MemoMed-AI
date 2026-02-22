@@ -15,9 +15,7 @@ export function ClockWidget() {
   useEffect(() => {
     function update() {
       const now = new Date();
-      setTime(
-        now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-      );
+      setTime(now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
       setDate(
         now.toLocaleDateString('ru-RU', {
           weekday: 'long',
@@ -39,7 +37,7 @@ export function ClockWidget() {
       >
         {time}
       </div>
-      <div className="text-lg text-[#757575] mt-2 capitalize">{date}</div>
+      <div className="text-lg text-slate-500 mt-2 capitalize">{date}</div>
     </div>
   );
 }

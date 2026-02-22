@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import type { Role } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { AdminPagination } from '@/components/admin/admin-pagination';
+import { DownloadReportButton } from '@/components/shared/download-report-button';
 
 export const metadata: Metadata = {
   title: 'Пользователи — Админ — MemoMed AI',
@@ -67,18 +68,18 @@ export default async function AdminUsersPage({
   const roles = ['patient', 'relative', 'doctor', 'admin'];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#212121]">Пользователи</h1>
-        <span className="text-sm text-[#9e9e9e]">Всего: {total}</span>
+    <div className="space-y-6 med-animate">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Пользователи</h1>
+        <span className="text-sm font-semibold text-slate-500">Всего: {total}</span>
       </div>
 
       {/* Фильтр по роли */}
       <div className="flex gap-2 flex-wrap">
         <a
           href="/admin/users"
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors
-            ${!roleFilter ? 'bg-[#1565C0] text-white' : 'bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]'}`}
+          className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] flex items-center
+            ${!roleFilter ? 'med-btn-primary' : 'med-btn-secondary'}`}
         >
           Все
         </a>
@@ -86,8 +87,8 @@ export default async function AdminUsersPage({
           <a
             key={r}
             href={`/admin/users?role=${r}`}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors
-              ${roleFilter === r ? 'bg-[#1565C0] text-white' : 'bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]'}`}
+            className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] flex items-center
+              ${roleFilter === r ? 'med-btn-primary' : 'med-btn-secondary'}`}
           >
             {roleLabels[r]}
           </a>
@@ -95,42 +96,50 @@ export default async function AdminUsersPage({
       </div>
 
       {/* Таблица */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="med-card overflow-hidden p-0">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="text-center px-3 py-3 text-[#bdbdbd] font-medium w-10">#</th>
-              <th className="text-left px-4 py-3 text-[#757575] font-medium">Имя / Email</th>
-              <th className="text-left px-4 py-3 text-[#757575] font-medium">Роль</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Лекарств</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Связей</th>
-              <th className="text-right px-4 py-3 text-[#757575] font-medium">Дата регистрации</th>
+              <th className="text-center px-3 py-3 text-slate-400 font-medium w-10">#</th>
+              <th className="text-left px-4 py-3 text-slate-500 font-medium">Имя / Email</th>
+              <th className="text-left px-4 py-3 text-slate-500 font-medium">Роль</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Лекарств</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Связей</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">PDF</th>
+              <th className="text-right px-4 py-3 text-slate-500 font-medium">Дата регистрации</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-slate-100">
             {users.map((u, idx) => (
-              <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-3 py-3 text-center text-xs text-[#bdbdbd] font-mono">
+              <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-3 py-3 text-center text-sm text-slate-400 font-mono">
                   {skip + idx + 1}
                 </td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#212121] truncate max-w-[220px]">
+                  <p className="font-medium text-[#0D1B2A] truncate max-w-[220px]">
                     {u.profile?.fullName ?? '—'}
                   </p>
-                  <p className="text-xs text-[#9e9e9e] truncate max-w-[220px]">{u.email}</p>
+                  <p className="text-sm text-slate-500 truncate max-w-[220px]">{u.email}</p>
                 </td>
                 <td className="px-4 py-3">
                   <span
-                    className={`px-2 py-1 rounded-lg text-xs font-medium ${roleColors[u.role] ?? ''}`}
+                    className={`px-2 py-1 rounded-lg text-sm font-medium ${roleColors[u.role] ?? ''}`}
                   >
                     {roleLabels[u.role] ?? u.role}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-center text-[#424242]">{u._count.medications}</td>
-                <td className="px-4 py-3 text-center text-[#424242]">
+                <td className="px-4 py-3 text-center text-slate-600">{u._count.medications}</td>
+                <td className="px-4 py-3 text-center text-slate-600">
                   {u._count.patientConnections}
                 </td>
-                <td className="px-4 py-3 text-right text-[#9e9e9e]">
+                <td className="px-4 py-3 text-center">
+                  {u.role === 'patient' ? (
+                    <DownloadReportButton patientId={u.id} period="30d" label="30 дн" compact />
+                  ) : (
+                    <span className="text-slate-400 text-xs">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-right text-slate-500">
                   {u.createdAt.toLocaleDateString('ru')}
                 </td>
               </tr>

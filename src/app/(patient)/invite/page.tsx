@@ -9,7 +9,13 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { CopyInviteCode } from '@/components/patient/copy-invite-code';
-import { UsersIcon } from '@/components/shared/nav-icons';
+import {
+  UsersIcon,
+  LockIcon,
+  UserIcon,
+  HeartPulseIcon,
+  InfoIcon,
+} from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Мой код — MemoMed AI',
@@ -54,8 +60,8 @@ export default async function InvitePage() {
     <div className="med-page med-animate">
       {/* Заголовок */}
       <div className="mb-6">
-        <h1 className="text-2xl font-black text-[#0D1B2A]">Мой код доступа</h1>
-        <p className="text-slate-500 text-sm mt-0.5">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Мой код доступа</h1>
+        <p className="text-slate-500 text-base mt-0.5">
           Поделитесь кодом, чтобы подключить врача или родственника
         </p>
       </div>
@@ -72,8 +78,9 @@ export default async function InvitePage() {
           </p>
         </div>
         <CopyInviteCode code={user.inviteCode} />
-        <div className="bg-blue-50/80 rounded-xl p-3 text-sm text-[#1565C0] text-center">
-          🔒 Код постоянный и уникальный для вашего аккаунта
+        <div className="bg-blue-50/80 rounded-xl p-3 text-sm text-[#1565C0] flex items-center justify-center gap-2">
+          <LockIcon className="w-4 h-4 shrink-0" aria-hidden />
+          Код постоянный и уникальный для вашего аккаунта
         </div>
       </div>
 
@@ -101,54 +108,54 @@ export default async function InvitePage() {
       </div>
 
       {/* Подключённые */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-[#0D1B2A]">Подключённые</h2>
-          <span className="text-sm text-slate-400">{active.length} активных</span>
+          <span className="text-sm font-semibold text-slate-500">{active.length} активных</span>
         </div>
 
         {connections.length === 0 ? (
-          <div className="med-card flex flex-col items-center py-10 text-center space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center">
-              <UsersIcon className="w-7 h-7 text-slate-300" />
+          <div className="med-card flex flex-col items-center py-12 text-center space-y-4">
+            <div
+              className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-400 to-slate-500
+                flex items-center justify-center shadow-md"
+            >
+              <UsersIcon className="w-8 h-8 text-white" />
             </div>
-            <p className="font-semibold text-[#0D1B2A]">Никто пока не подключён</p>
-            <p className="text-sm text-slate-400">Передайте код врачу или родственнику</p>
+            <p className="font-bold text-[#0D1B2A] text-lg">Никто пока не подключён</p>
+            <p className="text-slate-500 text-base">Передайте код врачу или родственнику</p>
           </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3 med-stagger">
             {active.map((conn) => {
               const name = conn.relative.profile?.fullName ?? conn.relative.email ?? 'Пользователь';
               const role = ROLE_LABELS[conn.relative.role] ?? conn.relative.role;
               return (
-                <li
-                  key={conn.id}
-                  className="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl
-                    border border-slate-100"
-                >
-                  <div
-                    className="w-10 h-10 rounded-xl bg-green-50 flex items-center
-                    justify-center text-lg flex-shrink-0"
-                  >
-                    {conn.relative.role === 'doctor' ? '🩺' : '👤'}
+                <li key={conn.id}>
+                  <div className="med-card-accent flex items-center gap-3 px-4 py-4 hover:translate-x-1 transition-all">
+                    <div
+                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600
+                        flex items-center justify-center flex-shrink-0 shadow-md"
+                    >
+                      {conn.relative.role === 'doctor' ? (
+                        <HeartPulseIcon className="w-6 h-6 text-white" aria-hidden />
+                      ) : (
+                        <UserIcon className="w-6 h-6 text-white" aria-hidden />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[#0D1B2A] text-base truncate">{name}</p>
+                      <p className="text-sm text-slate-500">
+                        {role} · с{' '}
+                        {new Date(conn.createdAt).toLocaleDateString('ru', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                    <span className="med-badge-success flex-shrink-0">Активен</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-[#0D1B2A] text-sm truncate">{name}</p>
-                    <p className="text-sm text-slate-400">
-                      {role} · с{' '}
-                      {new Date(conn.createdAt).toLocaleDateString('ru', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                  <span
-                    className="text-sm px-2 py-1 bg-green-100 text-green-700
-                    rounded-lg font-semibold flex-shrink-0"
-                  >
-                    Активен
-                  </span>
                 </li>
               );
             })}
@@ -156,27 +163,20 @@ export default async function InvitePage() {
               const name = conn.relative.profile?.fullName ?? conn.relative.email ?? 'Пользователь';
               const role = ROLE_LABELS[conn.relative.role] ?? conn.relative.role;
               return (
-                <li
-                  key={conn.id}
-                  className="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl
-                    border border-amber-100"
-                >
-                  <div
-                    className="w-10 h-10 rounded-xl bg-amber-50 flex items-center
-                    justify-center text-lg flex-shrink-0"
-                  >
-                    ⏳
+                <li key={conn.id}>
+                  <div className="med-card flex items-center gap-3 px-4 py-4 border-l-4 border-amber-400">
+                    <div
+                      className="w-12 h-12 rounded-xl bg-amber-100 flex items-center
+                      justify-center flex-shrink-0"
+                    >
+                      <InfoIcon className="w-6 h-6 text-amber-600" aria-hidden />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[#0D1B2A] text-base truncate">{name}</p>
+                      <p className="text-sm text-slate-500">{role} · Ожидает подтверждения</p>
+                    </div>
+                    <span className="med-badge-warning flex-shrink-0">Ожидает</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-[#0D1B2A] text-sm truncate">{name}</p>
-                    <p className="text-sm text-slate-400">{role} · Ожидает подтверждения</p>
-                  </div>
-                  <span
-                    className="text-sm px-2 py-1 bg-amber-100 text-amber-700
-                    rounded-lg font-semibold flex-shrink-0"
-                  >
-                    Ожидает
-                  </span>
                 </li>
               );
             })}

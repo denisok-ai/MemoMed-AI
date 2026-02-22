@@ -11,6 +11,7 @@ import { useActionState } from 'react';
 import { connectToPatientAction, type ConnectActionResult } from '@/lib/connections/actions';
 import { FormError } from '@/components/shared/form-error';
 import { SubmitButton } from '@/components/shared/submit-button';
+import { CheckIcon } from '@/components/shared/nav-icons';
 
 const initialState: ConnectActionResult = {};
 
@@ -26,7 +27,7 @@ export function ConnectForm() {
           role="alert"
           className="flex items-start gap-3 bg-[#e8f5e9] border border-[#4caf50] rounded-xl p-4"
         >
-          <span className="text-xl">✅</span>
+          <CheckIcon className="w-5 h-5 shrink-0 text-[#2e7d32]" aria-hidden />
           <p className="text-base font-medium text-[#2e7d32]">{state.message}</p>
         </div>
       )}
@@ -43,7 +44,7 @@ export function ConnectForm() {
           autoComplete="off"
           autoCapitalize="characters"
           className="w-full px-4 py-3 text-xl font-mono tracking-widest text-center
-            border-2 border-gray-200 rounded-xl uppercase
+            border-2 border-slate-200 rounded-xl uppercase
             focus:border-[#1565C0] focus:outline-none transition-colors"
           placeholder="Введите код"
           maxLength={32}

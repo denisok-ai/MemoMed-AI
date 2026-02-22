@@ -8,6 +8,7 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db/prisma';
 import { AdminPagination } from '@/components/admin/admin-pagination';
+import { AdminPillIcon } from '@/components/admin/admin-icons';
 
 export const metadata: Metadata = {
   title: 'Лекарства — Админ — MemoMed AI',
@@ -70,28 +71,28 @@ export default async function AdminMedicationsPage({
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#212121]">Лекарства</h1>
+    <div className="space-y-6 med-animate">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">Лекарства</h1>
         <div className="flex gap-3 text-sm">
-          <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded-xl font-medium">
+          <span className="med-badge-success px-3 py-1.5">
             Активных: {totalActive.toLocaleString('ru')}
           </span>
-          <span className="px-3 py-1.5 bg-gray-50 text-gray-500 rounded-xl font-medium">
+          <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl font-semibold">
             В архиве: {totalArchived.toLocaleString('ru')}
           </span>
         </div>
       </div>
 
       {/* Топ препаратов */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-[#424242]">Топ-10 назначаемых препаратов</h2>
+      <div className="med-card p-5 space-y-3">
+        <h2 className="med-section-title">Топ-10 назначаемых препаратов</h2>
         <div className="flex flex-wrap gap-2">
           {topMeds.map((m, i) => (
             <div key={m.name} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-xl">
-              <span className="text-xs font-bold text-[#9e9e9e]">{i + 1}</span>
+              <span className="text-sm font-bold text-slate-500">{i + 1}</span>
               <span className="text-sm font-medium text-[#1565C0]">{m.name}</span>
-              <span className="text-xs text-[#757575]">{m._count.id}×</span>
+              <span className="text-sm text-slate-500">{m._count.id}×</span>
             </div>
           ))}
         </div>
@@ -108,19 +109,14 @@ export default async function AdminMedicationsPage({
             <a
               key={f.value}
               href={`/admin/medications?status=${f.value}${q ? `&q=${q}` : ''}`}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors
-                ${
-                  statusFilter === f.value || (!statusFilter && !f.value)
-                    ? 'bg-[#1565C0] text-white'
-                    : 'bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]'
-                }`}
+              className={`px-4 py-2.5 rounded-xl text-sm font-semibold min-h-[48px] flex items-center
+                ${statusFilter === f.value || (!statusFilter && !f.value) ? 'med-btn-primary' : 'med-btn-secondary'}`}
             >
               {f.label}
             </a>
           ))}
         </div>
 
-        {/* Поиск */}
         <form method="GET" action="/admin/medications" className="flex-1 max-w-xs">
           {statusFilter && <input type="hidden" name="status" value={statusFilter} />}
           <input
@@ -128,62 +124,60 @@ export default async function AdminMedicationsPage({
             name="q"
             defaultValue={q ?? ''}
             placeholder="Поиск по названию..."
-            className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm
-              text-[#424242] placeholder-[#bdbdbd] focus:outline-none focus:border-[#1565C0]
-              focus:ring-1 focus:ring-[#1565C0]"
+            className="med-input"
           />
         </form>
       </div>
 
       {/* Таблица */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="med-card overflow-hidden p-0">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="text-center px-3 py-3 text-[#bdbdbd] font-medium w-10">#</th>
-              <th className="text-left px-4 py-3 text-[#757575] font-medium">Лекарство</th>
-              <th className="text-left px-4 py-3 text-[#757575] font-medium">Пациент</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Время</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Приёмов</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Отзывов</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Статус</th>
-              <th className="text-right px-4 py-3 text-[#757575] font-medium">Добавлено</th>
+              <th className="text-center px-3 py-3 text-slate-400 font-medium w-10">#</th>
+              <th className="text-left px-4 py-3 text-slate-500 font-medium">Лекарство</th>
+              <th className="text-left px-4 py-3 text-slate-500 font-medium">Пациент</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Время</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Приёмов</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Отзывов</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Статус</th>
+              <th className="text-right px-4 py-3 text-slate-500 font-medium">Добавлено</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-slate-100">
             {medications.map((med, idx) => (
-              <tr key={med.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-3 py-3 text-center text-xs text-[#bdbdbd] font-mono">
+              <tr key={med.id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-3 py-3 text-center text-sm text-slate-400 font-mono">
                   {skip + idx + 1}
                 </td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#212121]">{med.name}</p>
-                  <p className="text-xs text-[#9e9e9e]">{med.dosage}</p>
+                  <p className="font-medium text-[#0D1B2A]">{med.name}</p>
+                  <p className="text-sm text-slate-500">{med.dosage}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <p className="text-[#424242] truncate max-w-[180px]">
+                  <p className="text-slate-600 truncate max-w-[180px]">
                     {med.patient.profile?.fullName ?? '—'}
                   </p>
-                  <p className="text-xs text-[#bdbdbd] truncate max-w-[180px]">
+                  <p className="text-sm text-slate-400 truncate max-w-[180px]">
                     {med.patient.email}
                   </p>
                 </td>
-                <td className="px-4 py-3 text-center text-[#424242] font-mono text-xs">
+                <td className="px-4 py-3 text-center text-slate-600 font-mono text-sm">
                   {med.scheduledTime}
                 </td>
-                <td className="px-4 py-3 text-center text-[#424242]">
+                <td className="px-4 py-3 text-center text-slate-600">
                   {med._count.logs.toLocaleString('ru')}
                 </td>
-                <td className="px-4 py-3 text-center text-[#424242]">{med._count.feedback}</td>
+                <td className="px-4 py-3 text-center text-slate-600">{med._count.feedback}</td>
                 <td className="px-4 py-3 text-center">
                   <span
-                    className={`px-2 py-1 rounded-lg text-xs font-medium
-                      ${med.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+                    className={`px-2 py-1 rounded-lg text-sm font-medium
+                      ${med.isActive ? 'med-badge-success' : 'bg-slate-100 text-slate-600'}`}
                   >
                     {med.isActive ? 'Активно' : 'В архиве'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-[#9e9e9e] text-xs">
+                <td className="px-4 py-3 text-right text-slate-500 text-sm">
                   {med.createdAt.toLocaleDateString('ru')}
                 </td>
               </tr>
@@ -192,8 +186,10 @@ export default async function AdminMedicationsPage({
         </table>
 
         {medications.length === 0 && (
-          <div className="text-center py-12 text-[#9e9e9e]">
-            <p className="text-4xl mb-3">💊</p>
+          <div className="text-center py-12 text-slate-500">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <AdminPillIcon className="w-8 h-8 text-white" aria-hidden />
+            </div>
             <p>Лекарств не найдено</p>
           </div>
         )}

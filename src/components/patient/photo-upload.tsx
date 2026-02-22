@@ -11,6 +11,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { AlertTriangleIcon, PlusIcon, TrashIcon } from '@/components/shared/nav-icons';
 
 interface PhotoUploadProps {
   medicationId: string;
@@ -141,7 +142,7 @@ export function PhotoUpload({ medicationId, currentPhotoUrl, medicationName }: P
       {/* Область загрузки / превью */}
       <div
         className={`relative rounded-2xl overflow-hidden border-2 transition-all
-          ${isDragging ? 'border-[#1565C0] bg-[#E3F2FD]' : 'border-dashed border-gray-300'}
+          ${isDragging ? 'border-[#1565C0] bg-[#E3F2FD]' : 'border-dashed border-slate-300'}
           ${preview ? 'border-solid' : ''}`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -168,17 +169,17 @@ export function PhotoUpload({ medicationId, currentPhotoUrl, medicationName }: P
         ) : (
           <button
             onClick={() => inputRef.current?.click()}
-            className="w-full py-10 flex flex-col items-center gap-3 text-[#9e9e9e]
+            className="w-full py-10 flex flex-col items-center gap-3 text-slate-500
               hover:text-[#1565C0] hover:bg-[#f5f5f5] transition-colors"
             aria-label="Добавить фото лекарства"
           >
-            <span className="text-4xl" aria-hidden="true">
-              📷
-            </span>
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
+              <PlusIcon className="w-8 h-8 text-slate-400" aria-hidden />
+            </div>
             <span className="text-base">
               {isDragging ? 'Отпустите файл' : 'Добавить фото упаковки'}
             </span>
-            <span className="text-sm text-[#bdbdbd]">Камера или галерея</span>
+            <span className="text-sm text-slate-400">Камера или галерея</span>
           </button>
         )}
       </div>
@@ -186,7 +187,8 @@ export function PhotoUpload({ medicationId, currentPhotoUrl, medicationName }: P
       {/* Сообщение об ошибке */}
       {error && (
         <p role="alert" className="text-sm text-[#f44336]">
-          ⚠️ {error}
+          <AlertTriangleIcon className="w-4 h-4 shrink-0 inline-block mr-1" aria-hidden />
+          {error}
         </p>
       )}
 
@@ -199,7 +201,7 @@ export function PhotoUpload({ medicationId, currentPhotoUrl, medicationName }: P
             rounded-xl hover:bg-[#BBDEFB] transition-colors min-h-[48px]
             disabled:opacity-50"
         >
-          {preview ? '📷 Заменить' : '📷 Добавить фото'}
+          {preview ? 'Заменить' : 'Добавить фото'}
         </button>
 
         {preview && (
@@ -211,7 +213,7 @@ export function PhotoUpload({ medicationId, currentPhotoUrl, medicationName }: P
               disabled:opacity-50"
             aria-label="Удалить фото"
           >
-            🗑️
+            <TrashIcon className="w-5 h-5" aria-hidden />
           </button>
         )}
       </div>
@@ -231,7 +233,7 @@ export function PhotoUpload({ medicationId, currentPhotoUrl, medicationName }: P
         aria-hidden="true"
       />
 
-      <p className="text-sm text-[#9e9e9e]">
+      <p className="text-sm text-slate-500">
         Макс. {process.env.NEXT_PUBLIC_UPLOAD_MAX_SIZE_MB ?? '5'} МБ · JPG, PNG, WebP · Сжимается
         автоматически
       </p>

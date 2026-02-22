@@ -32,7 +32,7 @@ export function getMedicationStatusColor(
     if (delayMinutes <= 30) return '#ffc107';
     return '#f44336';
   }
-  return '#757575';
+  return '#64748b'; /* slate-500 */
 }
 
 export function generateInviteCode(): string {

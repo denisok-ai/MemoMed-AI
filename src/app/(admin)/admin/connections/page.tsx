@@ -8,15 +8,16 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db/prisma';
 import { AdminPagination } from '@/components/admin/admin-pagination';
+import { AdminLinkIcon } from '@/components/admin/admin-icons';
 
 export const metadata: Metadata = {
   title: 'Связи — Админ — MemoMed AI',
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-green-50 text-green-700',
-  pending: 'bg-yellow-50 text-yellow-700',
-  inactive: 'bg-gray-100 text-gray-500',
+  active: 'med-badge-success',
+  pending: 'med-badge-warning',
+  inactive: 'bg-slate-100 text-slate-600',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -67,43 +68,49 @@ export default async function AdminConnectionsPage({
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#212121]">Связи пациент — родственник</h1>
-        <span className="text-sm text-[#9e9e9e]">Всего: {total}</span>
+    <div className="space-y-6 med-animate">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A]">
+          Связи пациент — родственник
+        </h1>
+        <span className="text-sm font-semibold text-slate-500">Всего: {total}</span>
       </div>
 
       {/* Счётчики */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Активных', value: activeCount, color: 'text-green-700', bg: 'bg-green-50' },
-          { label: 'Ожидают', value: pendingCount, color: 'text-yellow-700', bg: 'bg-yellow-50' },
-          { label: 'Неактивных', value: inactiveCount, color: 'text-gray-500', bg: 'bg-gray-50' },
+          { label: 'Ожидают', value: pendingCount, color: 'text-amber-700', bg: 'bg-amber-50' },
+          {
+            label: 'Неактивных',
+            value: inactiveCount,
+            color: 'text-slate-600',
+            bg: 'bg-slate-100',
+          },
         ].map((s) => (
-          <div key={s.label} className={`${s.bg} rounded-2xl p-4 text-center`}>
+          <div
+            key={s.label}
+            className={`${s.bg} rounded-2xl p-4 text-center border border-slate-100`}
+          >
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-sm text-[#9e9e9e] mt-1">{s.label}</p>
+            <p className="text-sm text-slate-500 mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Фильтры статуса */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {[
           { value: '', label: 'Все' },
-          { value: 'active', label: '✅ Активные' },
-          { value: 'pending', label: '⏳ Ожидают' },
-          { value: 'inactive', label: '⛔ Неактивные' },
+          { value: 'active', label: 'Активные' },
+          { value: 'pending', label: 'Ожидают' },
+          { value: 'inactive', label: 'Неактивные' },
         ].map((f) => (
           <a
             key={f.value}
             href={`/admin/connections${f.value ? `?status=${f.value}` : ''}`}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors
-              ${
-                statusFilter === f.value || (!statusFilter && !f.value)
-                  ? 'bg-[#1565C0] text-white'
-                  : 'bg-white border border-gray-200 text-[#424242] hover:border-[#1565C0]'
-              }`}
+            className={`px-4 py-2.5 rounded-xl text-sm font-semibold min-h-[48px] flex items-center
+              ${statusFilter === f.value || (!statusFilter && !f.value) ? 'med-btn-primary' : 'med-btn-secondary'}`}
           >
             {f.label}
           </a>
@@ -111,50 +118,52 @@ export default async function AdminConnectionsPage({
       </div>
 
       {/* Таблица */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="med-card overflow-hidden p-0">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="text-center px-3 py-3 text-[#bdbdbd] font-medium w-10">#</th>
-              <th className="text-left px-4 py-3 text-[#757575] font-medium">Пациент</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">→</th>
-              <th className="text-left px-4 py-3 text-[#757575] font-medium">Родственник</th>
-              <th className="text-center px-4 py-3 text-[#757575] font-medium">Статус</th>
-              <th className="text-right px-4 py-3 text-[#757575] font-medium">Создана</th>
+              <th className="text-center px-3 py-3 text-slate-400 font-medium w-10">#</th>
+              <th className="text-left px-4 py-3 text-slate-500 font-medium">Пациент</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">→</th>
+              <th className="text-left px-4 py-3 text-slate-500 font-medium">Родственник</th>
+              <th className="text-center px-4 py-3 text-slate-500 font-medium">Статус</th>
+              <th className="text-right px-4 py-3 text-slate-500 font-medium">Создана</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-slate-100">
             {connections.map((conn, idx) => (
-              <tr key={conn.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-3 py-3 text-center text-xs text-[#bdbdbd] font-mono">
+              <tr key={conn.id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-3 py-3 text-center text-sm text-slate-400 font-mono">
                   {skip + idx + 1}
                 </td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#212121] truncate max-w-[200px]">
+                  <p className="font-medium text-[#0D1B2A] truncate max-w-[200px]">
                     {conn.patient.profile?.fullName ?? '—'}
                   </p>
-                  <p className="text-xs text-[#9e9e9e] truncate max-w-[200px]">
+                  <p className="text-sm text-slate-500 truncate max-w-[200px]">
                     {conn.patient.email}
                   </p>
                 </td>
-                <td className="px-4 py-3 text-center text-[#bdbdbd]">🔗</td>
+                <td className="px-4 py-3 text-center text-slate-400">
+                  <AdminLinkIcon className="w-5 h-5 inline-block" aria-hidden />
+                </td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#212121] truncate max-w-[200px]">
+                  <p className="font-medium text-[#0D1B2A] truncate max-w-[200px]">
                     {conn.relative.profile?.fullName ?? '—'}
                   </p>
-                  <p className="text-xs text-[#9e9e9e] truncate max-w-[200px]">
+                  <p className="text-sm text-slate-500 truncate max-w-[200px]">
                     {conn.relative.email}
                   </p>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <span
-                    className={`px-2 py-1 rounded-lg text-xs font-medium
-                    ${STATUS_STYLES[conn.status] ?? 'bg-gray-50 text-gray-600'}`}
+                    className={`px-2 py-1 rounded-lg text-sm font-medium
+                    ${STATUS_STYLES[conn.status] ?? 'bg-slate-100 text-slate-600'}`}
                   >
                     {STATUS_LABELS[conn.status] ?? conn.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-[#9e9e9e] text-xs">
+                <td className="px-4 py-3 text-right text-slate-500 text-sm">
                   {conn.createdAt.toLocaleDateString('ru')}
                 </td>
               </tr>
@@ -163,8 +172,10 @@ export default async function AdminConnectionsPage({
         </table>
 
         {connections.length === 0 && (
-          <div className="text-center py-12 text-[#9e9e9e]">
-            <p className="text-4xl mb-3">🔗</p>
+          <div className="text-center py-12 text-slate-500">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+              <AdminLinkIcon className="w-8 h-8 text-white" aria-hidden />
+            </div>
             <p>Связей не найдено</p>
           </div>
         )}

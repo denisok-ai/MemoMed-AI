@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import { ConnectForm } from '@/components/relative/connect-form';
-import { UsersIcon } from '@/components/shared/nav-icons';
+import { UsersIcon, InfoIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Подключиться к пациенту — MemoMed AI',
@@ -39,14 +39,16 @@ export default async function DoctorConnectPage() {
     <div className="med-page med-animate">
       <Link
         href="/doctor/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#1565C0]
-          transition-colors mb-4 min-h-[auto]"
+        className="inline-flex items-center gap-2 text-base text-slate-500 hover:text-[#1565C0]
+          transition-colors mb-4 py-2 min-h-[48px] items-center"
       >
         ← Список пациентов
       </Link>
 
-      <h1 className="text-2xl font-black text-[#0D1B2A] mb-2">Подключиться к пациенту</h1>
-      <p className="text-slate-500 text-sm mb-6">
+      <h1 className="text-2xl md:text-3xl font-black text-[#0D1B2A] mb-2">
+        Подключиться к пациенту
+      </h1>
+      <p className="text-slate-500 text-base mb-6">
         Введите код приглашения, который пациент скопировал в разделе «Мой код»
       </p>
 
@@ -54,8 +56,11 @@ export default async function DoctorConnectPage() {
       <div className="med-card p-6 mb-6 space-y-6">
         <ConnectForm />
 
-        <div className="bg-blue-50 rounded-2xl p-4 space-y-2">
-          <p className="text-sm font-semibold text-[#1565C0]">💡 Как получить код?</p>
+        <div className="med-card-accent p-4 space-y-2">
+          <p className="text-sm font-bold text-[#1565C0] flex items-center gap-2">
+            <InfoIcon className="w-4 h-4 shrink-0" aria-hidden />
+            Как получить код?
+          </p>
           <ol className="text-sm text-slate-500 space-y-1 list-decimal list-inside">
             <li>Попросите пациента открыть приложение MemoMed AI</li>
             <li>Пациент переходит в раздел «Мой код» (вкладка Настройки)</li>
@@ -67,12 +72,12 @@ export default async function DoctorConnectPage() {
 
       {/* Список уже подключённых */}
       {connections.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-[#0D1B2A]">Мои пациенты</h2>
-            <span className="text-sm text-slate-400">{connections.length}</span>
+            <span className="text-sm font-semibold text-slate-500">{connections.length}</span>
           </div>
-          <ul className="space-y-2">
+          <ul className="space-y-3 med-stagger">
             {connections.map((conn) => {
               const name = conn.patient.profile?.fullName ?? conn.patient.email;
               const medCount = conn.patient.medications.length;
@@ -80,23 +85,28 @@ export default async function DoctorConnectPage() {
                 <li key={conn.id}>
                   <Link
                     href={`/doctor/patients/${conn.patientId}`}
-                    className="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl
-                      border border-slate-100 hover:border-[#1565C0] transition-all"
+                    className="med-card-accent flex items-center gap-3 px-4 py-4
+                      hover:translate-x-1 transition-all group"
                   >
                     <div
-                      className="w-10 h-10 rounded-xl bg-blue-50 flex items-center
-                      justify-center text-sm font-bold text-[#1565C0] flex-shrink-0"
+                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600
+                        flex items-center justify-center text-lg font-bold text-white flex-shrink-0
+                        shadow-md group-hover:shadow-lg transition-shadow"
                     >
                       {(name?.[0] ?? '?').toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[#0D1B2A] text-sm truncate">{name}</p>
-                      <p className="text-sm text-slate-400">
-                        💊 {medCount} препарат{medCount !== 1 ? 'ов' : ''} · с{' '}
+                      <p className="font-bold text-[#0D1B2A] text-base truncate group-hover:text-[#1565C0] transition-colors">
+                        {name}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        {medCount} препарат{medCount !== 1 ? 'ов' : ''} · с{' '}
                         {new Date(conn.createdAt).toLocaleDateString('ru')}
                       </p>
                     </div>
-                    <span className="text-sm text-slate-300">→</span>
+                    <span className="text-slate-300 group-hover:text-[#1565C0] transition-colors">
+                      →
+                    </span>
                   </Link>
                 </li>
               );
@@ -106,11 +116,14 @@ export default async function DoctorConnectPage() {
       )}
 
       {connections.length === 0 && (
-        <div className="flex flex-col items-center py-10 text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center">
-            <UsersIcon className="w-7 h-7 text-slate-300" />
+        <div className="med-card flex flex-col items-center py-12 text-center space-y-4">
+          <div
+            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-400 to-slate-500
+              flex items-center justify-center shadow-md"
+          >
+            <UsersIcon className="w-8 h-8 text-white" />
           </div>
-          <p className="text-slate-400 text-sm">У вас пока нет подключённых пациентов</p>
+          <p className="text-slate-500 text-base">У вас пока нет подключённых пациентов</p>
         </div>
       )}
     </div>

@@ -67,10 +67,10 @@ export function StatsDashboard({ patientId }: StatsDashboardProps) {
       <div className="space-y-4 animate-pulse">
         <div className="grid grid-cols-2 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-gray-100 bg-gray-50 h-28" />
+            <div key={i} className="rounded-2xl border border-slate-100 bg-slate-50 h-28" />
           ))}
         </div>
-        <div className="rounded-2xl border border-gray-100 bg-gray-50 h-64" />
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 h-64" />
       </div>
     );
   }
@@ -105,7 +105,7 @@ export function StatsDashboard({ patientId }: StatsDashboardProps) {
               ${
                 days === d
                   ? 'bg-[#1565C0] text-white'
-                  : 'bg-gray-100 text-[#757575] hover:bg-gray-200'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
               }`}
           >
             {d === 7 ? '7 дн' : d === 14 ? '2 нед' : d === 30 ? 'Месяц' : '3 мес'}

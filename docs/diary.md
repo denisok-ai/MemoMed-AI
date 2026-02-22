@@ -12,6 +12,28 @@
 
 ---
 
+## [2026-02-22] Аудит дизайна MedTech и правило для AI
+
+### Наблюдения
+
+Пользователь запросил подключение «скиллов дизайнера» и унификацию всех страниц под MedTech-стиль с эталоном dashboard. В skills-cursor нет отдельного designer skill — создано правило в `.cursor/rules/memomed-medtech-design.mdc`.
+
+### Решения
+
+1. **Правило memomed-medtech-design.mdc** — применяется к `**/*.tsx` и `**/*.css`. Содержит: эталон dashboard, обязательные классы (med-page, med-card, med-btn-primary и т.д.), цвета из globals.css, принципы адаптивности mobile-first, запреты (text-xs, min-h &lt; 48px, хардкод hex).
+
+2. **Документ design-audit-medtech-2026-02-22.md** — полный аудит всех страниц (patient, relative, doctor, admin, auth). Для каждой страницы: текущее состояние, проблемы, приоритет. План доработок в 3 фазы: критичные (Feed, Admin), средние (Medications, Connect, Journal, Stats, Doctor), низкие (Auth, Settings и др.). Чеклист адаптивности.
+
+### Следующие шаги
+
+Реализация доработок по плану в design-audit-medtech-2026-02-22.md — **выполнено 2026-02-22**:
+
+- Фаза 1: Feed (med-card, med-btn-primary, med-badge-info), Admin (bg-[#F0F4F8], med-stat, med-card, градиентные quick-links)
+- Фаза 2: Medications, Connect, Journal, Stats, Doctor dashboard
+- Фаза 3: Auth (bg), History, Invite
+
+---
+
 ## [2026-02-22] Архитектурное проектирование: выбор стека и формирование документации
 
 ### Наблюдения
