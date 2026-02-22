@@ -33,24 +33,24 @@ export const authConfig: NextAuthConfig = {
         return {
           id: user.id,
           email: user.email,
-          role: user.role,
+          role: user.role as string,
           name: null,
-        };
+        } as unknown as { id: string; email: string; role: string; name: null };
       },
     }),
   ],
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = (user as { role: string }).role;
+        token['id'] = user.id;
+        token['role'] = (user as unknown as { role: string }).role;
       }
       return token;
     },
     session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
-        (session.user as { role: string }).role = token.role as string;
+        (session.user as unknown as { id: string }).id = token['id'] as string;
+        (session.user as unknown as { role: string }).role = token['role'] as string;
       }
       return session;
     },

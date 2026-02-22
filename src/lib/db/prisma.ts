@@ -1,6 +1,6 @@
 /**
  * @file prisma.ts
- * @description Singleton Prisma client instance with pg adapter (Prisma 7+)
+ * @description Singleton Prisma client instance for Next.js (Prisma 7+)
  * @dependencies @prisma/client, @prisma/adapter-pg, pg
  * @created 2026-02-22
  */
@@ -16,13 +16,10 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient(): PrismaClient {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    max: 10,
   });
   const adapter = new PrismaPg(pool);
-
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  });
+  return new PrismaClient({ adapter });
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

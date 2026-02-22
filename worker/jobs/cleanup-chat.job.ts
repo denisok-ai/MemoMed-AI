@@ -5,7 +5,7 @@
  * @created 2026-02-22
  */
 
-import { Worker, Queue, QueueScheduler } from 'bullmq';
+import { Worker, Queue } from 'bullmq';
 import { prisma } from '../lib/prisma';
 import { redisConnection } from '../lib/redis';
 
