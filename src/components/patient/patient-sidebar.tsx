@@ -39,18 +39,30 @@ export function PatientSidebar() {
 
   return (
     <>
-      {/* Бургер-кнопка — только на мобильных */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl
-          bg-white border border-slate-200 shadow-md
-          flex items-center justify-center text-slate-600
-          hover:bg-slate-50 hover:border-slate-300 active:scale-95 transition-all"
-        aria-label="Открыть меню"
+      {/* Мобильный хедер — бургер над контентом, не сбоку */}
+      <header
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-4
+          bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm"
       >
-        <MenuIcon className="w-6 h-6" />
-      </button>
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl flex items-center justify-center
+            text-slate-600 hover:bg-slate-100 active:scale-95 transition-all"
+          aria-label="Открыть меню"
+        >
+          <MenuIcon className="w-6 h-6" />
+        </button>
+        <Link href="/dashboard" className="flex-1 flex justify-center items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1565C0] to-[#0D47A1] flex items-center justify-center shrink-0">
+            <MedCrossIcon className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-sm font-bold text-[#1565C0] font-[family-name:var(--font-montserrat)]">
+            MemoMed
+          </span>
+        </Link>
+        <div className="w-10 shrink-0" aria-hidden />
+      </header>
 
       {/* Оверлей */}
       <div

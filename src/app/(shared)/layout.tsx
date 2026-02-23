@@ -29,8 +29,8 @@ export default async function SharedLayout({ children }: { children: React.React
       <OfflineIndicator />
       <SidebarByRole userRole={userRole} />
 
-      {/* Основной контент */}
-      <main className="flex-1 p-4 sm:p-6 pt-20 sm:pt-16 pl-16 sm:pl-14 lg:pt-8 lg:pl-8 lg:ml-60 lg:max-w-[calc(100vw-240px)]">
+      {/* Основной контент — pt для хедера на мобильных */}
+      <main className="flex-1 p-4 sm:p-6 pt-20 lg:pt-8 lg:pl-8 lg:ml-60 lg:max-w-[calc(100vw-240px)]">
         {children}
       </main>
     </div>

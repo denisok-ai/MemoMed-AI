@@ -21,8 +21,8 @@ export default async function DoctorLayout({ children }: { children: React.React
       <OfflineIndicator />
       <DoctorSidebar />
 
-      {/* Основной контент — pt/pl для бургера на мобильных, ml для sidebar на десктопе */}
-      <main className="flex-1 p-4 sm:p-6 pt-20 sm:pt-16 pl-16 sm:pl-14 lg:pt-8 lg:pl-8 lg:ml-60 lg:max-w-[calc(100vw-240px)]">
+      {/* Основной контент — pt для хедера на мобильных, ml для sidebar на десктопе */}
+      <main className="flex-1 p-4 sm:p-6 pt-20 lg:pt-8 lg:pl-8 lg:ml-60 lg:max-w-[calc(100vw-240px)]">
         {children}
       </main>
     </div>
