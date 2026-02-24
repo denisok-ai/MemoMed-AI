@@ -10,6 +10,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignOutButton } from '@/components/shared/sign-out-button';
+import { Logo } from '@/components/shared/logo';
 import {
   MenuIcon,
   XIcon,
@@ -48,14 +49,11 @@ export function DoctorSidebar() {
         >
           <MenuIcon className="w-6 h-6" />
         </button>
-        <Link href="/doctor/dashboard" className="flex-1 flex justify-center items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1565C0] to-[#0D47A1] flex items-center justify-center shrink-0">
-            <MedCrossIcon className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-sm font-bold text-[#1565C0] font-[family-name:var(--font-montserrat)]">
-            MemoMed
-          </span>
-        </Link>
+        <Logo
+          href="/doctor/dashboard"
+          variant="sidebar-compact"
+          className="flex-1 justify-center"
+        />
         <div className="w-10 shrink-0" aria-hidden />
       </header>
 
@@ -78,14 +76,7 @@ export function DoctorSidebar() {
       >
         {/* Логотип + кнопка закрытия */}
         <div className="flex items-center justify-between mb-6 lg:mb-8">
-          <Link href="/doctor/dashboard" className="flex items-center gap-2" onClick={closeSidebar}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1565C0] to-[#0D47A1] flex items-center justify-center shadow-md shrink-0">
-              <MedCrossIcon className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-base sm:text-lg lg:text-base font-bold text-[#1565C0] font-[family-name:var(--font-montserrat)] whitespace-nowrap">
-              MemoMed
-            </span>
-          </Link>
+          <Logo href="/doctor/dashboard" variant="sidebar" onClick={closeSidebar} />
           <button
             type="button"
             onClick={closeSidebar}

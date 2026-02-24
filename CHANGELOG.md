@@ -11,21 +11,63 @@
 
 ### Добавлено
 
-- PDF-отчёты для админа: блок на /admin/reports, колонка PDF в /admin/users для пациентов
-- Кнопка «Скачать PDF-отчёт» в шапке страницы /stats (пациент)
-- Блок PDF-отчётов во вкладке «Обзор» карточки пациента у врача (/doctor/patients/[id])
-- Пагинация «Показать ещё» в ленте событий (/feed) — курсорная загрузка старых событий
+- (пусто)
+
+### Изменено
+
+- (пусто)
+
+### Исправлено
+
+- (пусто)
+
+---
+
+## [0.3.0] — 2026-02-24
+
+### Добавлено
+
+- **Персонализация напоминаний (LLM)**: AI генерирует дружелюбный текст push-уведомлений (DeepSeek, temp 0.5, max 80 токенов, кэш Redis 7 дней)
+- Unit-тесты (268): utils, report.prompt, reminder.prompt, env, cache.service, medications.queries, log-actions, connections.actions, onboarding.actions, medications.actions, reminders.queue, admin.prompt.actions, auth.actions, push.send, admin.llm.actions, auth.config, dev-actions
+
+### Изменено
+
+- buildMedicationReminderPayload: опциональный параметр bodyOverride для персонализированного текста
+- reminder.job: вызов getPersonalizedReminderText перед отправкой push пациенту
+- vitest thresholds: 5% → 80% (lines, functions, statements), 60% (branches)
+- Coverage: исключены components, hooks, middleware, i18n
+
+### Исправлено
+
+- auth.test.ts: timeout 10s для bcrypt.compare (неправильный пароль)
+- llm.actions: apiKey/notes formData.get() → ?? undefined (Zod optional не принимает null)
+
+---
+
+## [0.2.0] — 2026-02-24
+
+### Добавлено
+
+- E2E-тесты: relative-flow.spec.ts (родственник: лента → connect → профиль пациента), journal-flow.spec.ts (пациент: дневник → форма записи)
+- Unit-тесты: token-budget (checkTokenBudget, getUsedTokens, consumeTokens), sync.service (syncPendingLogs успех, ошибка 500)
+- Компонент Logo (MemoMedAI) с градиентным выделением AI в стиле MedTech (teal→cyan)
+- Integration-тесты API: /api/health, /api/medications, /api/logs, /api/logs/sync, /api/feed/events (с моками auth, prisma, redis)
+- Документация REST API: docs/api.md (эндпоинты, роли, примеры запросов/ответов)
+- Unit-тесты: utils, rate-limit
+- PDF-отчёты для админа: блок на /admin/reports, колонка PDF в /admin/users
+- Пагинация «Показать ещё» в ленте событий (/feed)
 - Вариант `compact` для кнопки DownloadReportButton
 
 ### Изменено
 
-- Унификация цветов: gray → slate (slate-500, slate-400, #64748b) во всех компонентах
-- PDF-отчёты: цветовая схема приведена к slate (#0D1B2A, #475569, #94a3b8)
+- Логотип MemoMedAI: единый компонент Logo на всех страницах, AI выделен градиентом
+- Унификация цветов: gray → slate
+- PDF-отчёты: цветовая схема slate
 - Admin: API /api/reports/:patientId разрешает доступ для роли admin
 
 ### Исправлено
 
-- JSX: обёртка в div для пагинации на странице /medications (исправление ошибки парсинга)
+- push.service.test.ts, schedule-utils, api-health.test.ts, api-logs (UUID v4), vitest thresholds
 
 ---
 
@@ -49,5 +91,7 @@
 
 ---
 
-[Unreleased]: https://github.com/denisok-ai/MemoMed-AI/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/denisok-ai/MemoMed-AI/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/denisok-ai/MemoMed-AI/releases/tag/v0.3.0
+[0.2.0]: https://github.com/denisok-ai/MemoMed-AI/releases/tag/v0.2.0
 [0.1.0]: https://github.com/denisok-ai/MemoMed-AI/releases/tag/v0.1.0

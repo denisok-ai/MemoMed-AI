@@ -79,13 +79,13 @@
 
 ### Auth и общие
 
-| Страница    | Путь          | Статус                       |
-| ----------- | ------------- | ---------------------------- |
-| Лендинг     | `/`           | ✅ SVG-иконки                |
-| Вход        | `/login`      | —                            |
-| Регистрация | `/register`   | —                            |
-| Онбординг   | `/onboarding` | —                            |
-| Privacy     | `/privacy`    | ✅ LockIcon, med-card, slate |
+| Страница    | Путь          | Статус                                                                 |
+| ----------- | ------------- | ---------------------------------------------------------------------- |
+| Лендинг     | `/`           | ✅ SVG-иконки                                                          |
+| Вход        | `/login`      | ✅ bg #F0F4F8, med-card, SVG (PillIcon, HeartPulseIcon, ClipboardIcon) |
+| Регистрация | `/register`   | ✅ bg #F0F4F8, med-card, LockIcon                                      |
+| Онбординг   | `/onboarding` | ✅ SVG (HeartPulseIcon, PillIcon, CheckIcon, UsersIcon), градиенты     |
+| Privacy     | `/privacy`    | ✅ LockIcon, med-card, slate                                           |
 
 ---
 

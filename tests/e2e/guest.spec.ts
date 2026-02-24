@@ -15,7 +15,9 @@ test.describe('Публичные страницы', () => {
   test('страница входа загружается', async ({ page }) => {
     await page.goto('/login');
     await expect(page).toHaveTitle(/Вход|Login/);
-    await expect(page.getByRole('heading', { name: /вход|login/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Добро пожаловать|Welcome|Войдите/i })
+    ).toBeVisible();
   });
 
   test('страница регистрации загружается', async ({ page }) => {

@@ -33,7 +33,7 @@ test.describe('Критический путь пациента', () => {
       return;
     }
     await expect(page).toHaveURL(/\/(dashboard|onboarding)/);
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByText('Быстрый доступ').first()).toBeVisible();
   });
 
   test('дашборд → список лекарств', async ({ page }) => {
@@ -42,7 +42,10 @@ test.describe('Критический путь пациента', () => {
       test.skip(true, 'dev-login недоступен');
       return;
     }
-    await page.getByRole('link', { name: /Лекарства/i }).click();
+    await page
+      .getByRole('link', { name: /Лекарства/i })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/medications/);
   });
 
@@ -52,7 +55,10 @@ test.describe('Критический путь пациента', () => {
       test.skip(true, 'dev-login недоступен');
       return;
     }
-    await page.getByRole('link', { name: /Лекарства/i }).click();
+    await page
+      .getByRole('link', { name: /Лекарства/i })
+      .first()
+      .click();
     await page.waitForURL(/\/medications/);
     await page
       .getByRole('link', { name: /Добавить/ })

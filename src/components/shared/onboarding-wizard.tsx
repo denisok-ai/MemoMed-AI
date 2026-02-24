@@ -20,7 +20,7 @@ interface OnboardingStep {
 const steps: OnboardingStep[] = [
   {
     Icon: HeartPulseIcon,
-    title: 'Добро пожаловать в MemoMed!',
+    title: 'Добро пожаловать в MemoMedAI!',
     description:
       'Мы поможем вам не забывать принимать лекарства вовремя. Всё просто и понятно — разберётесь за минуту!',
     gradient: 'from-[#1565C0] to-[#1976D2]',

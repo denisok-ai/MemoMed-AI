@@ -14,6 +14,7 @@
   --color-brand:          #1976D2;
   --color-teal:           #00838F;
   --color-teal-light:     #E0F7FA;
+  --color-ai-accent:      #00ACC1;
 
   --color-success:        #2E7D32;
   --color-success-light:  #E8F5E9;
@@ -487,6 +488,41 @@ a,
 .admin-sidebar-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOGO — MemoMedAI (AI с градиентом MedTech)
+   Teal→Cyan для инновационности и технологичности
+═══════════════════════════════════════════════════════════════ */
+
+.logo-ai-gradient {
+  background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-ai-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-ai-gradient-landing {
+  background: linear-gradient(135deg, #4DD0E1 0%, #80DEEA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.logo-ai-gradient-footer {
+  background: linear-gradient(135deg, #4DD0E1 0%, #80DEEA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Auth (login) — на тёмном синем фоне */
+.logo-ai-gradient-auth-dark {
+  background: linear-gradient(135deg, #4DD0E1 0%, #80DEEA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ═══════════════════════════════════════════════════════════════

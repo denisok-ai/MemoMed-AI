@@ -4,7 +4,14 @@
  * @created 2026-02-22
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('@/lib/db/prisma', () => ({
+  prisma: {
+    pushSubscription: { findMany: vi.fn(), deleteMany: vi.fn() },
+  },
+}));
+
 import { buildMedicationReminderPayload } from '@/lib/push/push.service';
 
 describe('buildMedicationReminderPayload', () => {
@@ -39,5 +46,17 @@ describe('buildMedicationReminderPayload', () => {
     const actions = payload.actions ?? [];
     expect(actions.some((a) => a.action === 'taken')).toBe(true);
     expect(actions.some((a) => a.action === 'snooze')).toBe(true);
+  });
+
+  it('использует bodyOverride при передаче персонализированного текста', () => {
+    const payload = buildMedicationReminderPayload(
+      'Метформин',
+      '500 мг',
+      '08:00',
+      0,
+      'Доброе утро! Пора принять лекарство.'
+    );
+    expect(payload.body).toBe('Доброе утро! Пора принять лекарство.');
+    expect(payload.title).toBe('Время принять Метформин');
   });
 });

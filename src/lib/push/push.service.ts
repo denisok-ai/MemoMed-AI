@@ -90,20 +90,23 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
 }
 
 /**
- * Формирует текст уведомления о лекарстве
+ * Формирует текст уведомления о лекарстве.
+ * bodyOverride — персонализированный текст от AI (если передан).
  */
 export function buildMedicationReminderPayload(
   medicationName: string,
   dosage: string,
   scheduledTime: string,
-  delayMinutes = 0
+  delayMinutes = 0,
+  bodyOverride?: string
 ): PushPayload {
   const timeStr = delayMinutes === 0 ? `в ${scheduledTime}` : `${delayMinutes} минут назад`;
+  const defaultBody = `${dosage} — запланировано ${timeStr}`;
 
   return {
     title:
       delayMinutes === 0 ? `Время принять ${medicationName}` : `Не забыли про ${medicationName}?`,
-    body: `${dosage} — запланировано ${timeStr}`,
+    body: bodyOverride ?? defaultBody,
     tag: `reminder-${medicationName}`,
     data: { url: '/dashboard' },
     actions: [

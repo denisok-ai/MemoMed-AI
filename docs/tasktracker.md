@@ -7,7 +7,7 @@
 
 # MemoMed AI -- Трекер задач
 
-> Последнее обновление: 2026-02-22 (раздел «Блокеры», E2E добавление/приём)
+> Последнее обновление: 2026-02-24 (v0.3.0: персонализация напоминаний, coverage 80%, 268 тестов)
 
 **Статусы**: Не начата | В процессе | Завершена | Отложена | Отменена
 **Приоритеты**: Критический | Высокий | Средний | Низкий
@@ -501,10 +501,11 @@
 | **Переделка всех страниц в стиле /admin**                 | Высокий   | ✅ Завершена. gray→slate, med-card. План: [plan-redesign-admin-style-2026-02-22.md](plan-redesign-admin-style-2026-02-22.md)                                                                                                                                          |
 | **PDF-отчёты для админа**                                 | Средний   | ✅ API разрешает admin; блок на /admin/reports; колонка PDF в /admin/users для пациентов                                                                                                                                                                              |
 | **Пагинация на страницах с большим количеством объектов** | Средний   | ✅ Добавлена: admin/prompts (10/стр), admin/llm (10/стр), patient/medications (12/стр), patient/feedback (10/стр), relative/connect (10/стр + фильтр по статусу), feed «Показать ещё» (курсорная пагинация). Admin users, medications, connections, audit — уже были. |
-| Integration-тесты API                                     | Низкий    | Расширить: /api/health (с моками), /api/medications                                                                                                                                                                                                                   |
-| Покрытие 80%+                                             | Низкий    | `npm run test:coverage` — проверить и закрыть пробелы                                                                                                                                                                                                                 |
-| OpenAPI/Swagger                                           | Низкий    | Документация API в docs/                                                                                                                                                                                                                                              |
-| CHANGELOG.md                                              | Низкий    | История изменений по версиям                                                                                                                                                                                                                                          |
+| Integration-тесты API                                     | Низкий    | ✅ /api/health, /api/medications, /api/logs, /api/logs/sync, /api/feed/events (с моками)                                                                                                                                                                              |
+| Покрытие 80%+                                             | Низкий    | ✅ Завершена. Coverage lib: ~81% lines. Пороги 80%. Добавлены: admin.llm.actions, auth.config, dev-actions. Исправлен llm.actions: apiKey/notes null→undefined для Zod.                                                                                               |
+| OpenAPI/Swagger                                           | Низкий    | ✅ docs/api.md — REST API документация (эндпоинты, роли, примеры)                                                                                                                                                                                                     |
+| CHANGELOG.md                                              | Низкий    | ✅ История изменений по версиям (Keep a Changelog, [Unreleased] + [0.1.0])                                                                                                                                                                                            |
+| **Персонализация напоминаний (LLM)**                      | Средний   | ✅ reminder.prompt.ts, кэш Redis 7д, интеграция в reminder.job (project.md 4.3 #7)                                                                                                                                                                                    |
 
 ---
 
@@ -516,5 +517,6 @@
 - [Версионирование](versioning.md)
 - [Аудит кода и дизайна 2026-02-22](audit-2026-02-22.md)
 - [Описание проекта](project.md)
+- [REST API](api.md)
 - [Дневник разработки](diary.md)
 - [Вопросы по архитектуре](qa.md)

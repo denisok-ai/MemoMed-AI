@@ -8,7 +8,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { RegisterForm } from '@/components/shared/register-form';
-import { MedCrossIcon, LockIcon } from '@/components/shared/nav-icons';
+import { Logo } from '@/components/shared/logo';
+import { LockIcon } from '@/components/shared/nav-icons';
 
 export const metadata: Metadata = {
   title: 'Регистрация — MemoMed AI',
@@ -22,22 +23,9 @@ export default function RegisterPage() {
     >
       <div className="w-full max-w-md space-y-6">
         {/* Логотип */}
-        <div className="flex items-center justify-center gap-3">
-          <div
-            className="w-12 h-12 rounded-2xl bg-[#1565C0] flex items-center
-            justify-center shadow-md"
-          >
-            <MedCrossIcon className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <p
-              className="font-black text-2xl text-[#0D1B2A] tracking-tight
-              font-[family-name:var(--font-montserrat)]"
-            >
-              MemoMed<span className="text-[#1565C0]"> AI</span>
-            </p>
-            <p className="text-slate-500 text-sm">Создайте аккаунт</p>
-          </div>
+        <div className="flex flex-col items-center justify-center gap-1">
+          <Logo variant="auth" showIcon />
+          <p className="text-slate-500 text-sm">Создайте аккаунт</p>
         </div>
 
         {/* Форма */}

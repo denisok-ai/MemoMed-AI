@@ -13,8 +13,8 @@ export type ReminderDelay = (typeof REMINDER_DELAYS)[number];
  */
 export function computeNextScheduledAt(scheduledTime: string, now: Date = new Date()): Date {
   const [hours, minutes] = scheduledTime.split(':').map(Number);
-  const h = hours ?? 0;
-  const m = minutes ?? 0;
+  const h = Number.isFinite(hours) ? hours : 0;
+  const m = Number.isFinite(minutes) ? minutes : 0;
   const scheduledAt = new Date(now);
   scheduledAt.setHours(h, m, 0, 0);
   if (scheduledAt <= now) {

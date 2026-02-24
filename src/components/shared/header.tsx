@@ -9,7 +9,8 @@
 import Link from 'next/link';
 import { SignOutButton } from './sign-out-button';
 import { LanguageSwitcher } from './language-switcher';
-import { MedCrossIcon, UserIcon, SettingsIcon } from './nav-icons';
+import { Logo } from './logo';
+import { UserIcon, SettingsIcon } from './nav-icons';
 import { getLocale } from 'next-intl/server';
 
 interface HeaderProps {
@@ -55,25 +56,7 @@ export async function Header({ userRole, userName }: HeaderProps) {
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
       <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         {/* Логотип */}
-        <Link
-          href={config.href}
-          className="flex items-center gap-2.5 flex-shrink-0 group"
-          aria-label="MemoMed AI — на главную"
-        >
-          <div
-            className="w-9 h-9 rounded-xl bg-[#1565C0] flex items-center justify-center
-            shadow-sm group-hover:bg-[#0D47A1] transition-colors flex-shrink-0"
-          >
-            <MedCrossIcon className="w-5 h-5 text-white" />
-          </div>
-          <span
-            className="font-bold text-[#0D1B2A] text-lg tracking-tight
-            font-[family-name:var(--font-montserrat)] hidden sm:block"
-          >
-            MemoMed
-            <span className="text-[#1565C0] font-black"> AI</span>
-          </span>
-        </Link>
+        <Logo href={config.href} variant="header" hideTextBelow="sm" />
 
         {/* Центр: бейдж роли */}
         {userRole !== 'patient' && (

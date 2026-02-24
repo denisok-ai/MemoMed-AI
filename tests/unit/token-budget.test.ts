@@ -20,7 +20,13 @@ vi.mock('@/lib/db/redis', () => ({
   },
 }));
 
-import { getRemainingTokens, isTokenBudgetExceeded } from '@/lib/ai/token-budget';
+import {
+  getRemainingTokens,
+  isTokenBudgetExceeded,
+  checkTokenBudget,
+  getUsedTokens,
+  consumeTokens,
+} from '@/lib/ai/token-budget';
 import { redis } from '@/lib/db/redis';
 
 describe('Token Budget', () => {
@@ -56,5 +62,46 @@ describe('Token Budget', () => {
     vi.mocked(redis.get).mockResolvedValue('10000');
     const exceeded = await isTokenBudgetExceeded('user-123');
     expect(exceeded).toBe(false);
+  });
+
+  it('checkTokenBudget returns remaining and exceeded', async () => {
+    vi.mocked(redis.get).mockResolvedValue('30000');
+    const result = await checkTokenBudget('user-123');
+    expect(result).toEqual({ remaining: 20_000, exceeded: false });
+  });
+
+  it('checkTokenBudget returns exceeded when 0 remaining', async () => {
+    vi.mocked(redis.get).mockResolvedValue('50000');
+    const result = await checkTokenBudget('user-123');
+    expect(result).toEqual({ remaining: 0, exceeded: true });
+  });
+
+  it('getUsedTokens returns 0 when no usage', async () => {
+    vi.mocked(redis.get).mockResolvedValue(null);
+    const used = await getUsedTokens('user-123');
+    expect(used).toBe(0);
+  });
+
+  it('getUsedTokens returns parsed value', async () => {
+    vi.mocked(redis.get).mockResolvedValue('25000');
+    const used = await getUsedTokens('user-123');
+    expect(used).toBe(25_000);
+  });
+
+  it('consumeTokens increments counter via pipeline', async () => {
+    const mockExec = vi.fn().mockResolvedValue(null);
+    const mockExpire = vi.fn().mockReturnThis();
+    const mockIncrby = vi.fn().mockReturnThis();
+    vi.mocked(redis.pipeline).mockReturnValue({
+      incrby: mockIncrby,
+      expire: mockExpire,
+      exec: mockExec,
+    } as unknown as ReturnType<typeof redis.pipeline>);
+
+    await consumeTokens('user-123', 1000);
+
+    expect(mockIncrby).toHaveBeenCalled();
+    expect(mockExpire).toHaveBeenCalled();
+    expect(mockExec).toHaveBeenCalled();
   });
 });

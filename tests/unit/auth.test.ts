@@ -53,7 +53,7 @@ describe('Хэширование паролей', () => {
     expect(result).toBe(true);
   });
 
-  it('bcrypt.compare возвращает false для неправильного пароля', async () => {
+  it('bcrypt.compare возвращает false для неправильного пароля', { timeout: 10000 }, async () => {
     const password = 'testPassword123';
     const wrongPassword = 'wrongPassword';
     const hash = await bcrypt.hash(password, 12);

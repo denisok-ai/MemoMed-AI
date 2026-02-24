@@ -36,10 +36,10 @@ export async function createLlmProviderAction(formData: FormData) {
     name: formData.get('name'),
     baseUrl: formData.get('baseUrl'),
     model: formData.get('model'),
-    apiKey: formData.get('apiKey'),
+    apiKey: formData.get('apiKey') ?? undefined,
     temperature: formData.get('temperature'),
     maxTokens: formData.get('maxTokens'),
-    notes: formData.get('notes'),
+    notes: formData.get('notes') ?? undefined,
   });
 
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
@@ -62,10 +62,10 @@ export async function updateLlmProviderAction(id: string, formData: FormData) {
     name: formData.get('name'),
     baseUrl: formData.get('baseUrl'),
     model: formData.get('model'),
-    apiKey: formData.get('apiKey'),
+    apiKey: formData.get('apiKey') ?? undefined,
     temperature: formData.get('temperature'),
     maxTokens: formData.get('maxTokens'),
-    notes: formData.get('notes'),
+    notes: formData.get('notes') ?? undefined,
   });
 
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };

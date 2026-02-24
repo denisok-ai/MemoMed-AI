@@ -113,6 +113,7 @@ npm run run:standalone
 - [Версионирование](docs/versioning.md)
 - [Руководство по участию](CONTRIBUTING.md)
 - [Описание проекта](docs/project.md)
+- [REST API](docs/api.md)
 - [Трекер задач](docs/tasktracker.md)
 - [Установка на чистый сервер](docs/server-setup.md)
 - [Перенос сборки на внешний сервер](docs/deploy-to-server.md)

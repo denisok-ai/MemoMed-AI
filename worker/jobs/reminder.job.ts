@@ -10,6 +10,7 @@ import { Worker, type Job } from 'bullmq';
 import { prisma } from '../lib/prisma';
 import { redisConnection } from '../lib/redis';
 import { sendPushToUser, buildMedicationReminderPayload } from '../../src/lib/push/push.service';
+import { getPersonalizedReminderText } from '../../src/lib/ai/reminder.prompt';
 import { REMINDER_QUEUE, type ReminderJobData } from '../../src/lib/reminders/queue';
 
 export { scheduleReminders, cancelReminders } from '../../src/lib/reminders/queue';
@@ -46,11 +47,30 @@ export const reminderWorker = new Worker<ReminderJobData>(
       return { skipped: true, reason: 'already_taken' };
     }
 
+    const patient = await prisma.profile.findUnique({
+      where: { userId: patientId },
+      select: { fullName: true },
+    });
+
     // T+0, T+10, T+20 — уведомление пациенту
     if (delayMinutes < 30) {
+      const personalizedBody = await getPersonalizedReminderText({
+        medicationName,
+        dosage,
+        scheduledTime,
+        delayMinutes,
+        patientName: patient?.fullName ?? undefined,
+      }).catch(() => null);
+
       await sendPushToUser(
         patientId,
-        buildMedicationReminderPayload(medicationName, dosage, scheduledTime, delayMinutes)
+        buildMedicationReminderPayload(
+          medicationName,
+          dosage,
+          scheduledTime,
+          delayMinutes,
+          personalizedBody ?? undefined
+        )
       );
     }
 
@@ -59,11 +79,6 @@ export const reminderWorker = new Worker<ReminderJobData>(
       const connections = await prisma.connection.findMany({
         where: { patientId, status: 'active' },
         select: { relativeId: true },
-      });
-
-      const patient = await prisma.profile.findUnique({
-        where: { userId: patientId },
-        select: { fullName: true },
       });
 
       for (const conn of connections) {

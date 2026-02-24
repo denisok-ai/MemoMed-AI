@@ -7,6 +7,7 @@
  */
 
 import Link from 'next/link';
+import { Logo } from '@/components/shared/logo';
 import {
   MedCrossIcon,
   PillIcon,
@@ -113,32 +114,14 @@ export default function LandingPage() {
 
         {/* Content */}
         <div className="relative z-10 max-w-4xl w-full text-center space-y-8">
-          {/* Logo */}
-          <div
-            className="flex items-center justify-center gap-4 landing-reveal"
-            style={{ animationDelay: '0ms' }}
-          >
-            <div
-              className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md
-              flex items-center justify-center border border-white/20
-              shadow-2xl shadow-black/10"
-            >
-              <MedCrossIcon className="w-9 h-9 text-white" />
-            </div>
-          </div>
-
-          {/* Headline */}
+          {/* Logo + Headline */}
           <div className="space-y-4">
-            <h1 className="landing-reveal" style={{ animationDelay: '100ms' }}>
-              <span
-                className="block text-5xl md:text-7xl font-black text-white
-                tracking-tight leading-[1.1]
-                font-[family-name:var(--font-montserrat)]
-                drop-shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
-              >
-                MemoMed AI
-              </span>
-            </h1>
+            <div
+              className="flex flex-col items-center justify-center gap-4 landing-reveal"
+              style={{ animationDelay: '0ms' }}
+            >
+              <Logo variant="landing" showIcon />
+            </div>
             <p
               className="text-xl md:text-2xl text-white/80 font-medium max-w-2xl mx-auto
               leading-relaxed landing-reveal"
@@ -342,7 +325,7 @@ export default function LandingPage() {
               Кому подходит
             </p>
             <h2 className="text-3xl md:text-4xl font-black text-[#0D1B2A]">
-              MemoMed AI для каждого
+              MemoMed<span className="font-black logo-ai-gradient">AI</span> для каждого
             </h2>
           </div>
 
@@ -453,12 +436,9 @@ export default function LandingPage() {
 
       {/* ═══════════ FOOTER ═══════════ */}
       <footer className="py-8 px-6 bg-[#0A1628] text-center space-y-3">
-        <div className="flex items-center justify-center gap-2">
-          <MedCrossIcon className="w-5 h-5 text-blue-400" />
-          <span className="text-white/80 font-bold text-sm">MemoMed AI</span>
-        </div>
+        <Logo variant="footer" className="justify-center" />
         <p className="text-white/30 text-xs">
-          Соответствует GDPR и 152-ФЗ · MemoMed AI не заменяет консультацию врача
+          Соответствует GDPR и 152-ФЗ · MemoMedAI не заменяет консультацию врача
         </p>
       </footer>
     </main>

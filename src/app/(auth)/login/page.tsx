@@ -9,6 +9,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LoginForm } from '@/components/shared/login-form';
+import { Logo } from '@/components/shared/logo';
 import {
   MedCrossIcon,
   HeartPulseIcon,
@@ -40,19 +41,9 @@ export default function LoginPage() {
         />
 
         {/* Логотип */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
-            <MedCrossIcon className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <p
-              className="font-black text-2xl text-white tracking-tight
-              font-[family-name:var(--font-montserrat)]"
-            >
-              MemoMed AI
-            </p>
-            <p className="text-blue-200 text-sm font-medium">Контроль приёма лекарств</p>
-          </div>
+        <div className="relative z-10">
+          <Logo variant="auth-dark" showIcon />
+          <p className="text-blue-200 text-sm font-medium mt-1">Контроль приёма лекарств</p>
         </div>
 
         {/* Преимущества */}
@@ -81,16 +72,8 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-12 bg-[#F0F4F8]">
         <div className="w-full max-w-md space-y-8">
           {/* Мобильный логотип */}
-          <div className="lg:hidden flex items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#1565C0] flex items-center justify-center shadow-md">
-              <MedCrossIcon className="w-7 h-7 text-white" />
-            </div>
-            <p
-              className="font-black text-2xl text-[#0D1B2A] tracking-tight
-              font-[family-name:var(--font-montserrat)]"
-            >
-              MemoMed<span className="text-[#1565C0]"> AI</span>
-            </p>
+          <div className="lg:hidden flex justify-center">
+            <Logo variant="auth" showIcon />
           </div>
 
           {/* Заголовок */}
